@@ -96,10 +96,36 @@ if [ ! "$UID" = "0" ]; then
   exit 1;
 fi
 
+#howto call mounting <"device"> <"mountpoint">
+#mount or use directory
+#mounting()
+#{
+#  local device="$1"
+#  local mountpoint="$2"
+#  if [ ! -d ${device} ];then
+#    if mountpoint "${device}" &> /dev/null; then
+#      echo "Debug: ${device} is already mounted."
+#      return 
+#    else
+#      if ! mount "${clonetargetdevice}" "${mountpoint}"; then
+#        # error message by mount itself
+#        echo "Hint: have you restarted the kernel after last update?"
+#        exit 1
+#      fi
+#    fi
+#  fi
+#}
 
 #check if directory is mounted
 ##don't run this when the process is a subprocess beyond syncdir
 if [ "$choosemode" != "---special-mode---" ]; then
+#template for new version
+#  if [ -d "${syncdir}"/src ]; then
+#    if [ "$(grub-probe -t device -d ${clonesource})" != "$(grub-probe -t device "${syncdir}")" ] && [ "$(grub-probe -t fs_uuid -d ${clonetargetdevice})" != "$(grub-probe -t fs_uuid "${syncdir}")" ]; then
+#        echo "error: mounted device is not target device"
+#        exit 1;
+#    fi
+
   if [ -d "${syncdir}" ]; then
     if mountpoint "${syncdir}" &> /dev/null; then
       echo "Debug: ${syncdir} is already mounted."
@@ -200,22 +226,23 @@ do
     fi
     
     if [ "$answer_useracc" = "c" ]; then
-      echo "Delete superfluous user entries on target system? Type yes (not the default)"
-      echo "Please consider this question. I haven't tested the algorithm extensively"
-      read question_delete
-      if [ "$question_delete" = "yes" ]; then
-        #experimental
-        sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/passwd
-        sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/passwd-
-        sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/group
-        sed -i -e "s/\b${usertemp}\b//g" "${syncdir}"/etc/group
-        sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/group-
-        sed -i -e "s/\b${usertemp}\b//g" "${syncdir}"/etc/group-
-        sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/gshadow
-        sed -i -e "s/\b${usertemp}\b//g" "${syncdir}"/etc/gshadow
-        sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/gshadow-
-        sed -i -e "s/\b${usertemp}\b//g" "${syncdir}"/etc/gshadow-
-        echo "remove finished"
+      if [ ! -d "${syncdir}"/home/"$usertemp" ];then
+        echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type yes (not the default)"
+        read question_delete
+        if [ "$question_delete" = "yes" ]; then
+          #still experimental
+          sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/passwd
+          sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/passwd-
+          sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/group
+          sed -i -e "s/\b${usertemp}\b//g" "${syncdir}"/etc/group
+          sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/group-
+          sed -i -e "s/\b${usertemp}\b//g" "${syncdir}"/etc/group-
+          sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/gshadow
+          sed -i -e "s/\b${usertemp}\b//g" "${syncdir}"/etc/gshadow
+          sed -i -e "/^${usertemp}/d" "${syncdir}"/etc/gshadow-
+          sed -i -e "s/\b${usertemp}\b//g" "${syncdir}"/etc/gshadow-
+          echo "remove finished"
+        fi
       fi
       break
     fi
@@ -237,7 +264,7 @@ installer(){
   if [ -e "${syncdir}"/boot/grub/device.map ];then
     sed -i -e "s/\((hd0)\)/# \1/" "${syncdir}"/boot/grub/device.map
   fi
-  echo "(hd0) $(grub-probe -t device -d "${clonetargetdevice}" | sed -e "s|[0-9]*$||") #--special-clone-me--" >> "${syncdir}"/boot/grub/device.map
+  echo "(hd0) $(grub-probe -t device -d "${clonetargetdevice}" | sed -e "s|[0-9]*$||") #--specialclone-me--" >> "${syncdir}"/boot/grub/device.map
   sed -i -e "s/.\+\( \/ .\+\)/UUID=$(grub-probe -t fs_uuid -d ${clonetargetdevice})\1/" "${syncdir}"/etc/fstab
   echo "root in fstab updated"
   echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
@@ -256,7 +283,7 @@ installer(){
 
   chroot "${syncdir}" $0 "---special-mode---" "${clonetargetdevice}"
 
-  sed -i -e "/#--special-clone-me--/d" "${syncdir}"/boot/grub/device.map
+  sed -i -e "/#--specialclone-me--/d" "${syncdir}"/boot/grub/device.map
   #sed -i -e "s/# (hd0)/(hd0)/" "${syncdir}"/boot/grub/device.map
   echo "if you want to use device.map please type \"yes\" and edit it now"
   read shall_devicemap
