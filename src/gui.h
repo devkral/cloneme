@@ -57,12 +57,13 @@ private:
 	GtkWidget* vteterm;
 	Glib::RefPtr<Gtk::Alignment> terminal;
 	void update();
+	void install();
 	//copyuser copydialog;
 	//createuser createdialog;
 	//void *execparted();
 	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> main_win;
-	Glib::RefPtr<Gtk::Button> gparted,cloneme;
+	Glib::RefPtr<Gtk::Button> gparted,installb,updateb;
 	Glib::RefPtr<Gtk::Entry> src, dest;
 	srcdest srcdestobject;
 	Glib::RefPtr<Gtk::FileChooserButton> srcb, destb;

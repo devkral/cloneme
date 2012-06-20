@@ -1,2 +1,5 @@
 this bash script can clone the whole system it's running on
 be careful: alpha quality
+
+
+cloneme commandline version is in src/sh

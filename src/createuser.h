@@ -26,7 +26,7 @@
 class createuser
 {
 public:
-	createuser(std::string src, std::string dest);
+	createuser(int argc, char* argv[]);
 	
 protected:
 
@@ -35,4 +35,3 @@ private:
 };
 
 #endif // _CREATEUSER_H_
-

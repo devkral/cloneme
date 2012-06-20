@@ -26,7 +26,7 @@ class gui;
 class copyuser
 {
 public:
-	copyuser(std::string src, std::string dest);
+	copyuser(int argc, char* argv[]);
 
 protected:
 

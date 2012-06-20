@@ -257,13 +257,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 shdir = \""$(pkgdatadir)"\"/sh
-sh_SCRIPTS = mounting.sh \
-	unmounting.sh \
-	update.sh \
-	install_bootloader.sh \
-	install_clean.sh \
-	install_rsync.sh
-
+sh_SCRIPTS = cloneme.sh
 all: all-am
 
 .SUFFIXES:

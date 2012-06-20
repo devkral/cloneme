@@ -19,8 +19,15 @@
 
 #include "createuser.h"
 #include <string>
+#include <unistd.h>
+#include <getopt.h>
 
-createuser::createuser(std::string src, std::string dest)
+static struct option longopts[] = {
+        { "src", required_argument, 0, 0 },
+        { "dest", required_argument, 0, 0 }
+};
+
+createuser::createuser(int argc, char* argv[])
 {
 
 }

@@ -18,9 +18,15 @@
  */
 
 #include "copyuser.h"
+#include <getopt.h>
+
+static struct option longopts[] = {
+        { "src", required_argument, 0, 0 },
+        { "dest", required_argument, 0, 0 }
+};
 
 
-copyuser::copyuser(std::string src, std::string dest)
+copyuser::copyuser(int argc, char* argv[])
 {
 	
 }

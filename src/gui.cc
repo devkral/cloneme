@@ -76,35 +76,19 @@ void gui::opengparted()
 	}
 }
 
-srcdest execmounting(std::string src, std::string dest)
-{
-	srcdest temp;
-	temp.src=system2(PACKAGE_DATA_DIR"/sh/mounting.sh "+src);
-	temp.dest=system2(PACKAGE_DATA_DIR"/sh/mounting.sh "+dest);
-	return temp;
-}
-
-void execunmounting(srcdest umountobject)
-{
-	system2(PACKAGE_DATA_DIR"/sh/unmounting.sh "+umountobject.src+" "+umountobject.dest);
-}
-
-void execupdate(srcdest temp)
-{
-	execmounting(temp.src,temp.dest);
-	std::string sum=PACKAGE_DATA_DIR;
-	sum+="/sh/update.sh "+temp.src+" "+temp.dest;
-	system(sum.c_str());
-}
-
 void gui::update()
 {
-	srcdest updatepaths=execmounting(src->get_text(),dest->get_text());
-	execupdate(updatepaths);
-	//copydialog.run();
-	execunmounting(updatepaths);
+	std::string sum=PACKAGE_DATA_DIR;
+	sum+="/sh/cloneme.sh update "+src->get_text()+" "+dest->get_text()+"\n";
+	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
+void gui::install()
+{
+	std::string sum=PACKAGE_DATA_DIR;
+	sum+="/sh/cloneme.sh install "+src->get_text()+" "+dest->get_text()+"\n";
+	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+}
 
 
 gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this),createdialog(this)
@@ -166,7 +150,7 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	terminal=transform_to_rptr<Gtk::Alignment>(builder->get_object("termspace"));
 	vteterm=vte_terminal_new();
 	terminal->add(*Glib::wrap(vteterm));
-	char* startterm[2]={(char*)"/bin/sh",0};
+	char* startterm[2]={vte_get_user_shell (),0};
 	
 	bool test=vte_terminal_fork_command_full(VTE_TERMINAL(vteterm),
 			                           VTE_PTY_DEFAULT,
@@ -186,12 +170,17 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	//Buttons
 	gparted=transform_to_rptr<Gtk::Button>(builder->get_object("gparted"));
 	gparted->signal_clicked ().connect(sigc::mem_fun(*this,&gui::opengparted));
+	installb=transform_to_rptr<Gtk::Button>(builder->get_object("installb"));
+	installb->signal_clicked ().connect(sigc::mem_fun(*this,&gui::install));
+	updateb=transform_to_rptr<Gtk::Button>(builder->get_object("updateb"));
+	updateb->signal_clicked ().connect(sigc::mem_fun(*this,&gui::update));
 	
 	//Filechooser
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
 	src->set_text("/");
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
 	dest->set_text("/syncdir");
+
 	
 	main_win->show_all_children();
 	if (main_win!=0)

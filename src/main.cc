@@ -21,7 +21,11 @@
 
 //#include "config.h"
 #include "gui.h"
-#include <unistd.h>
+#include "copyuser.h"
+#include "createuser.h"
+
+#include <getopt.h>
+//#include <unistd.h>
 #include <gtkmm.h>
 #include <cstdlib>
 #include <string>
@@ -45,17 +49,54 @@ bool comparechar(char *r1, char *r2)
 
 }
 
-int
-main (int argc, char *argv[])
+// options descriptor 
+static struct option longopts[] = {
+        { "copyuser", no_argument, 0, 'c' },
+        { "create", no_argument, 0, 'n' },
+        { "install_bootloader",  no_argument, 0, 'i' },
+        { "edit", no_argument, 0, 'e' }
+};
+
+void startgui(int argc, char* argv[])
 {
-	//std::cout << getuid();
-	if (getuid()==0 || comparechar(argv[1],(char*)"test"))
+	if (getuid()==0)
+	{
 		gui(argc,argv);
-	if (getuid()!=0 && comparechar(argv[1],(char*)"test")==false)
+	}
+	if (getuid()!=0)
 	{
 		std::string summary="gksu -k ";
 		summary+=argv[0];
 		system(summary.c_str());
 	}
+}
+
+
+int
+main (int argc, char *argv[])
+{
+	//std::cout << getuid();
+	
+	int ch;
+
+	if (ch = getopt_long(argc, argv, ":", longopts, NULL) != -1)
+	{
+		switch(ch)
+		{
+			case 1: copyuser(argc,argv);
+				break;
+			case 2: createuser(argc,argv);
+				break;
+			case 3: //not ready
+				break;
+			case 4: //not ready
+				break;
+			default: startgui(argc,argv);
+				break;
+		};
+	}
+	else
+		startgui(argc,argv);
+
 	return 0;
 }
