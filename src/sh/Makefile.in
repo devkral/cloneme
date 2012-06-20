@@ -256,7 +256,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-shdir = \""$(pkgdatadir)"\"/sh
+shdir = $(pkgdatadir)/sh
 sh_SCRIPTS = cloneme.sh
 all: all-am
 

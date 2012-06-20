@@ -110,7 +110,7 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 			std::cerr << "cloneme.ui not found; fall back to src directory\n";
 			try
 			{
-				builder->add_from_file("src/ui/cloneme.ui");
+				builder->add_from_file("./src/ui/cloneme.ui");
 			}
 			catch(const Glib::FileError& ex)
 			{
@@ -179,7 +179,7 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
 	src->set_text("/");
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
-	dest->set_text("/syncdir");
+	dest->set_text("/dev/sdb1");
 
 	
 	main_win->show_all_children();
