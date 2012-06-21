@@ -18,6 +18,8 @@ Makefile
 
 # http://www.gnu.org/software/autoconf
 
+*.in
+
 /autom4te.cache
 /aclocal.m4
 /compile

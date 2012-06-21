@@ -26,7 +26,7 @@
 
 #include <getopt.h>
 //#include <unistd.h>
-#include <gtkmm.h>
+//#include <gio.h>
 #include <cstdlib>
 #include <string>
 //#include <iostream>
@@ -57,6 +57,40 @@ static struct option longopts[] = {
         { "edit", no_argument, 0, 'e' }
 };
 
+std::string becomeroot()
+{
+	//Gtk::Main t();
+/**	
+	Glib::RefPtr<Gio::File> preserve = Gio::File::create_for_path ((std::string)(PACKAGE_DATA_DIR"/ui/"));
+
+	Glib::RefPtr<Gio::File> testsudo1 = Gio::File::create_for_path ("/usr/bin/gksudo");
+	Glib::RefPtr<Gio::File> testsudo2 = Gio::File::create_for_path ("/usr/bin/sudo");
+	Glib::RefPtr<Gio::File> testsu1 = Gio::File::create_for_path ("/usr/bin/gksu");
+//	Glib::RefPtr<Gio::File> testsu2 = Gio::File::create_for_path ("/bin/su");
+//in case of a strange distro
+//	Glib::RefPtr<Gio::File> testsu3 = Gio::File::create_for_path ("/usr/bin/su");
+	bool preserving=false;
+	if ( preserve->query_exists())
+		preserving=true;
+	if ( testsudo1->query_exists())
+		if (preserving)
+			return (std::string)"gksudo -k ";
+		else
+			return (std::string)"gksudo ";
+	if ( testsudo2->query_exists())
+		if (preserving)
+			return (std::string)"sudo -E ";
+		else
+			return (std::string)"sudo ";
+	if ( testsu1->query_exists())
+		if (preserving)
+			return (std::string)"gksu -k ";
+		else
+			return (std::string)"gksu ";*/
+	//return (std::string)"su -c";
+	return (std::string)"gksudo -k ";
+};
+
 void startgui(int argc, char* argv[])
 {
 	if (getuid()==0)
@@ -65,8 +99,10 @@ void startgui(int argc, char* argv[])
 	}
 	if (getuid()!=0)
 	{
-		std::string summary="gksu -k ";
+		std::string summary=becomeroot();
 		summary+=argv[0];
+		for (int count=1; count<argc; count++)
+			summary+=argv[count];
 		system(summary.c_str());
 	}
 }
@@ -77,6 +113,7 @@ main (int argc, char *argv[])
 {
 	//std::cout << getuid();
 	
+	//Gtk::Main();
 	int ch;
 
 	if (ch = getopt_long(argc, argv, ":", longopts, NULL) != -1)

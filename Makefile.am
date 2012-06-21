@@ -10,7 +10,8 @@ clonemedoc_DATA = \
 	AUTHORS\
 	ChangeLog\
 	INSTALL\
-	NEWS
+	NEWS\
+	TODO
 
 
 INTLTOOL_FILES = intltool-extract.in \

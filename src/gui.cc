@@ -78,15 +78,15 @@ void gui::opengparted()
 
 void gui::update()
 {
-	std::string sum=PACKAGE_DATA_DIR;
-	sum+="/sh/cloneme.sh update "+src->get_text()+" "+dest->get_text()+"\n";
+	std::string sum=PACKAGE_BIN_DIR;
+	sum+="/cloneme.sh update "+src->get_text()+" "+dest->get_text()+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
 void gui::install()
 {
-	std::string sum=PACKAGE_DATA_DIR;
-	sum+="/sh/cloneme.sh install "+src->get_text()+" "+dest->get_text()+"\n";
+	std::string sum=PACKAGE_BIN_DIR;
+	sum+="/cloneme.sh install "+src->get_text()+" "+dest->get_text()+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
