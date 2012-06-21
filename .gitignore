@@ -8,14 +8,18 @@
 !.gitignore
 
 Makefile
+# not needed delete it!
+Makefile.in*
+#  need it keep
 !Makefile.am
-# not needed
-#  !Makefile.in
+
 
 /Debug
 
 /libtool
 /stamp-h1
+/po/stamp-it
+/po/POTFILES
 
 # http://www.gnu.org/software/autoconf
 
