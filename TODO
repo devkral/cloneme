@@ -1,0 +1,33 @@
++include TODO
++working check for gksu
+
+
+
+not very important:
+
+make it working with raw files via loop (done but no interface)
+
+
+try qemu (relevant files):
+http://www.netzkompetenz.ch/ubuntu/qcow2-disk-image-mounten/
+
+qcow2 Disk Image mounten
+
+Kurzanleitung um eine gcow2 Disk-Image auf Ubuntu LTS 10.04 zu mounten:
+
+Als root, mit einem qcow2 image
+
+for partitions
+modprobe nbd max_part=8
+qemu-nbd --connect=/dev/nbd0 db1_old.qcow2
+# mount first partition
+mount /dev/nbd0p1 /mnt/
+
+wieder freigeben:
+
+umount /mnt/
+qemu-nbd --disconnect /dev/nbd0
+
+
+
+http://blog.loftninjas.org/2008/10/27/mounting-kvm-qcow2-qemu-disk-images/
