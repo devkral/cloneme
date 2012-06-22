@@ -110,7 +110,12 @@ mounting()
 
   if mountpoint "${mountpath}" &> /dev/null; then
 #sorry predecessor but we must be sure that is mounted as ROOT
-    umount "${mountpath}"
+    if ! umount "${mountpath}"; then
+      echo "can\'t unmount the partition"
+      echo "means: an other service depending on theis directory is still running"
+      echo "abort!"
+      exit 1
+    fi
   fi
 
   if ! mount "${clonetargetdevice}" "${mountpath}"; then
