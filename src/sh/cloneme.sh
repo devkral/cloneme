@@ -79,7 +79,7 @@ if [ ! -e /sbin/losetup ] && [ ! -e /usr/bin/losetup ]; then
 fi
 
 if [ ! -e /usr/bin/"$EDITOR" ] && [ ! -e /bin/"$EDITOR" ] && [ ! -e "$EDITOR" ]; then
-  echo "error no default editor found"
+  echo "error: no default editor found"
   echo "please enter your favourite editor"
   read EDITOR
   echo "Shall I set this editor as default editor? [yes] (writes into ~/bashrc)"

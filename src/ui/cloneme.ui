@@ -140,7 +140,7 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Source
 (where is copied from)
-(can be device or directory)</property>
+(can be a device or directory)</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -184,7 +184,7 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Destination
 (where is copied to)
-(can be device or directory)</property>
+(can be a device or directory)</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>

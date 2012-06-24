@@ -7,6 +7,8 @@ not very important:
 
 make it working with raw files via loop (done but no interface)
 
+nbd stuff
+http://atrey.karlin.mff.cuni.cz/~pavel/nbd/nbd.html
 
 try qemu (relevant files):
 http://www.netzkompetenz.ch/ubuntu/qcow2-disk-image-mounten/

@@ -25,11 +25,10 @@
 #include "createuser.h"
 
 #include <getopt.h>
-//#include <unistd.h>
-//#include <gio.h>
+#include <unistd.h>
 #include <cstdlib>
 #include <string>
-//#include <iostream>
+#include <iostream>
 //#include <cstdio>
 
 #ifdef ENABLE_NLS
@@ -51,44 +50,39 @@ bool comparechar(char *r1, char *r2)
 
 // options descriptor 
 static struct option longopts[] = {
-        { "copyuser", no_argument, 0, 'c' },
-        { "create", no_argument, 0, 'n' },
-        { "install_bootloader",  no_argument, 0, 'i' },
-        { "edit", no_argument, 0, 'e' }
+//needs args but this is handled by copyuser directly
+        { "copyuser", no_argument, 0, 0 },
+//needs args but this is handled by createuser directly
+        { "createuser", no_argument, 0, 0 },
+//        { "install_bootloader",  no_argument, 0, 0 },
+//        { "edit", no_argument, 0, 'e' }
 };
 
 std::string becomeroot()
 {
-	//Gtk::Main t();
-/**	
-	Glib::RefPtr<Gio::File> preserve = Gio::File::create_for_path ((std::string)(PACKAGE_DATA_DIR"/ui/"));
-
-	Glib::RefPtr<Gio::File> testsudo1 = Gio::File::create_for_path ("/usr/bin/gksudo");
-	Glib::RefPtr<Gio::File> testsudo2 = Gio::File::create_for_path ("/usr/bin/sudo");
-	Glib::RefPtr<Gio::File> testsu1 = Gio::File::create_for_path ("/usr/bin/gksu");
-//	Glib::RefPtr<Gio::File> testsu2 = Gio::File::create_for_path ("/bin/su");
-//in case of a strange distro
-//	Glib::RefPtr<Gio::File> testsu3 = Gio::File::create_for_path ("/usr/bin/su");
-	bool preserving=false;
-	if ( preserve->query_exists())
-		preserving=true;
-	if ( testsudo1->query_exists())
-		if (preserving)
+//what did I want to prevent here?
+//	bool preserving=false;
+//	if ( access(PACKAGE_DATA_DIR"/ui/",F_OK)==0)
+//		preserving=true;
+	
+	if ( access("/usr/bin/gksudo",F_OK)==0)
+//		if (preserving)
 			return (std::string)"gksudo -k ";
-		else
-			return (std::string)"gksudo ";
-	if ( testsudo2->query_exists())
-		if (preserving)
+//		else
+//			return (std::string)"gksudo ";
+	if ( access("/usr/bin/gksu",F_OK)==0)
+//		if (preserving)
+			return (std::string)"gksu -S -k ";
+//		else
+//			return (std::string)"gksu -S ";
+	
+	if ( access("/usr/bin/sudo",F_OK)==0)
+//		if (preserving)
 			return (std::string)"sudo -E ";
-		else
-			return (std::string)"sudo ";
-	if ( testsu1->query_exists())
-		if (preserving)
-			return (std::string)"gksu -k ";
-		else
-			return (std::string)"gksu ";*/
-	//return (std::string)"su -c";
-	return (std::string)"gksudo -k ";
+//		else
+//			return (std::string)"sudo ";
+	
+	return (std::string)"su -c";
 };
 
 void startgui(int argc, char* argv[])
@@ -111,23 +105,19 @@ void startgui(int argc, char* argv[])
 int
 main (int argc, char *argv[])
 {
-	//std::cout << getuid();
-	
-	//Gtk::Main();
 	int ch;
-
-	if (ch = getopt_long(argc, argv, ":", longopts, NULL) != -1)
+	if (ch = getopt_long(argc, argv, "+:", longopts, NULL) != -1)
 	{
 		switch(ch)
 		{
-			case 1: copyuser(argc,argv);
+			case 0: copyuser(argc,argv);
 				break;
-			case 2: createuser(argc,argv);
+			case 1: createuser(argc,argv);
 				break;
-			case 3: //not ready
-				break;
-			case 4: //not ready
-				break;
+//			case 2: //not ready
+//				break;
+//			case 'e': //not ready
+//				break;
 			default: startgui(argc,argv);
 				break;
 		};

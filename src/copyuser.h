@@ -17,6 +17,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <gtkmm.h>
+#include <string>
 
 class gui;
 
@@ -33,6 +34,9 @@ protected:
 private:
 	//Glib::RefPtr<Gtk::Builder> builder;
 	//Glib::RefPtr<Gtk::Window> copyuser_win;
+	std::string src;
+	std::string dest;
+	std::string name;
 
 };
 

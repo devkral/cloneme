@@ -21,14 +21,37 @@
 #include <string>
 #include <unistd.h>
 #include <getopt.h>
+#include <iostream>
 
 static struct option longopts[] = {
         { "src", required_argument, 0, 0 },
-        { "dest", required_argument, 0, 0 }
+        { "dest", required_argument, 0, 0  }
 };
 
 createuser::createuser(int argc, char* argv[])
 {
+	int ch;
+	while (ch = getopt_long(argc, argv, ":", longopts, NULL) != -1)
+	{
+		switch(ch)
+		{
+			case 0: src=optarg;
+				break;
+			case 1: dest=optarg;
+				break;
+		};
+    }
+		if  (src.empty())
+	{
+		std::cerr << "Error: src wasn't specified\n";
+		throw (-1);
+		
+	}
 
+	if (dest.empty())
+	{
+		std::cerr << "Error: dest wasn't specified\n";
+		throw (-1);
+	}
 }
 

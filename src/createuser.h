@@ -18,7 +18,7 @@
  */
 
 #include <gtkmm.h>
-
+#include <string>
 
 #ifndef _CREATEUSER_H_
 #define _CREATEUSER_H_
@@ -31,7 +31,8 @@ public:
 protected:
 
 private:
-
+	std::string src;
+	std::string dest;
 };
 
 #endif // _CREATEUSER_H_
