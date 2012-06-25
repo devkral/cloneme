@@ -245,7 +245,7 @@ do
           sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow
           sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow-
           sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow-
-          rm "/var/spool/mail/${usertemp}"
+          rm "/var/spool/mail/${usertemp}" 2> /dev/null
           echo "remove finished"
         fi
       fi
