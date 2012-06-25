@@ -227,6 +227,7 @@ do
           chown $usertemp:$usertemp "${clonetargetdevice2}"/home/"$usertemp"
         fi
       fi
+      break
     fi
     
     if [ "$answer_useracc" = "c" ]; then
