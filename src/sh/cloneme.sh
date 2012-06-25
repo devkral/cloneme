@@ -209,7 +209,7 @@ do
       echo -e "Synchronize user account. Type \"s\""
     else
       echo -e "Copy user account. Type \"s\""
-      echo -e "Create empty user account (with the same password as the existing one). Type \"e\""
+      echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
     fi
     echo -e "Don't use the user account. Type \"c\""
     read -n 1 answer_useracc
