@@ -3,7 +3,7 @@
 
 SUBDIRS = src po
 
-clonemedocdir = \""$(pkgdatarootdir)"\"/doc/cloneme
+clonemedocdir = $(pkgdatarootdir)/doc/cloneme
 clonemedoc_DATA = \
 	README\
 	COPYING\
