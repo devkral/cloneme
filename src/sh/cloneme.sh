@@ -156,7 +156,7 @@ if [ "$choosemode" != "---special-mode---" ]; then
   fi
 #check clonesource2; it has to end with /"
   tempp="$(echo "$clonesource2" | sed "s/\/$//")"
-  clonesource2="$tempp"
+  clonesource2="$tempp/"
 fi
 
 
