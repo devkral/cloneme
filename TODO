@@ -1,5 +1,5 @@
-+include TODO
-+working check for gksu
+
++make EDITOR fetch from main system working (see gui.cc)
 
 
 

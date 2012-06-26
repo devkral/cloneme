@@ -10,7 +10,7 @@
 Makefile
 # not needed delete it!
 Makefile.in*
-#  need it keep
+# needed keep it
 !Makefile.am
 
 

@@ -1,23 +1,42 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * cloneme
- * Copyright (C) alex 2012 <devkral@web.de>
- * 
- * cloneme is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * cloneme is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Created by alex devkral@web.de
+ *
+ * Copyright (c) 2012
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * Neither the name of the project's author nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 #include "gui.h"
+#include "myfilechooser.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -68,6 +87,27 @@ void execparted(gui *refback)
 	refback->gpartmut.unlock();
 }
 
+void gui::chooseeditor()
+{
+	if (graphicaleditor->get_active ())
+	{
+		std::string sum="EDITOR=gedit\n";
+		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+	}
+	else
+	{
+//TODO:
+//buggy;can't fetch the editor from the main system
+//most probably because I haven't set environment variables
+		std::string sum="EDITOR="+system2("echo \"$EDITOR\"")+"\n";
+		std::cout << sum;
+//so use my favourite
+		sum="EDITOR=nano\n";
+		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+	}
+
+}
+
 void gui::opengparted()
 {
 	if (gpartmut.try_lock())
@@ -89,6 +129,29 @@ void gui::install()
 	sum+="/cloneme.sh install "+src->get_text()+" "+dest->get_text()+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
+
+void gui::choosesrc()
+	{
+		
+		myfilechooser select;
+		std::string temp=select.run();
+		if (!temp.empty())
+		{
+			src->set_text(temp);
+			srcdestobject.src=temp;
+		}
+	}
+
+	void gui::choosedest()
+	{
+		myfilechooser select;
+		std::string temp=select.run();
+		if (!temp.empty())
+		{
+			dest->set_text(temp);
+			srcdestobject.dest=temp;
+		}
+	}
 
 
 gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this),createdialog(this)
@@ -178,9 +241,16 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	//Filechooser
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
 	src->set_text("/");
+	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
+	srcselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosesrc));
+	
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
 	dest->set_text("/dev/sdb1");
+	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
+	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
 
+	graphicaleditor=transform_to_rptr<Gtk::CheckButton>(builder->get_object("graphicaleditor"));
+	graphicaleditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::chooseeditor));
 	
 	main_win->show_all_children();
 	if (main_win!=0)

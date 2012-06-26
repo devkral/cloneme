@@ -3,18 +3,23 @@
 #License: Do what you want with this script. But no warranty.
 
 #the command which configures the target system
-config_new_sys="addnewusersmanually"
+config_new_sys="addnewusers"
 #the command to install the bootloader
-installbootloader="installer_grub2"
-
+if [ ! installbootloader ];then
+  installbootloader="installer_grub2"
+fi
 #defaults
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
 syncdir="/syncdir"
-#partition which is mounted
-# too dangerous
-###clonetargetdevice="/dev/sdb1"
+#default groups of new users
+usergroupargs="video,audio,optical,power"
+#graphic interface (not uncomment! just as reference)
+#graphic_interface_path
+#don't comment or change this
+cloneme_ui_mode=false
+
 
 help(){
   echo "cloneme <mode> [<source>] <target> [<syncdir>]"
@@ -44,13 +49,16 @@ if [ "$choosemode" = "--help" ]; then
   help; exit 0;
 fi
 
-
 #check if runs with root permission
 if [ ! "$UID" = "0" ]; then
   echo "error: needs root permissions"
   exit 1;
 fi
 
+#activate ui mode
+if [ ${graphic_interface_path} ]
+  cloneme_ui_mode=true
+fi
 
 #check syncdir; it mustn't end with /"
 tempp="$(echo "$syncdir" | sed "s/\/$//")"
@@ -127,7 +135,7 @@ mounting()
 }
 
 #mount
-##don't run this when the process is a subprocess beyond syncdir
+##don't run this when a subprocess of itself
 if [ "$choosemode" != "---special-mode---" ]; then
   if [ -d "${clonesource}" ];then
     clonesource2="${clonesource}"
@@ -160,41 +168,44 @@ if [ "$choosemode" != "---special-mode---" ]; then
 fi
 
 
-addnewusersmanually(){
-  usercounter=0
-  for (( ; ; ))
-  do
-    if [ $usercounter = 0 ];then
-      usercounter=1;
-      echo "Create new user? [yes/no]"
-    else
-      echo "Create another new user? [yes/no]"
-    fi
-    read n_user
-    if [ "$n_user" = "yes" ];then
-      usergroupargs="video,audio,optical,power"
-      echo "Enter user name"
-      read user_name;
-      echo "Shall this user account have admin (can change to root) permissions? [yes] default: no"
-      read admin_perm
-      if [ "$admin_perm" = "yes" ];then
-        if grep "wheel" /etc/group > /dev/null;then
-          usergroupargs+=",wheel"
-        fi
-        if grep "adm" /etc/group > /dev/null;then
-          usergroupargs+=",adm"
-        fi
-        if grep "admin" /etc/group > /dev/null;then
-          usergroupargs+=",admin"
-        fi
+addnewusers(){
+  if [ $cloneme_ui_mode = false ];then
+    usercounter=0
+    for (( ; ; ))
+    do
+      if [ $usercounter = 0 ];then
+        usercounter=1;
+        echo "Create new user? [yes/no]"
+      else
+        echo "Create another new user? [yes/no]"
       fi
-      useradd -m -U "$user_name" -p "" -G $usergroupargs
-      passwd -e "$user_name"
-    fi
-    if [ "$n_user" = "no" ];then
-      break
-    fi
-  done
+      read n_user
+      if [ "$n_user" = "yes" ];then
+        echo "Enter user name"
+        read user_name;
+        echo "Shall this user account have admin (can change to root) permissions? [yes] default: no"
+        read admin_perm
+        if [ "$admin_perm" = "yes" ];then
+          if grep "wheel" /etc/group > /dev/null;then
+            usergroupargs+=",wheel"
+          fi
+          if grep "adm" /etc/group > /dev/null;then
+            usergroupargs+=",adm"
+          fi
+          if grep "admin" /etc/group > /dev/null;then
+            usergroupargs+=",admin"
+          fi
+        fi
+        useradd -m -U "$user_name" -p "" -G $usergroupargs
+        passwd -e "$user_name"
+      fi
+      if [ "$n_user" = "no" ];then
+        break
+      fi
+    done
+  else
+    ${graphic_interface_path} --createuser
+  fi
 }
 
 
@@ -202,57 +213,62 @@ copyuser(){
 
 for usertemp in $(ls /home)
 do
-  for (( ; ; ))
-  do
-    echo "What shall be done with user $usertemp?"
-    if [ -d "${clonetargetdevice2}"/home/"$usertemp" ]; then
-      echo -e "Synchronize user account. Type \"s\""
-    else
-      echo -e "Copy user account. Type \"s\""
-      echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
-    fi
-    echo -e "Don't use the user account. Type \"c\""
-    read -n 1 answer_useracc
-    if [ "$answer_useracc" = "s" ]; then
-      rsync -a -A --progress --delete --exclude "${clonetargetdevice2}" "${clonesource2}"home/"${usertemp}" "${clonetargetdevice2}"/home/
-      break
-    fi
-    
-    if [ "$answer_useracc" = "e" ]; then
-      mkdir -p "${clonetargetdevice2}"/home/"$usertemp"
-      
-      if grep "$usertemp" "${clonesource2}"etc/passwd > /dev/null;then
-        chown $usertemp "${clonetargetdevice2}"/home/"$usertemp"
-        if grep "$usertemp" "${clonesource2}"etc/group > /dev/null;then
-          chown $usertemp:$usertemp "${clonetargetdevice2}"/home/"$usertemp"
-        fi
+  if [ $cloneme_ui_mode = false ];then
+    for (( ; ; ))
+    do
+      echo "What shall be done with user $usertemp?"
+      if [ -d "${clonetargetdevice2}"/home/"$usertemp" ]; then
+        echo -e "Synchronize user account. Type \"s\""
+      else
+        echo -e "Copy user account. Type \"s\""
+        echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
       fi
-      break
-    fi
-    
-    if [ "$answer_useracc" = "c" ]; then
-      if [ ! -d "${clonetargetdevice2}"/home/"$usertemp" ];then
-        echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type yes (not the default)"
-        read question_delete
-        if [ "$question_delete" = "yes" ]; then
-          #still experimental
-          sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/passwd
-          sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/passwd-
-          sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/group
-          sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/group
-          sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/group-
-          sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/group-
-          sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow
-          sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow
-          sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow-
-          sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow-
-          rm "/var/spool/mail/${usertemp}" 2> /dev/null
-          echo "remove finished"
-        fi
+      echo -e "Don't use the user account. Type \"c\""
+      read -n 1 answer_useracc
+      if [ "$answer_useracc" = "s" ]; then
+        rsync -a -A --progress --delete --exclude "${clonetargetdevice2}" "${clonesource2}"home/"${usertemp}" "${clonetargetdevice2}"/home/
+        break
       fi
-      break
-    fi
-  done
+    
+      if [ "$answer_useracc" = "e" ]; then
+        mkdir -p "${clonetargetdevice2}"/home/"$usertemp"
+        #
+        if grep "$usertemp" "${clonesource2}"etc/passwd > /dev/null;then
+          chown $usertemp "${clonetargetdevice2}"/home/"$usertemp"
+          #chown group
+          if grep "$usertemp" "${clonesource2}"etc/group > /dev/null;then
+            chown $usertemp:$usertemp "${clonetargetdevice2}"/home/"$usertemp"
+          fi
+        fi
+        break
+      fi
+    
+      if [ "$answer_useracc" = "c" ]; then
+        if [ ! -d "${clonetargetdevice2}"/home/"$usertemp" ];then
+          echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type yes (not the default)"
+          read question_delete
+          if [ "$question_delete" = "yes" ]; then
+            #still experimental
+            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/passwd
+            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/passwd-
+            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/group
+            sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/group
+            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/group-
+            sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/group-
+            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow
+            sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow
+            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow-
+            sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow-
+            rm "/var/spool/mail/${usertemp}" 2> /dev/null
+            echo "cleaning finished"
+          fi
+        fi
+        break
+      fi
+    done
+  else
+    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2
+  fi
 done
 
 
@@ -309,9 +325,9 @@ installer(){
 installer_grub2(){
   echo "Install grub…"
   #clonetargetdevice because mounting isn't executed
-  get_dev="$(grub-probe -t device -d "${clonetargetdevice}" | sed  -e "s|[0-9]*$||")"
+  get_dev="$(grub-probe -t device "${clonetargetdevice2}" | sed  -e "s|[0-9]*$||")"
   if ! grub-install "$get_dev";then
-    echo "I fail please do it yourself"
+    echo "I failed please do it yourself"
     /bin/sh
   fi
   

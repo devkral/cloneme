@@ -35,15 +35,35 @@
  *
  */
 
-#include "createuser.h"
+#include <gtkmm.h>
 #include <string>
-//#include <unistd.h>
-//#include <getopt.h>
-#include <iostream>
+#include <mutex>
 
+#ifndef _MYFILECHOOSER_H_
+#define _MYFILECHOOSER_H_
 
-createuser::createuser(int argc, char* argv[])
+class myfilechooser
 {
+public:
+	myfilechooser ();
+	std::string run();
+protected:
 
-}
+private:
+	Gtk::Main kit;
+	Glib::RefPtr<Gtk::Builder> builder;
+	Glib::RefPtr<Gtk::Window> myfilechoose;
+	Glib::RefPtr<Gtk::FileChooserWidget> filechooserwidget1;
+	Glib::RefPtr<Gtk::Button>selectfile,currentfold,canceldialog;
+	std::string path;
+
+	void usefile();
+	void usefolder();
+	void cancelpath();
+	
+	
+	
+};
+
+#endif // _MYFILECHOOSER_H_
 

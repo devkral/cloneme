@@ -1,5 +1,6 @@
 #! /bin/bash
- 
+
+#License: Do what you want with this script. But no warranty.
 #be careful; this is a very hard topic. I won't use much safeguarding
 transferscript="/sbin/cloneme.sh update"
 

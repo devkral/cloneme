@@ -4,4 +4,5 @@ uidir = $(pkgdatadir)/ui
 ui_DATA = cloneme.ui \
 	copyuser.ui \
 	editor.ui \
-	createuser.ui
+	createuser.ui \
+	myfiledialog.ui
