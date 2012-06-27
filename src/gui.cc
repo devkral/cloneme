@@ -37,6 +37,7 @@
 
 #include "gui.h"
 #include "myfilechooser.h"
+#include "basismethods.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -45,40 +46,10 @@
 #include <unistd.h>
 #include <vte/vte.h>
 
-#include <cstdio>
 //#include <cerrno>
 
-std::string system2(std::string _tcommand)
-{
-   FILE * proc;
-   std::string temp;
-
-   proc = popen (_tcommand.c_str() , "r");
-   if (proc == NULL)
-		{
-			perror ("Error opening command");
-			return NULL;
-		}
-   else 
-		{
-			while (!feof(proc))
-				{
-					temp+=fgetc (proc);
-				}
-			fclose (proc);
-			temp.erase(temp.length()-2, temp.length()-1);
-			return temp;
-		}
-}
 
 
-template< class T_CppObject > Glib::RefPtr<T_CppObject>
-transform_to_rptr(const Glib::RefPtr< Glib::Object >& p)
-{
-	if (p==0)
-		std::cerr << "Error object empty";
-	return Glib::RefPtr<T_CppObject>::cast_dynamic(p);
-}
 
 
 void execparted(gui *refback)

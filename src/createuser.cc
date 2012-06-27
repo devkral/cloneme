@@ -36,6 +36,7 @@
  */
 
 #include "createuser.h"
+#include "basismethods.h"
 #include <string>
 //#include <unistd.h>
 //#include <getopt.h>

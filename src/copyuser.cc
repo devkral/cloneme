@@ -36,10 +36,13 @@
  */
 
 #include "copyuser.h"
+#include "basismethods.h"
 #include <iostream>
 #include <string>
 #include <unistd.h>
 #include <getopt.h>
+
+
 
 static struct option longopts[] = {
 	{ "src", required_argument, 0, 0 },
@@ -47,6 +50,68 @@ static struct option longopts[] = {
 	{ "name", required_argument, 0, 0 }
 };
 
+
+
+void copyuser::synch()
+{
+
+
+}
+
+void copyuser::clean()
+{
+	std::string sum="";
+sum+="        if [ ! -d \""+dest+"\"/home/\""+name+"\" ];then\n";
+	if (==true)
+		sum+="question_delete=\"yes\"";
+	else
+		sum+="question_delete=\"no\"";
+		
+sum+="          if [ \"$question_delete\" = \"yes\" ]; then\n";
+sum+="            \n";
+sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd\n";
+sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd-\n";
+sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group\n";
+sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group\n";
+sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group-\n";
+sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group-\n";
+sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow\n";
+sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow\n";
+sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow-\n";
+sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow-\n";
+sum+="            rm \"/var/spool/mail/"+name+"\" 2> /dev/null\n";
+sum+="            echo \"cleaning finished\"\n";
+sum+="          fi\n";
+sum+="        fi\n";
+
+	system2(sum);
+
+}
+
+void copyuser::empty()
+{
+	std::string sum="";
+	sum+="        mkdir -p \""+dest+"\"/home/\"$usertemp\"\n";
+	sum+="        \n";
+	sum+="        if grep \"$usertemp\" \""+src+"\"etc/passwd > /dev/null;then\n";
+	sum+="          chown $usertemp \""+dest+"\"/home/\"$usertemp\"\n";
+	sum+="          \n";
+	sum+="          if grep \"$usertemp\" \""+src+"\"etc/group > /dev/null;then\n";
+	sum+="            chown $usertemp:$usertemp \""+dest+"\"/home/\"$usertemp\"\n";
+	sum+="          fi\n";
+	sum+="        fi\n";
+
+	system2(sum);
+}
+
+void copyuser::explaining()
+{
+	if (explaination->get_visible())
+		explaination->hide();
+	else
+		explaination->show();
+
+}
 
 copyuser::copyuser(int argc, char* argv[])
 {
@@ -81,4 +146,67 @@ copyuser::copyuser(int argc, char* argv[])
 		std::cerr << "Error: User wasn't specified\n";
 		throw (-1);
 	}
+
+	builder = Gtk::Builder::create();
+	try
+	{
+		builder->add_from_file(PACKAGE_DATA_DIR"/ui/copyuser.ui");
+	}
+	catch(const Glib::FileError& ex)
+	{
+		//std::cerr << ENOENT;
+		//if (ex.code()==ENOENT)
+		//	std::cerr << "good";
+		//strange ENOENT doesn't work even it should correspond
+		if (ex.code()==4)
+		{
+			std::cerr << "myfiledialog.ui not found; fall back to src directory\n";
+			try
+			{
+				builder->add_from_file("./src/ui/copyuser.ui");
+			}
+			catch(const Glib::FileError& ex)
+			{
+				std::cerr << "FileError: " << ex.what() << std::endl;
+				throw(ex);
+			}
+			catch(const Glib::MarkupError& ex)
+			{
+				std::cerr << "MarkupError: " << ex.what() << std::endl;
+				throw(ex);
+			}
+			catch(const Gtk::BuilderError& ex)
+			{
+				std::cerr << "BuilderError: " << ex.what() << std::endl;
+				throw(ex);
+			}
+		}
+		else
+		{
+			std::cerr << "FileError: " << ex.what() << std::endl;
+			throw(ex);
+		}
+	}
+	catch(const Glib::MarkupError& ex)
+	{
+		std::cerr << "MarkupError: " << ex.what() << std::endl;
+		throw(ex);
+	}
+	catch(const Gtk::BuilderError& ex)
+	{
+		std::cerr << "BuilderError: " << ex.what() << std::endl;
+		throw(ex);
+	}
+	copyuser_win=transform_to_rptr<Gtk::Window>(builder->get_object("copyuser_win"));
+	explaination=transform_to_rptr<Gtk::Window>(builder->get_object("explaination"));
+	
+	username=transform_to_rptr<Gtk::Label>(builder->get_object("username"));
+	username->set_text(name);
+	copysynch=transform_to_rptr<Gtk::Button>(builder->get_object("copysynch"));
+	createempty=transform_to_rptr<Gtk::Button>(builder->get_object("createempty"));
+	explain=transform_to_rptr<Gtk::Button>(builder->get_object("explain"));
+	explain->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::explaining));
+	deleteusercomp=transform_to_rptr<Gtk::Button>(builder->get_object("deleteusercomp"));
+	deletepasswd=transform_to_rptr<Gtk::CheckButton>(builder->get_object("deletepasswd"));
+	copyuser_win->show();
 }

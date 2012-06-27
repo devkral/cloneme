@@ -259,7 +259,7 @@ do
             sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow
             sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow-
             sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow-
-            rm "/var/spool/mail/${usertemp}" 2> /dev/null
+            rm "${clonetargetdevice2}/var/spool/mail/${usertemp}" 2> /dev/null
             echo "cleaning finished"
           fi
         fi
@@ -267,7 +267,7 @@ do
       fi
     done
   else
-    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2
+    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2 --name "${usertemp}"
   fi
 done
 
