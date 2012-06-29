@@ -63,9 +63,9 @@ void copyuser::clean()
 	std::string sum="";
 sum+="        if [ ! -d \""+dest+"\"/home/\""+name+"\" ];then\n";
 	if (==true)
-		sum+="question_delete=\"yes\"";
+		sum+="question_delete=\"yes\"\n";
 	else
-		sum+="question_delete=\"no\"";
+		sum+="question_delete=\"no\"\n";
 		
 sum+="          if [ \"$question_delete\" = \"yes\" ]; then\n";
 sum+="            \n";
@@ -208,5 +208,10 @@ copyuser::copyuser(int argc, char* argv[])
 	explain->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::explaining));
 	deleteusercomp=transform_to_rptr<Gtk::Button>(builder->get_object("deleteusercomp"));
 	deletepasswd=transform_to_rptr<Gtk::CheckButton>(builder->get_object("deletepasswd"));
+	if ( access("/home/"+name,F_OK)==0)
+	{
+
+
+	}
 	copyuser_win->show();
 }

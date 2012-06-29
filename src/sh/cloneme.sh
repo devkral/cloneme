@@ -219,11 +219,14 @@ do
       echo "What shall be done with user $usertemp?"
       if [ -d "${clonetargetdevice2}"/home/"$usertemp" ]; then
         echo -e "Synchronize user account. Type \"s\""
+		echo -e "Don't change the user account. Type \"c\""
+		echo -e "Eradicate user file. Type \"e\""
       else
         echo -e "Copy user account. Type \"s\""
         echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
+        echo -e "Don't copy the user account. Type \"c\""      
       fi
-      echo -e "Don't use the user account. Type \"c\""
+      
       read -n 1 answer_useracc
       if [ "$answer_useracc" = "s" ]; then
         rsync -a -A --progress --delete --exclude "${clonetargetdevice2}" "${clonesource2}"home/"${usertemp}" "${clonetargetdevice2}"/home/
@@ -231,6 +234,7 @@ do
       fi
     
       if [ "$answer_useracc" = "e" ]; then
+        rm -r "${clonetargetdevice2}"/home/"$usertemp"
         mkdir -p "${clonetargetdevice2}"/home/"$usertemp"
         #
         if grep "$usertemp" "${clonesource2}"etc/passwd > /dev/null;then

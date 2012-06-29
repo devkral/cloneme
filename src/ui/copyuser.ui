@@ -206,8 +206,7 @@
         </child>
         <child>
           <object class="GtkButton" id="deleteusercomp">
-            <property name="label" translatable="yes">Don't copy account
-(cleaning recommended)</property>
+            <property name="label" translatable="yes">Don't snychronize account</property>
             <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
