@@ -56,7 +56,7 @@ if [ ! "$UID" = "0" ]; then
 fi
 
 #activate ui mode
-if [ ${graphic_interface_path} ]
+if [ ${graphic_interface_path} ]; then
   cloneme_ui_mode=true
 fi
 

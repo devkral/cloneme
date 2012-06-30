@@ -2,5 +2,4 @@
 
 shdir = $(bindir)
 
-sh_SCRIPTS = cloneme.sh \
-	transferbetweenimages.sh
+sh_SCRIPTS = cloneme.sh
