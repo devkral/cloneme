@@ -49,16 +49,19 @@ public:
 protected:
 
 private:
-	Glib::RefPtr<Gtk::Main> kitcreate;
+	Gtk::Main kitcreate;
+	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> createuser_win;
 	//lowest row
 	Glib::RefPtr<Gtk::Button> addnewuser,breaknewuser,addnewuserandbreak;
 	// input fields
 	Glib::RefPtr<Gtk::Entry> username;
 	Glib::RefPtr<Gtk::CheckButton> admswitch;
+	//functions
 	void adduser();
 	void quit();
 	void adduserquit();
+	int makeuser();
 	
 };
 

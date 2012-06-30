@@ -50,12 +50,13 @@ public:
 protected:
 
 private:
+	Gtk::Main kitcopy;
 	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> copyuser_win,explaination;
 	Glib::RefPtr<Gtk::Button> copysynch;
 	Glib::RefPtr<Gtk::Button> createempty;
 	Glib::RefPtr<Gtk::Button> explain;
-	Glib::RefPtr<Gtk::Button> deleteusercomp;
+	Glib::RefPtr<Gtk::Button> ignoreuser;
 	Glib::RefPtr<Gtk::Label> username;
 	Glib::RefPtr<Gtk::CheckButton> deletepasswd;
 

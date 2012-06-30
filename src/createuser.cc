@@ -42,12 +42,32 @@
 //#include <getopt.h>
 #include <iostream>
 
-int createuser::usercreation()
+int createuser::makeuser()
 {
-	
-	if (log="")
+	if (username->get_text_length () ==0)
+		return 2;
+	std::string sum="";
+	sum+="usergroupargs=\"video,audio,optical,power\"\n";
+	if (admswitch->get_state()==true)
+	{
+		sum+="admin_perm=\"yes\"\n";
+	}
+	sum+="        if [ \"$admin_perm\" = \"yes\" ];then\n";
+	sum+="          if grep \"wheel\" /etc/group > /dev/null;then\n";
+	sum+="            usergroupargs+=\",wheel\"\n";
+	sum+="          fi\n";
+	sum+="          if grep \"adm\" /etc/group > /dev/null;then\n";
+	sum+="            usergroupargs+=\",adm\"\n";
+	sum+="          fi\n";
+	sum+="          if grep \"admin\" /etc/group > /dev/null;then\n";
+	sum+="            usergroupargs+=\",admin\"\n";
+	sum+="          fi\n";
+	sum+="        fi\n";
+	sum+="        useradd -m -U \""+username->get_text()+"\" -p \"\" -G $usergroupargs\n";
+	sum+="        passwd -e \""+username->get_text()+"\"\n";
+	std::string log=system2(sum);
+	if (log.empty()==true)
 		return 0;
-	
 	std::cerr << log;
 	return 1;
 	
@@ -55,8 +75,15 @@ int createuser::usercreation()
 
 void createuser::adduser()
 {
-	if (usercreation()==0)
-		std::cout << "success";
+	int temp=makeuser();
+	if (temp!=0)
+	{
+		std::cerr << "Error";
+	}
+	if (temp==2)
+	{
+		std::cerr << "Error: name empty\n";
+	}
 }
 
 void createuser::quit()
@@ -66,8 +93,13 @@ void createuser::quit()
 
 void createuser::adduserquit()
 {
-	if (usercreation()==0)
+	int temp=makeuser();
+	if (temp==0)
 		kitcreate.quit();
+	if (temp==2)
+	{
+		std::cerr << "Error: name empty\n";
+	}
 }
 
 createuser::createuser(int argc, char* argv[]): kitcreate(argc, argv)
@@ -122,25 +154,25 @@ createuser::createuser(int argc, char* argv[]): kitcreate(argc, argv)
 		std::cerr << "BuilderError: " << ex.what() << std::endl;
 		throw(ex);
 	}
-	createuser_win=transform_to_rptr<Gtk::Window>(builder->get_object("copyuser_win"));
+	createuser_win=transform_to_rptr<Gtk::Window>(builder->get_object("createuser_win"));
 
 	//init entry, checkbutton
-	username=transform_to_rptr<Gtk::Button>(builder->get_object("username"));
+	username=transform_to_rptr<Gtk::Entry>(builder->get_object("username"));
 	admswitch=transform_to_rptr<Gtk::CheckButton>(builder->get_object("admswitch"));
 	
 	//init buttons
 	addnewuser=transform_to_rptr<Gtk::Button>(builder->get_object("addnewuser"));
-	addnewuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::adduser));
+	addnewuser->signal_clicked ().connect(sigc::mem_fun(*this,&createuser::adduser));
 	breaknewuser=transform_to_rptr<Gtk::Button>(builder->get_object("breaknewuser"));
-	breaknewuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::quit));
+	breaknewuser->signal_clicked ().connect(sigc::mem_fun(*this,&createuser::quit));
 	addnewuserandbreak=transform_to_rptr<Gtk::Button>(builder->get_object("addnewuserandbreak"));
-	addnewuserandbreak->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::adduserquit));
+	addnewuserandbreak->signal_clicked ().connect(sigc::mem_fun(*this,&createuser::adduserquit));
 
 	createuser_win->show();
 	
 	if (createuser_win!=0)
 	{
-		kitcreate.run(*main_win.operator->());
+		kitcreate.run(*createuser_win.operator->());
 	}
 }
 

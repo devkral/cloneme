@@ -90,6 +90,7 @@ void gui::opengparted()
 void gui::update()
 {
 	std::string sum=PACKAGE_BIN_DIR;
+	sum+=(std::string)"graphic_interface_path=\""+home_path+(std::string)"\"";
 	sum+="/cloneme.sh update "+src->get_text()+" "+dest->get_text()+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
@@ -128,6 +129,7 @@ void gui::choosesrc()
 gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this),createdialog(this)
 {
 	//syncdir="";
+	home_path=argv[0];
 	builder = Gtk::Builder::create();
 	try
 	{

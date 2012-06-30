@@ -145,7 +145,9 @@ if [ "$choosemode" != "---special-mode---" ]; then
     clonesource2="${syncdir}"/src
   elif [ -f "${clonesource}" ];then
     mkdir -p "${syncdir}"/src 2> /dev/null
-    mounting "${clonesource}" "${syncdir}"/src
+    losetup -f -P "${clonesource}"
+    local clonesourcetemp=$(losetup -a | grep "${clonesource}")
+    mounting "${clonesourcetemp}" "${syncdir}"/src
     clonesource2="${syncdir}"/src
   else
     echo "source not recognized"
@@ -156,7 +158,9 @@ if [ "$choosemode" != "---special-mode---" ]; then
     clonetargetdevice2="${clonetargetdevice}"
   elif [ -b "${clonetargetdevice}" ];then
     mkdir -p "${syncdir}"/dest 2> /dev/null
-    mounting "${clonetargetdevice}" "${syncdir}"/dest
+    losetup -f -P "${clonetargetdevice}"
+    local clonetargettemp=$(losetup -a | grep "${clonetargetdevice}")
+    mounting "${clonetargettemp}" "${syncdir}"/dest
     clonetargetdevice2="${syncdir}"/dest
   else
     echo "target not recognized"

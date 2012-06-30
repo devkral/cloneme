@@ -3,7 +3,6 @@
   <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkWindow" id="createuser_win">
     <property name="can_focus">False</property>
-    <property name="type">popup</property>
     <property name="title" translatable="yes">Create new user account</property>
     <child>
       <object class="GtkGrid" id="grid2">

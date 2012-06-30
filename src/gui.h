@@ -95,6 +95,9 @@ private:
 	void choosesrc ();
 	void choosedest ();
 
+	//directs to program file
+	std::string home_path;
+
 	//choose editor
 	Glib::RefPtr<Gtk::CheckButton> graphicaleditor;
 	void chooseeditor();

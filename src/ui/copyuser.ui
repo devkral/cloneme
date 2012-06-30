@@ -206,7 +206,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="deleteusercomp">
+          <object class="GtkButton" id="ignoreuser">
             <property name="label" translatable="yes">Don't copy account</property>
             <property name="use_action_appearance">False</property>
             <property name="visible">True</property>

@@ -62,28 +62,28 @@ void copyuser::synch()
 void copyuser::clean()
 {
 	std::string sum="";
-sum+="        if [ ! -d \""+dest+"\"/home/\""+name+"\" ];then\n";
-	if (==true)
+	sum+="        if [ ! -d \""+dest+"\"/home/\""+name+"\" ];then\n";
+	if (deletepasswd->get_active ()==true)
 		sum+="question_delete=\"yes\"\n";
 	else
 		sum+="question_delete=\"no\"\n";
 		
-sum+="          if [ \"$question_delete\" = \"yes\" ]; then\n";
-sum+="            \n";
-sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd\n";
-sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd-\n";
-sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group\n";
-sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group\n";
-sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group-\n";
-sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group-\n";
-sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow\n";
-sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow\n";
-sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow-\n";
-sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow-\n";
-sum+="            rm \"/var/spool/mail/"+name+"\" 2> /dev/null\n";
-sum+="            echo \"cleaning finished\"\n";
-sum+="          fi\n";
-sum+="        fi\n";
+	sum+="          if [ \"$question_delete\" = \"yes\" ]; then\n";
+	sum+="            \n";
+	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd\n";
+	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd-\n";
+	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group\n";
+	sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group\n";
+	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group-\n";
+	sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group-\n";
+	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow\n";
+	sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow\n";
+	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow-\n";
+	sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow-\n";
+	sum+="            shred -u \""+dest+"/var/spool/mail/"+name+"\" 2> /dev/null\n";
+	sum+="            echo \"cleaning finished\"\n";
+	sum+="          fi\n";
+	sum+="        fi\n";
 
 	system2(sum);
 
@@ -209,23 +209,24 @@ copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 	createempty->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::empty));
 	explain=transform_to_rptr<Gtk::Button>(builder->get_object("explain"));
 	explain->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::explaining));
-	deleteusercomp=transform_to_rptr<Gtk::Button>(builder->get_object("deleteusercomp"));
+	ignoreuser=transform_to_rptr<Gtk::Button>(builder->get_object("deleteusercomp"));
+	ignoreuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::clean));
 	deletepasswd=transform_to_rptr<Gtk::CheckButton>(builder->get_object("deletepasswd"));
-	if ( access("/home/"+name,F_OK)==0)
+	if ( access(((std::string)"/home/"+name).c_str(),F_OK)==0)
 	{
 		//hide
 		deletepasswd->set_active(false);
 		deletepasswd->hide();
 		explain->hide();
-		copysynch->set_text("Synchronize target account");
-		copysynch->set_text("Delete the user files of the existing target account");
-		copysynch->set_text("Don't touch the existing target account");
+		copysynch->set_label("Synchronize target account");
+		createempty->set_label("Delete the user files of the existing target account");
+		ignoreuser->set_label("Don't touch the existing target account");
 
 	}
 	copyuser_win->show();
 
 	if (copyuser_win!=0)
 	{
-		kitcopy.run(*main_win.operator->());
+		kitcopy.run(*copyuser_win.operator->());
 	}
 }
