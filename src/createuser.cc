@@ -42,8 +42,35 @@
 //#include <getopt.h>
 #include <iostream>
 
+int createuser::usercreation()
+{
+	
+	if (log="")
+		return 0;
+	
+	std::cerr << log;
+	return 1;
+	
+}
 
-createuser::createuser(int argc, char* argv[])
+void createuser::adduser()
+{
+	if (usercreation()==0)
+		std::cout << "success";
+}
+
+void createuser::quit()
+{
+	kitcreate.quit();
+}
+
+void createuser::adduserquit()
+{
+	if (usercreation()==0)
+		kitcreate.quit();
+}
+
+createuser::createuser(int argc, char* argv[]): kitcreate(argc, argv)
 {
 	builder = Gtk::Builder::create();
 	try
@@ -97,9 +124,23 @@ createuser::createuser(int argc, char* argv[])
 	}
 	createuser_win=transform_to_rptr<Gtk::Window>(builder->get_object("copyuser_win"));
 
-	addnewuser=transform_to_rptr<Gtk::Button>(builder->get_object("addnewuser"));
-	breaknewuser=transform_to_rptr<Gtk::Button>(builder->get_object("breaknewuser"));
-	addnewuserandbreak=transform_to_rptr<Gtk::Button>(builder->get_object("addnewuserandbreak"));
+	//init entry, checkbutton
+	username=transform_to_rptr<Gtk::Button>(builder->get_object("username"));
+	admswitch=transform_to_rptr<Gtk::CheckButton>(builder->get_object("admswitch"));
 	
+	//init buttons
+	addnewuser=transform_to_rptr<Gtk::Button>(builder->get_object("addnewuser"));
+	addnewuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::adduser));
+	breaknewuser=transform_to_rptr<Gtk::Button>(builder->get_object("breaknewuser"));
+	breaknewuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::quit));
+	addnewuserandbreak=transform_to_rptr<Gtk::Button>(builder->get_object("addnewuserandbreak"));
+	addnewuserandbreak->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::adduserquit));
+
+	createuser_win->show();
+	
+	if (createuser_win!=0)
+	{
+		kitcreate.run(*main_win.operator->());
+	}
 }
 

@@ -114,7 +114,7 @@ void copyuser::explaining()
 
 }
 
-copyuser::copyuser(int argc, char* argv[])
+copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 {
 	int ch;
 	while (ch = getopt_long(argc, argv, "+:", longopts, NULL) != -1)
@@ -223,4 +223,9 @@ copyuser::copyuser(int argc, char* argv[])
 
 	}
 	copyuser_win->show();
+
+	if (copyuser_win!=0)
+	{
+		kitcopy.run(*main_win.operator->());
+	}
 }

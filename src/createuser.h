@@ -49,6 +49,7 @@ public:
 protected:
 
 private:
+	Glib::RefPtr<Gtk::Main> kitcreate;
 	Glib::RefPtr<Gtk::Window> createuser_win;
 	//lowest row
 	Glib::RefPtr<Gtk::Button> addnewuser,breaknewuser,addnewuserandbreak;
