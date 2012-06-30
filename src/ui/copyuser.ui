@@ -99,7 +99,8 @@
         </child>
         <child>
           <object class="GtkButton" id="createempty">
-            <property name="label" translatable="yes">Don't copy user files but keep account?</property>
+            <property name="label" translatable="yes">Don't copy user files
+(just create an account with the same permissions)</property>
             <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -206,12 +207,13 @@
         </child>
         <child>
           <object class="GtkButton" id="deleteusercomp">
-            <property name="label" translatable="yes">Don't snychronize account</property>
+            <property name="label" translatable="yes">Don't copy account</property>
             <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
+            <property name="image_position">right</property>
           </object>
           <packing>
             <property name="left_attach">0</property>

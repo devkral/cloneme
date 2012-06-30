@@ -244,6 +244,8 @@ do
             chown $usertemp:$usertemp "${clonetargetdevice2}"/home/"$usertemp"
           fi
         fi
+        # and remove email folder
+        shred -u "${clonetargetdevice2}/var/spool/mail/${usertemp}" 2> /dev/null
         break
       fi
     
@@ -263,7 +265,8 @@ do
             sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow
             sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow-
             sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow-
-            rm "${clonetargetdevice2}/var/spool/mail/${usertemp}" 2> /dev/null
+            # and remove email folder
+            shred -u "${clonetargetdevice2}/var/spool/mail/${usertemp}" 2> /dev/null
             echo "cleaning finished"
           fi
         fi

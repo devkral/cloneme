@@ -45,6 +45,61 @@
 
 createuser::createuser(int argc, char* argv[])
 {
+	builder = Gtk::Builder::create();
+	try
+	{
+		builder->add_from_file(PACKAGE_DATA_DIR"/ui/createuser.ui");
+	}
+	catch(const Glib::FileError& ex)
+	{
+		//std::cerr << ENOENT;
+		//if (ex.code()==ENOENT)
+		//	std::cerr << "good";
+		//strange ENOENT doesn't work even it should correspond
+		if (ex.code()==4)
+		{
+			std::cerr << "createuser.ui not found; fall back to src directory\n";
+			try
+			{
+				builder->add_from_file("./src/ui/createuser.ui");
+			}
+			catch(const Glib::FileError& ex)
+			{
+				std::cerr << "FileError: " << ex.what() << std::endl;
+				throw(ex);
+			}
+			catch(const Glib::MarkupError& ex)
+			{
+				std::cerr << "MarkupError: " << ex.what() << std::endl;
+				throw(ex);
+			}
+			catch(const Gtk::BuilderError& ex)
+			{
+				std::cerr << "BuilderError: " << ex.what() << std::endl;
+				throw(ex);
+			}
+		}
+		else
+		{
+			std::cerr << "FileError: " << ex.what() << std::endl;
+			throw(ex);
+		}
+	}
+	catch(const Glib::MarkupError& ex)
+	{
+		std::cerr << "MarkupError: " << ex.what() << std::endl;
+		throw(ex);
+	}
+	catch(const Gtk::BuilderError& ex)
+	{
+		std::cerr << "BuilderError: " << ex.what() << std::endl;
+		throw(ex);
+	}
+	createuser_win=transform_to_rptr<Gtk::Window>(builder->get_object("copyuser_win"));
 
+	addnewuser=transform_to_rptr<Gtk::Button>(builder->get_object("addnewuser"));
+	breaknewuser=transform_to_rptr<Gtk::Button>(builder->get_object("breaknewuser"));
+	addnewuserandbreak=transform_to_rptr<Gtk::Button>(builder->get_object("addnewuserandbreak"));
+	
 }
 

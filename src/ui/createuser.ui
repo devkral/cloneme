@@ -38,7 +38,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkEntry" id="userentry">
+          <object class="GtkEntry" id="username">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="invisible_char">●</property>
@@ -66,7 +66,7 @@ have admin permissions?</property>
           </packing>
         </child>
         <child>
-          <object class="GtkCheckButton" id="admbutton">
+          <object class="GtkCheckButton" id="admswitch">
             <property name="label" translatable="yes">Admin?</property>
             <property name="use_action_appearance">False</property>
             <property name="visible">True</property>

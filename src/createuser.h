@@ -49,8 +49,16 @@ public:
 protected:
 
 private:
-	std::string src;
-	std::string dest;
+	Glib::RefPtr<Gtk::Window> createuser_win;
+	//lowest row
+	Glib::RefPtr<Gtk::Button> addnewuser,breaknewuser,addnewuserandbreak;
+	// input fields
+	Glib::RefPtr<Gtk::Entry> username;
+	Glib::RefPtr<Gtk::CheckButton> admswitch;
+	void adduser();
+	void quit();
+	void adduserquit();
+	
 };
 
 #endif // _CREATEUSER_H_

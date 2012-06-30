@@ -54,8 +54,9 @@ static struct option longopts[] = {
 
 void copyuser::synch()
 {
-
-
+	std::string sum="";
+	sum+="        rsync -a -A --progress --delete --exclude \""+dest+"\" \""+src+"\"home/\""+name+"\" \""+dest+"\"/home/\n";
+	std::cerr << system2(sum);
 }
 
 void copyuser::clean()
@@ -160,7 +161,7 @@ copyuser::copyuser(int argc, char* argv[])
 		//strange ENOENT doesn't work even it should correspond
 		if (ex.code()==4)
 		{
-			std::cerr << "myfiledialog.ui not found; fall back to src directory\n";
+			std::cerr << "copyuser.ui not found; fall back to src directory\n";
 			try
 			{
 				builder->add_from_file("./src/ui/copyuser.ui");
@@ -203,14 +204,22 @@ copyuser::copyuser(int argc, char* argv[])
 	username=transform_to_rptr<Gtk::Label>(builder->get_object("username"));
 	username->set_text(name);
 	copysynch=transform_to_rptr<Gtk::Button>(builder->get_object("copysynch"));
+	copysynch->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::synch));
 	createempty=transform_to_rptr<Gtk::Button>(builder->get_object("createempty"));
+	createempty->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::empty));
 	explain=transform_to_rptr<Gtk::Button>(builder->get_object("explain"));
 	explain->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::explaining));
 	deleteusercomp=transform_to_rptr<Gtk::Button>(builder->get_object("deleteusercomp"));
 	deletepasswd=transform_to_rptr<Gtk::CheckButton>(builder->get_object("deletepasswd"));
 	if ( access("/home/"+name,F_OK)==0)
 	{
-
+		//hide
+		deletepasswd->set_active(false);
+		deletepasswd->hide();
+		explain->hide();
+		copysynch->set_text("Synchronize target account");
+		copysynch->set_text("Delete the user files of the existing target account");
+		copysynch->set_text("Don't touch the existing target account");
 
 	}
 	copyuser_win->show();
