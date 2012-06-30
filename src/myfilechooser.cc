@@ -121,7 +121,6 @@ myfilechooser::myfilechooser()
 		std::cerr << "BuilderError: " << ex.what() << std::endl;
 		throw(ex);
 	}
-
 	myfilechoose=transform_to_rptr<Gtk::Window>(builder->get_object("myfilechoose"));
 	
 	filechooserwidget1=transform_to_rptr<Gtk::FileChooserWidget>(builder->get_object("filechooserwidget1"));

@@ -39,7 +39,7 @@ help(){
 # translate into more informative names and check arguments
 choosemode="$1"
 case "$#" in
-  4)clonesource="$2";clonetargetdevice="$3";clonetarget="$4";;
+  4)clonesource="$2";clonetargetdevice="$3";syncdir="$4";;
   3)clonesource="$2";clonetargetdevice="$3";;
   2)clonetargetdevice="$2";;
   *)help;exit 1;;
@@ -169,11 +169,15 @@ if [ "$choosemode" != "---special-mode---" ]; then
 #check clonesource2; it has to end with /"
   tempp="$(echo "$clonesource2" | sed "s/\/$//")"
   clonesource2="$tempp/"
+else
+  clonetargetdevice2 = "${clonetargetdevice}"
 fi
 
 
 addnewusers(){
-  if [ $cloneme_ui_mode = false ];then
+  if [ $cloneme_ui_mode = true ];then
+    ${graphic_interface_path} --createuser
+  else
     usercounter=0
     for (( ; ; ))
     do
@@ -207,8 +211,6 @@ addnewusers(){
         break
       fi
     done
-  else
-    ${graphic_interface_path} --createuser
   fi
 }
 
@@ -217,14 +219,16 @@ copyuser(){
 
 for usertemp in $(ls /home)
 do
-  if [ $cloneme_ui_mode = false ];then
+  if [ $cloneme_ui_mode = true ];then
+    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2}" --name "${usertemp}"
+  else
     for (( ; ; ))
     do
       echo "What shall be done with user $usertemp?"
       if [ -d "${clonetargetdevice2}"/home/"$usertemp" ]; then
         echo -e "Synchronize user account. Type \"s\""
+		echo -e "Eradicate user files. Type \"e\""
 		echo -e "Don't change the user account. Type \"c\""
-		echo -e "Eradicate user file. Type \"e\""
       else
         echo -e "Copy user account. Type \"s\""
         echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
@@ -233,7 +237,10 @@ do
       
       read -n 1 answer_useracc
       if [ "$answer_useracc" = "s" ]; then
-        rsync -a -A --progress --delete --exclude "${clonetargetdevice2}" "${clonesource2}"home/"${usertemp}" "${clonetargetdevice2}"/home/
+        if ! rsync -a -A --progress --delete --exclude "${clonetargetdevice2}" "${clonesource2}"home/"${usertemp}" "${clonetargetdevice2}"/home/ ;then
+          echo "error: rsync could not sync"
+          exit 1
+        fi  
         break
       fi
     
@@ -254,8 +261,9 @@ do
       fi
     
       if [ "$answer_useracc" = "c" ]; then
-        if [ ! -d "${clonetargetdevice2}"/home/"$usertemp" ];then
-          echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type yes (not the default)"
+        if [ ! -d "${clonetargetdevice2}/home/$usertemp" ]; then
+          # bug (not mine) if you use "i n" sourcehighlighting goes mad
+          echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type \"yes\" (not the default)"
           read question_delete
           if [ "$question_delete" = "yes" ]; then
             #still experimental
@@ -277,8 +285,6 @@ do
         break
       fi
     done
-  else
-    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2}" --name "${usertemp}"
   fi
 done
 
@@ -286,16 +292,21 @@ done
 }
 
 installer(){
-  if [ "$(ls -A "${clonetargetdevice2}")" != "" ];then
-    echo "The target partition is not empty. Shall I clean it? Type \"yes\""
-    read shall_clean
-    if [ "${shall_clean}" = "yes" ];then
-      rm -r "${clonetargetdevice2}"/*
+  if [ $cloneme_ui_mode = false ];then
+    if [ "$(ls -A "${clonetargetdevice2}")" != "" ];then
+      echo "The target partition is not empty. Shall I clean it? Type \"yes\""
+      read shall_clean
+      if [ "${shall_clean}" = "yes" ];then
+        rm -r "${clonetargetdevice2}"/*
+      fi
     fi
   fi
 
-  rsync -a -A --progress --delete --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdevice2}" --exclude "${clonesource2}home/*" --exclude "${clonesource2}sys/*" --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}"
-  if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
+  if ! rsync -a -A --progress --delete --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdevice2}" --exclude "${clonesource2}home/*" --exclude "${clonesource2}sys/*" --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ;then
+    echo "error: rsync could not sync"
+    exit 1
+  fi  
+if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
     sed -i -e "s/\((hd0)\)/# \1/" "${clonetargetdevice2}"/boot/grub/device.map
   fi
   echo "(hd0) $(grub-probe -t device "${clonetargetdevice2}" | sed -e "s|[0-9]*$||") #--specialclone-me--" >> "${clonetargetdevice2}"/boot/grub/device.map
@@ -305,7 +316,7 @@ installer(){
     echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
     read shall_fstab
     if [ "$shall_fstab" = "yes" ]; then
-      if ! ${EDITOR} "${clonetargetdevice2}"/etc/fstab; then
+      if ! ${EDITOR} "${clonetargetdevice2}/etc/fstab"; then
         echo "Fall back to vi"
         vi "${clonetargetdevice2}"/etc/fstab
       fi
@@ -341,18 +352,22 @@ installer_grub2(){
   #clonetargetdevice because mounting isn't executed
   get_dev="$(grub-probe -t device "${clonetargetdevice2}" | sed  -e "s|[0-9]*$||")"
   if ! grub-install "$get_dev";then
+    echo "Error: $get_dev not found"
     echo "I failed please do it yourself"
     /bin/sh
   fi
   
   #get_part="$(grub-probe -t device ${clonetargetdevice2}" | sed "s/.\+([0-9]*)/${clonetargetdevice2}/")"
   grub-mkconfig -o /boot/grub/grub.cfg
-  echo "grub installation finished. Beginn of the configuration of the new system"
+  echo -e "grub installation finished.\nStart with the configuration of the new system"
   $config_new_sys
 }
 
 updater(){
-  rsync -a -A --progress --delete --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map --exclude "${clonesource2}"etc/fstab --exclude "${syncdir}" --exclude "$clonetargetdevice2" --exclude "${clonesource2}home/*" --exclude "${clonesource2}"sys/ --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}"
+  if ! rsync -a -A --progress --delete --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map --exclude "${clonesource2}"etc/fstab --exclude "${syncdir}" --exclude "$clonetargetdevice2" --exclude "${clonesource2}home/*" --exclude "${clonesource2}"sys/ --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ; then
+    echo "error: rsync could not sync"
+    exit 1
+  fi  
   copyuser
 }
 
@@ -365,11 +380,17 @@ case "$choosemode" in
 esac
 
 
-#clean up
-if [ "$choosemode" != "---special-mode---" ]; then
-  umount "${clonetargetdevice2}"
-  rmdir "${clonetargetdevice2}"
+#clean up src
+if [ "${clonesource2}" = "${syncdir}/src" ]; then
   umount "${clonesource2}"
   rmdir "${clonesource2}"
+if [ "${clonetargetdevice2}" = "${syncdir}/dest" ]; then
+  umount "${clonetargetdevice2}"
+  rmdir "${clonetargetdevice2}"
+fi
+
+#doesn't exist in this mode
+if [ "${choosemode}" != "---special-mode---" ]; then 
   rmdir "${syncdir}"
 fi
+exit 0

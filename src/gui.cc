@@ -96,7 +96,7 @@ void gui::update()
 	else
 	{
 		std::cerr << "cloneme.sh not found; fall back to src directory\n";
-		sum+="./src/sh";
+		sum+="$PWD/src/sh";
 	}
 	sum+="/cloneme.sh update "+src->get_text()+" "+dest->get_text()+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
@@ -111,7 +111,7 @@ void gui::install()
 	else
 	{
 		std::cerr << "cloneme.sh not found; fall back to src directory\n";
-		sum+="./src/sh";
+		sum+="$PWD/src/sh";
 	}
 	sum+="/cloneme.sh install "+src->get_text()+" "+dest->get_text()+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());

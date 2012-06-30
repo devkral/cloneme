@@ -11,7 +11,7 @@ template< class T_CppObject > Glib::RefPtr<T_CppObject>
 transform_to_rptr(const Glib::RefPtr< Glib::Object >& p)
 {
 	if (p==0)
-		std::cerr << "Error object empty";
+		std::cerr << "Error: object empty";
 	return Glib::RefPtr<T_CppObject>::cast_dynamic(p);
 }
 
