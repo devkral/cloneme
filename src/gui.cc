@@ -90,13 +90,13 @@ void gui::opengparted()
 void gui::update()
 {
 	std::string sum="";
-	sum+=(std::string)"graphic_interface_path=\""+home_path+(std::string)"\"";
+	sum+=(std::string)"graphic_interface_path=\""+home_path+(std::string)"\"\n";
 	if ( access(PACKAGE_BIN_DIR"/cloneme.sh",F_OK)==0)
 		sum+=PACKAGE_BIN_DIR;
 	else
 	{
 		std::cerr << "cloneme.sh not found; fall back to src directory\n";
-		sum+="./src";
+		sum+="./src/sh";
 	}
 	sum+="/cloneme.sh update "+src->get_text()+" "+dest->get_text()+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
@@ -105,13 +105,13 @@ void gui::update()
 void gui::install()
 {
 	std::string sum="";
-	sum+=(std::string)"graphic_interface_path=\""+home_path+(std::string)"\"";
+	sum+=(std::string)"graphic_interface_path=\""+home_path+(std::string)"\"\n";
 	if ( access(PACKAGE_BIN_DIR"/cloneme.sh",F_OK)==0)
 		sum+=PACKAGE_BIN_DIR;
 	else
 	{
 		std::cerr << "cloneme.sh not found; fall back to src directory\n";
-		sum+="./src";
+		sum+="./src/sh";
 	}
 	sum+="/cloneme.sh install "+src->get_text()+" "+dest->get_text()+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());

@@ -5,7 +5,7 @@
 #the command which configures the target system
 config_new_sys="addnewusers"
 #the command to install the bootloader
-if [ ! installbootloader ];then
+if [ "${installbootloader}x" = "x" ];then
   installbootloader="installer_grub2"
 fi
 #defaults
@@ -56,7 +56,7 @@ if [ ! "$UID" = "0" ]; then
 fi
 
 #activate ui mode
-if [ ${graphic_interface_path} ]; then
+if [ "${graphic_interface_path}x" != "x" ]; then
   cloneme_ui_mode=true
 fi
 
@@ -140,15 +140,15 @@ if [ "$choosemode" != "---special-mode---" ]; then
   if [ -d "${clonesource}" ];then
     clonesource2="${clonesource}"
   elif [ -b "${clonesource}" ];then
-    mkdir -p "${syncdir}"/src 2> /dev/null
-    mounting "${clonesource}" "${syncdir}"/src
-    clonesource2="${syncdir}"/src
+    mkdir -p "${syncdir}/src" 2> /dev/null
+    mounting "${clonesource}" "${syncdir}/src"
+    clonesource2="${syncdir}/src"
   elif [ -f "${clonesource}" ];then
     mkdir -p "${syncdir}"/src 2> /dev/null
     losetup -f -P "${clonesource}"
-    local clonesourcetemp=$(losetup -a | grep "${clonesource}")
-    mounting "${clonesourcetemp}" "${syncdir}"/src
-    clonesource2="${syncdir}"/src
+    clonesourcetemp=$(losetup -a | grep "${clonesource}")
+    mounting "${clonesourcetemp}" "${syncdir}/src"
+    clonesource2="${syncdir}/src"
   else
     echo "source not recognized"
     exit 1
@@ -157,11 +157,11 @@ if [ "$choosemode" != "---special-mode---" ]; then
   if [ -d "${clonetargetdevice}" ];then
     clonetargetdevice2="${clonetargetdevice}"
   elif [ -b "${clonetargetdevice}" ];then
-    mkdir -p "${syncdir}"/dest 2> /dev/null
+    mkdir -p "${syncdir}/dest" 2> /dev/null
     losetup -f -P "${clonetargetdevice}"
-    local clonetargettemp=$(losetup -a | grep "${clonetargetdevice}")
-    mounting "${clonetargettemp}" "${syncdir}"/dest
-    clonetargetdevice2="${syncdir}"/dest
+    clonetargettemp=$(losetup -a | grep "${clonetargetdevice}")
+    mounting "${clonetargettemp}" "${syncdir}/dest"
+    clonetargetdevice2="${syncdir}/dest"
   else
     echo "target not recognized"
     exit 1
@@ -177,7 +177,7 @@ addnewusers(){
     usercounter=0
     for (( ; ; ))
     do
-      if [ $usercounter = 0 ];then
+      if [ ${usercounter} = 0 ];then
         usercounter=1;
         echo "Create new user? [yes/no]"
       else
@@ -278,7 +278,7 @@ do
       fi
     done
   else
-    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2 --name "${usertemp}"
+    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2}" --name "${usertemp}"
   fi
 done
 
@@ -301,12 +301,14 @@ installer(){
   echo "(hd0) $(grub-probe -t device "${clonetargetdevice2}" | sed -e "s|[0-9]*$||") #--specialclone-me--" >> "${clonetargetdevice2}"/boot/grub/device.map
   sed -i -e "s/.\+\( \/ .\+\)/UUID=$(grub-probe -t fs_uuid ${clonetargetdevice2})\1/" "${clonetargetdevice2}"/etc/fstab
   echo "root in fstab updated"
-  echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
-  read shall_fstab
-  if [ "$shall_fstab" = "yes" ]; then
-    if ! ${EDITOR} "${clonetargetdevice2}"/etc/fstab; then
-      echo "Fall back to vi"
-      vi "${clonetargetdevice2}"/etc/fstab
+  if [ $cloneme_ui_mode = false ];then
+    echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
+    read shall_fstab
+    if [ "$shall_fstab" = "yes" ]; then
+      if ! ${EDITOR} "${clonetargetdevice2}"/etc/fstab; then
+        echo "Fall back to vi"
+        vi "${clonetargetdevice2}"/etc/fstab
+      fi
     fi
   fi
   copyuser
@@ -319,15 +321,16 @@ installer(){
 
   sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
   #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdevice2}"/boot/grub/device.map
-  echo "if you want to use device.map please type \"yes\" and edit it now"
-  read shall_devicemap
-  if [ "$shall_devicemap" = "yes" ]; then
-    if ! ${EDITOR} "${clonetargetdevice2}"/boot/grub/device.map; then
-      echo "Fall back to vi"
-      vi "${clonetargetdevice2}"/boot/grub/device.map
+  if [ $cloneme_ui_mode = false ];then
+    echo "if you want to use device.map please type \"yes\" and edit it now"
+    read shall_devicemap
+    if [ "$shall_devicemap" = "yes" ]; then
+      if ! ${EDITOR} "${clonetargetdevice2}"/boot/grub/device.map; then
+        echo "Fall back to vi"
+        vi "${clonetargetdevice2}"/boot/grub/device.map
+      fi
     fi
   fi
-
   umount "${clonetargetdevice2}"/{proc,sys,dev}
 }
 
