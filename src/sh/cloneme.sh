@@ -19,7 +19,8 @@ usergroupargs="video,audio,optical,power"
 #graphic_interface_path
 #don't comment or change this
 cloneme_ui_mode=false
-
+clonesourceloop=""
+clonetargetloop=""
 
 help(){
   echo "cloneme <mode> [<source>] <target> [<syncdir>]"
@@ -145,9 +146,16 @@ if [ "$choosemode" != "---special-mode---" ]; then
     clonesource2="${syncdir}/src"
   elif [ -f "${clonesource}" ];then
     mkdir -p "${syncdir}"/src 2> /dev/null
-    losetup -f -P "${clonesource}"
-    clonesourcetemp=$(losetup -a | grep "${clonesource}")
-    mounting "${clonesourcetemp}" "${syncdir}/src"
+    if ! losetup -a | grep "${clonesource}";then
+      if ! losetup -f -P "${clonesource}";then
+        echo "Hint: have you restarted the kernel after last update?"
+        exit 1
+      fi
+    fi
+    clonesourceloop=$(losetup -a | grep "${clonesource}" | sed -e "s/:.*//")
+    echo "Please enter the partition number (beginning with p)"
+    read parts
+    mounting "${clonesourceloop}$parts" "${syncdir}/src"
     clonesource2="${syncdir}/src"
   else
     echo "source not recognized"
@@ -158,9 +166,20 @@ if [ "$choosemode" != "---special-mode---" ]; then
     clonetargetdevice2="${clonetargetdevice}"
   elif [ -b "${clonetargetdevice}" ];then
     mkdir -p "${syncdir}/dest" 2> /dev/null
-    losetup -f -P "${clonetargetdevice}"
-    clonetargettemp=$(losetup -a | grep "${clonetargetdevice}")
-    mounting "${clonetargettemp}" "${syncdir}/dest"
+    mounting "${clonetargetdevice}" "${syncdir}/dest"
+    clonetargetdevice2="${syncdir}/dest"
+  elif [ -f "${clonetargetdevice}" ];then
+    mkdir -p "${syncdir}/dest" 2> /dev/null
+    if ! losetup -a | grep "${clonetargetdevice}";then
+      if ! losetup -f -P "${clonetargetdevice}";then 
+        echo "Hint: have you restarted the kernel after last update?"
+        exit 1
+      fi
+    fi
+    clonetargetloop=$(losetup -a | grep "${clonetargetdevice}" | sed -e "s/:.*//")
+    echo "Please enter the partition number (beginning with p)"
+    read partd
+    mounting "${clonetargetloop}$partd" "${syncdir}/dest"
     clonetargetdevice2="${syncdir}/dest"
   else
     echo "target not recognized"
@@ -379,6 +398,14 @@ case "$choosemode" in
   *)help;exit 1;;
 esac
 
+#unmount loops
+if [ "${clonesourceloop}" != "" ];then
+  losetup -d "${clonesourceloop}"
+fi
+
+if [ "${clonetargetloop}" != "" ];then
+  losetup -d "${clonetargetloop}"
+fi
 
 #clean up src
 if [ "${clonesource2}" = "${syncdir}/src" ]; then
