@@ -10,8 +10,17 @@
   <object class="GtkWindow" id="myfilechoose">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Choose file or directory</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="icon">icon.png</property>
+    <property name="type_hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="opacity">0.94999999999999996</property>
     <child>
       <object class="GtkGrid" id="grid5">
+        <property name="width_request">500</property>
+        <property name="height_request">320</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="margin_left">5</property>
@@ -40,16 +49,16 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">center</property>
+            <property name="margin_top">7</property>
             <property name="column_spacing">11</property>
             <child>
-              <object class="GtkButton" id="fileaccept">
-                <property name="label">gtk-ok</property>
+              <object class="GtkButton" id="selectfile">
+                <property name="label" translatable="yes">Choose selected file</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -59,7 +68,23 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="filecancel">
+              <object class="GtkButton" id="currentfold">
+                <property name="label" translatable="yes">Select current folder</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="canceldialog">
                 <property name="label">gtk-cancel</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
@@ -69,7 +94,7 @@
                 <property name="use_stock">True</property>
               </object>
               <packing>
-                <property name="left_attach">1</property>
+                <property name="left_attach">2</property>
                 <property name="top_attach">0</property>
                 <property name="width">1</property>
                 <property name="height">1</property>

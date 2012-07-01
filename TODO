@@ -1,7 +1,6 @@
 
 +make EDITOR fetch from main system working (see gui.cc)
-++filedialog doesn't find mainfile (I don't know why)
-+graphic mode isn't accepted by cloneme.sh
++rename name
 
 not very important:
 

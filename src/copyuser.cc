@@ -44,11 +44,7 @@
 
 
 
-static struct option longopts[] = {
-	{ "src", required_argument, 0, 0 },
-	{ "dest", required_argument, 0, 0 },
-	{ "name", required_argument, 0, 0 }
-};
+
 
 
 
@@ -116,16 +112,26 @@ void copyuser::explaining()
 
 copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 {
-	int ch;
-	while (ch = getopt_long(argc, argv, "+:", longopts, NULL) != -1)
+	int ch=0;
+	// options descriptor 
+	static struct option longopts[] = {
+		{ "src", required_argument, &ch, 1 },
+		{ "dest", required_argument, &ch, 2 },
+		{ "user", required_argument, &ch, 3 },
+		{0,0,0,0}
+	};
+	int index=0;
+	while (getopt_long(argc, argv, "", longopts, &index) != -1)
 	{
 		switch(ch)
 		{
-			case 0: src=optarg;
+			case 1: src=optarg;
 				break;
-			case 1: dest=optarg;
+			case 2: dest=optarg;
 				break;
-			case 2: name=optarg;
+			case 3: name=optarg;
+				break;
+			default: ;
 				break;
 		};
     }
@@ -209,7 +215,7 @@ copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 	createempty->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::empty));
 	explain=transform_to_rptr<Gtk::Button>(builder->get_object("explain"));
 	explain->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::explaining));
-	ignoreuser=transform_to_rptr<Gtk::Button>(builder->get_object("deleteusercomp"));
+	ignoreuser=transform_to_rptr<Gtk::Button>(builder->get_object("ignoreuser"));
 	ignoreuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::clean));
 	deletepasswd=transform_to_rptr<Gtk::CheckButton>(builder->get_object("deletepasswd"));
 	if ( access(((std::string)"/home/"+name).c_str(),F_OK)==0)

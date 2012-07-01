@@ -66,10 +66,10 @@ int createuser::makeuser()
 	sum+="        useradd -m -U \""+username->get_text()+"\" -p \"\" -G $usergroupargs\n";
 	sum+="        passwd -e \""+username->get_text()+"\"\n";
 	std::string log=system2(sum);
-	if (log.empty()==true)
-		return 0;
-	std::cerr << log;
-	return 1;
+	username->set_text("");
+	// cout returned messages
+	std::cout << "Debug: " << log << "\n";
+	return 0;
 	
 }
 

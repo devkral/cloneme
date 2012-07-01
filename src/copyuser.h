@@ -65,8 +65,7 @@ private:
 	void empty();
 	void explaining();
 	
-	std::string src;
-	std::string dest;
+	std::string src, dest;
 	std::string name;
 
 };

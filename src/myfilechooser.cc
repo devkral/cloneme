@@ -122,7 +122,6 @@ myfilechooser::myfilechooser()
 		throw(ex);
 	}
 	myfilechoose=transform_to_rptr<Gtk::Window>(builder->get_object("myfilechoose"));
-	
 	filechooserwidget1=transform_to_rptr<Gtk::FileChooserWidget>(builder->get_object("filechooserwidget1"));
 	selectfile=transform_to_rptr<Gtk::Button>(builder->get_object("selectfile"));
 	selectfile->signal_clicked ().connect(sigc::mem_fun(*this,&myfilechooser::usefile));

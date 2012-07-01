@@ -69,7 +69,7 @@ void gui::chooseeditor()
 	{
 //TODO:
 //buggy;can't fetch the editor from the main system
-//most probably because I haven't set environment variables
+//most probably because of missing environment variables
 		std::string sum="EDITOR="+system2("echo \"$EDITOR\"")+"\n";
 		std::cout << sum;
 //so use my favourite
@@ -90,7 +90,6 @@ void gui::opengparted()
 void gui::update()
 {
 	std::string sum="";
-	sum+=(std::string)"graphic_interface_path=\""+home_path+(std::string)"\"\n";
 	if ( access(PACKAGE_BIN_DIR"/cloneme.sh",F_OK)==0)
 		sum+=PACKAGE_BIN_DIR;
 	else
@@ -98,7 +97,7 @@ void gui::update()
 		std::cerr << "cloneme.sh not found; fall back to src directory\n";
 		sum+="$PWD/src/sh";
 	}
-	sum+="/cloneme.sh update "+src->get_text()+" "+dest->get_text()+"\n";
+	sum+="/cloneme.sh mastergraphicmode update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
@@ -113,7 +112,7 @@ void gui::install()
 		std::cerr << "cloneme.sh not found; fall back to src directory\n";
 		sum+="$PWD/src/sh";
 	}
-	sum+="/cloneme.sh install "+src->get_text()+" "+dest->get_text()+"\n";
+	sum+="/cloneme.sh mastergraphicmode install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
@@ -196,7 +195,8 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 		throw(ex);
 	}
 	main_win=transform_to_rptr<Gtk::Window>(builder->get_object("main_win"));
-
+	
+	
 	//Terminal
 	terminal=transform_to_rptr<Gtk::Alignment>(builder->get_object("termspace"));
 	vteterm=vte_terminal_new();

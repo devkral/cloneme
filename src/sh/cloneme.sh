@@ -5,25 +5,23 @@
 #the command which configures the target system
 config_new_sys="addnewusers"
 #the command to install the bootloader
-if [ "${installbootloader}x" = "x" ];then
-  installbootloader="installer_grub2"
-fi
+installbootloader="installer_grub2"
 #defaults
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
-syncdir="/syncdir"
+syncdir="/run/syncdir"
 #default groups of new users
 usergroupargs="video,audio,optical,power"
-#graphic interface (not uncomment! just as reference)
-#graphic_interface_path
+#graphic interface
 #don't comment or change this
+graphic_interface_path=""
 cloneme_ui_mode=false
 clonesourceloop=""
 clonetargetloop=""
 
 help(){
-  echo "cloneme <mode> [<source>] <target> [<syncdir>]"
+  echo "cloneme <mode> [<source>] <target>"
   echo "valid modes are:"
   echo "update: updates the target system to the level of the source"
   echo "install: clone running system with respect for privacy of users"
@@ -31,25 +29,33 @@ help(){
   echo "Explaination"
   echo "<source> is the folder which is copied"
   echo "<target> is the partition on the device which is meant to contain the target system"
-  echo "<syncdir> is the directory where target is mounted"
 }
 	
 
 # basic checks
 
 # translate into more informative names and check arguments
-choosemode="$1"
-case "$#" in
-  4)clonesource="$2";clonetargetdevice="$3";syncdir="$4";;
-  3)clonesource="$2";clonetargetdevice="$3";;
-  2)clonetargetdevice="$2";;
-  *)help;exit 1;;
-esac
+if [ "$1" = "mastergraphicmode" ]; then
+  choosemode="$2";
+  clonesource="$3";
+  clonetargetdevice="$4";
+  graphic_interface_path="$5"
+  installbootloader="$6";
 
-if [ "$choosemode" = "--help" ]; then
-  help; exit 0;
+elif [ "$1" = "mastergraphicmode" ]; then
+
+else
+  choosemode="$1"
+  case "$#" in
+    3)clonesource="$2";clonetargetdevice="$3";;
+    2)clonetargetdevice="$2";;
+    *)help;exit 1;;
+  esac
+
+  if [ "$choosemode" = "--help" ]; then
+    help; exit 0;
+  fi
 fi
-
 #check if runs with root permission
 if [ ! "$UID" = "0" ]; then
   echo "error: needs root permissions"
@@ -57,7 +63,7 @@ if [ ! "$UID" = "0" ]; then
 fi
 
 #activate ui mode
-if [ "${graphic_interface_path}x" != "x" ]; then
+if [ "${graphic_interface_path}" != "" ]; then
   cloneme_ui_mode=true
 fi
 
@@ -137,7 +143,7 @@ mounting()
 
 #mount
 ##don't run this when a subprocess of itself
-if [ "$choosemode" != "---special-mode---" ]; then
+if [ "$choosemode" != "---special-mode---" ] || [ "$choosemode" != "---special-mode-graphic---" ]; then
   if [ -d "${clonesource}" ];then
     clonesource2="${clonesource}"
   elif [ -b "${clonesource}" ];then
@@ -189,7 +195,7 @@ if [ "$choosemode" != "---special-mode---" ]; then
   tempp="$(echo "$clonesource2" | sed "s/\/$//")"
   clonesource2="$tempp/"
 else
-  clonetargetdevice2 = "${clonetargetdevice}"
+  clonetargetdevice2 = "$2"
 fi
 
 
@@ -347,7 +353,11 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
   mount -o bind /sys "${clonetargetdevice2}"/sys
   mount -o bind /dev "${clonetargetdevice2}"/dev
 
-  chroot "${clonetargetdevice2}" $0 "---special-mode---" "${clonetargetdevice2}"
+  if [ $cloneme_ui_mode = false ];then
+    chroot "${clonetargetdevice2}" $0 "---special-mode---" "${clonetargetdevice2}"
+  else
+    chroot "${clonetargetdevice2}" $0 "---special-mode-graphic---" "${clonetargetdevice2}"
+  fi
 
   sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
   #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdevice2}"/boot/grub/device.map
@@ -393,6 +403,7 @@ updater(){
 
 case "$choosemode" in
   "---special-mode---") ${installbootloader};;
+  "---special-mode-graphic---") ${installbootloader};;
   "update")updater;;
   "install")installer;;
   *)help;exit 1;;
@@ -417,7 +428,7 @@ if [ "${clonetargetdevice2}" = "${syncdir}/dest" ]; then
 fi
 
 #doesn't exist in this mode
-if [ "${choosemode}" != "---special-mode---" ]; then 
+if [ "${choosemode}" != "---special-mode---" ] || [ "$choosemode" != "---special-mode-graphic---" ]; then 
   rmdir "${syncdir}"
 fi
 exit 0

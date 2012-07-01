@@ -48,15 +48,7 @@ bool comparechar(char *r1, char *r2)
 
 }
 
-// options descriptor 
-static struct option longopts[] = {
-//needs args but this is handled by copyuser directly
-        { "copyuser", no_argument, 0, 0 },
-//needs args but this is handled by createuser directly
-        { "createuser", no_argument, 0, 0 },
-//        { "install_bootloader",  no_argument, 0, 0 },
-//        { "edit", no_argument, 0, 'e' }
-};
+
 
 std::string becomeroot()
 {
@@ -105,14 +97,22 @@ void startgui(int argc, char* argv[])
 int
 main (int argc, char *argv[])
 {
-	int ch;
-	if (ch = getopt_long(argc, argv, "+:", longopts, NULL) != -1)
+	int ch=0;
+	// options descriptor 
+	static struct option longopts[] = {
+		//needs args but this is handled by copyuser directly
+        { "copyuser", no_argument, &ch, 1 },
+        { "createuser", no_argument, &ch, 2 },
+		{0, 0, 0, 0}
+	};
+	int index=1;
+	if (getopt_long(argc, argv, "", longopts, &index) != -1)
 	{
 		switch(ch)
 		{
-			case 0: copyuser(argc,argv);
+			case 1: copyuser(argc,argv);
 				break;
-			case 1: createuser(argc,argv);
+			case 2: createuser(argc,argv);
 				break;
 //			case 2: //not ready
 //				break;

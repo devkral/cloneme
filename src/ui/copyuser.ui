@@ -1,80 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkWindow" id="closedialogdon'tneed">
-    <property name="can_focus">False</property>
-    <property name="type">popup</property>
-    <child>
-      <object class="GtkGrid" id="grid1">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="border_width">5</property>
-        <property name="row_homogeneous">True</property>
-        <property name="column_homogeneous">True</property>
-        <child>
-          <object class="GtkGrid" id="grid2">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="column_spacing">23</property>
-            <child>
-              <object class="GtkButton" id="close">
-                <property name="label">gtk-yes</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-                <property name="width">1</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="abort">
-                <property name="label">gtk-cancel</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">0</property>
-                <property name="width">1</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="label1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Really close this window?</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">0</property>
-            <property name="width">1</property>
-            <property name="height">2</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkWindow" id="copyuser_win">
     <property name="can_focus">False</property>
     <child>
@@ -82,7 +8,7 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkButton" id="copsynch">
+          <object class="GtkButton" id="copysynch">
             <property name="label" translatable="yes">Copy</property>
             <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
@@ -154,6 +80,8 @@
           <object class="GtkGrid" id="grid4">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="halign">center</property>
+            <property name="hexpand">True</property>
             <child>
               <object class="GtkLabel" id="label7">
                 <property name="visible">True</property>
@@ -161,6 +89,10 @@
                 <property name="xalign">0.85000002384185791</property>
                 <property name="ypad">10</property>
                 <property name="label" translatable="yes">What to do with user:</property>
+                <attributes>
+                  <attribute name="weight" value="ultrabold"/>
+                  <attribute name="stretch" value="expanded"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -173,7 +105,14 @@
               <object class="GtkLabel" id="username">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="ypad">11</property>
+                <property name="margin_left">8</property>
+                <property name="margin_right">8</property>
+                <attributes>
+                  <attribute name="style" value="italic"/>
+                  <attribute name="weight" value="ultraheavy"/>
+                  <attribute name="scale" value="2"/>
+                  <attribute name="foreground" value="#ffff00001029"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -189,6 +128,9 @@
                 <property name="xalign">0.15000000596046448</property>
                 <property name="ypad">10</property>
                 <property name="label" translatable="yes">?</property>
+                <attributes>
+                  <attribute name="weight" value="ultrabold"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">2</property>
