@@ -29,6 +29,8 @@ protected:
 
 private:
 	std::string dest;
+	std::string srcdata;
+	std::string destdata;
 };
 
 #endif // _INSTALLGUIINSTALLER_H_

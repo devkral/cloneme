@@ -50,12 +50,22 @@ installguiinstaller::installguiinstaller(int argc, char* argv[] )
 		std::cerr << "Error: dest wasn't specified\n";
 		throw (-1);
 	}
+	
+	if ( access(PACKAGE_DATA_DIR,F_OK)==0)
+		srcdata=PACKAGE_DATA_DIR;
+	else
+		srcdata="${PWD}/src";
+	destdata=dest+PACKAGE_DATA_DIR;
+
 	std::string sum="";
-	sum+=(std::string)"mkdir -p "+dest+(std::string)PACKAGE_DATA_DIR+(std::string)"\n";
-	sum+=(std::string)"cp -r "+(std::string)PACKAGE_DATA_DIR+(std::string)"/* "+dest+(std::string)PACKAGE_DATA_DIR+(std::string)"\n";
-	sum+=(std::string)"cp "+(std::string)argv[0]+(std::string)" "+dest+(std::string)PACKAGE_BIN_DIR+(std::string)"\n";
+	sum+="mkdir -p "+destdata+"\n";
+	sum+="cp -r "+srcdata+"/* "+dest+PACKAGE_DATA_DIR+"\n";
+	sum+="cp "+(std::string)argv[0]+" "+destdata+"\n";
 	//TODO: copy desktop file
 	//sum+=(std::string)"cp "+(std::string)argv[0]+(std::string)" "+dest+(std::string)PACKAGE_BIN_DIR+(std::string)"\n";
-	std::cerr << system2(sum);
+	//what is wrong? logical nothing! memory corruption?
+	std::string log=system2(sum);
+	if (log.empty()==false)
+		std::cerr << log;
 
 }
