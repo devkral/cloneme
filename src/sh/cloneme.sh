@@ -19,6 +19,8 @@ graphic_interface_path=""
 cloneme_ui_mode=false
 clonesourceloop=""
 clonetargetloop=""
+#clonetargetdevice (don't change)
+clonetargetdevice=""
 
 help(){
   echo "cloneme <mode> [<source>] <target>"
@@ -41,9 +43,18 @@ if [ "$1" = "mastergraphicmode" ]; then
   clonetargetdevice="$4";
   graphic_interface_path="$5"
   installbootloader="$6";
+  if [ "$graphic_interface_path" != "" ] && [ -f "$graphic_interface_path" ] ;then
+    cloneme_ui_mode=true;
+  fi
 
-elif [ "$1" = "mastergraphicmode" ]; then
-
+elif [ "$1" = "---special-mode-graphic---" ]; then
+  bootloaderpart="$2"
+  graphic_interface_path="$3"
+  if [ "$graphic_interface_path" != "" ] && [ -f "$graphic_interface_path" ] ;then
+    cloneme_ui_mode=true;
+  fi
+elif [ "$1" = "---special-mode---" ]; then
+  bootloaderpart="$2"
 else
   choosemode="$1"
   case "$#" in
@@ -62,10 +73,7 @@ if [ ! "$UID" = "0" ]; then
   exit 1;
 fi
 
-#activate ui mode
-if [ "${graphic_interface_path}" != "" ]; then
-  cloneme_ui_mode=true
-fi
+
 
 #check syncdir; it mustn't end with /"
 tempp="$(echo "$syncdir" | sed "s/\/$//")"
@@ -74,8 +82,9 @@ syncdir="$tempp"
 
 
 #loop shouldn't happen
-if [ "$clonesource" = "$clonetargetdevice" ] || [ "$clonesource" = "$clonetargetdevice/" ];then
+if [ "$clonetargetdevice" != "" ] && ( [ "$clonesource" = "$clonetargetdevice" ] || [ "$clonesource" = "$clonetargetdevice/" ] );then
   echo "error: source = target"
+  echo "target: $clonetargetdevice"
   exit 1
 fi
 
@@ -199,8 +208,18 @@ else
 fi
 
 
+install_installer(){
+  if [ ! -f "${clonetargetdevice2}$0" ]; then
+    mkdir -p dirname "${clonetargetdevice2}$0"
+    cp "$0" dirname "${clonetargetdevice2}$0"
+  fi
+  if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdevice2}${graphic_interface_path}" ]; then
+    graphic_interface_path --install-me --dest "${clonetargetdevice2}"
+  fi
+}
+
 addnewusers(){
-  if [ $cloneme_ui_mode = true ];then
+  if [ "$cloneme_ui_mode" = true ];then
     ${graphic_interface_path} --createuser
   else
     usercounter=0
@@ -242,10 +261,10 @@ addnewusers(){
 
 copyuser(){
 
-for usertemp in $(ls /home)
+for usertemp in $(ls "${clonesource2}"/home)
 do
-  if [ $cloneme_ui_mode = true ];then
-    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2}" --name "${usertemp}"
+  if [ "$cloneme_ui_mode" = true ];then
+    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2}" --user "${usertemp}"
   else
     for (( ; ; ))
     do
@@ -274,10 +293,10 @@ do
         mkdir -p "${clonetargetdevice2}"/home/"$usertemp"
         #
         if grep "$usertemp" "${clonesource2}"etc/passwd > /dev/null;then
-          chown $usertemp "${clonetargetdevice2}"/home/"$usertemp"
+          chown "$usertemp" "${clonetargetdevice2}"/home/"$usertemp"
           #chown group
           if grep "$usertemp" "${clonesource2}"etc/group > /dev/null;then
-            chown $usertemp:$usertemp "${clonetargetdevice2}"/home/"$usertemp"
+            chown "${usertemp}:${usertemp}" "${clonetargetdevice2}"/home/"$usertemp"
           fi
         fi
         # and remove email folder
@@ -317,7 +336,7 @@ done
 }
 
 installer(){
-  if [ $cloneme_ui_mode = false ];then
+  if [ "$cloneme_ui_mode" = false ];then
     if [ "$(ls -A "${clonetargetdevice2}")" != "" ];then
       echo "The target partition is not empty. Shall I clean it? Type \"yes\""
       read shall_clean
@@ -337,7 +356,7 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
   echo "(hd0) $(grub-probe -t device "${clonetargetdevice2}" | sed -e "s|[0-9]*$||") #--specialclone-me--" >> "${clonetargetdevice2}"/boot/grub/device.map
   sed -i -e "s/.\+\( \/ .\+\)/UUID=$(grub-probe -t fs_uuid ${clonetargetdevice2})\1/" "${clonetargetdevice2}"/etc/fstab
   echo "root in fstab updated"
-  if [ $cloneme_ui_mode = false ];then
+  if [ "$cloneme_ui_mode" = false ];then
     echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
     read shall_fstab
     if [ "$shall_fstab" = "yes" ]; then
@@ -352,16 +371,18 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
   mount -o bind /proc "${clonetargetdevice2}"/proc
   mount -o bind /sys "${clonetargetdevice2}"/sys
   mount -o bind /dev "${clonetargetdevice2}"/dev
+  
+  install_installer
 
-  if [ $cloneme_ui_mode = false ];then
+  if [ "$cloneme_ui_mode" = false ];then
     chroot "${clonetargetdevice2}" $0 "---special-mode---" "${clonetargetdevice2}"
   else
-    chroot "${clonetargetdevice2}" $0 "---special-mode-graphic---" "${clonetargetdevice2}"
+    chroot "${clonetargetdevice2}" $0 "---special-mode-graphic---" "${clonetargetdevice2}" "${graphic_interface_path}"
   fi
 
   sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
   #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdevice2}"/boot/grub/device.map
-  if [ $cloneme_ui_mode = false ];then
+  if [ "$cloneme_ui_mode" = false ];then
     echo "if you want to use device.map please type \"yes\" and edit it now"
     read shall_devicemap
     if [ "$shall_devicemap" = "yes" ]; then
@@ -375,18 +396,16 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
 }
 
 
-
 installer_grub2(){
   echo "Install grub…"
-  #clonetargetdevice because mounting isn't executed
-  get_dev="$(grub-probe -t device "${clonetargetdevice2}" | sed  -e "s|[0-9]*$||")"
+  get_dev="$(grub-probe -t device "${bootloaderpart}" | sed  -e "s|[0-9]*$||")"
   if ! grub-install "$get_dev";then
     echo "Error: $get_dev not found"
     echo "I failed please do it yourself"
     /bin/sh
   fi
   
-  #get_part="$(grub-probe -t device ${clonetargetdevice2}" | sed "s/.\+([0-9]*)/${clonetargetdevice2}/")"
+  #get_part="$(grub-probe -t device ${bootloaderpart}" | sed "s/.\+([0-9]*)/${bootloaderpart}/")"
   grub-mkconfig -o /boot/grub/grub.cfg
   echo -e "grub installation finished.\nStart with the configuration of the new system"
   $config_new_sys

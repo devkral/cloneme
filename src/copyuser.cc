@@ -53,6 +53,7 @@ void copyuser::synch()
 	std::string sum="";
 	sum+="        rsync -a -A --progress --delete --exclude \""+dest+"\" \""+src+"\"home/\""+name+"\" \""+dest+"\"/home/\n";
 	std::cerr << system2(sum);
+	kitcopy.quit();
 }
 
 void copyuser::clean()
@@ -82,6 +83,8 @@ void copyuser::clean()
 	sum+="        fi\n";
 
 	system2(sum);
+	kitcopy.quit();
+	
 
 }
 
@@ -99,6 +102,7 @@ void copyuser::empty()
 	sum+="        fi\n";
 
 	system2(sum);
+	kitcopy.quit();
 }
 
 void copyuser::explaining()

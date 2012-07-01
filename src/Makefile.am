@@ -28,7 +28,9 @@ cloneme_SOURCES = \
 	myfilechooser.cc \
 	myfilechooser.h \
 	basismethods.h \
-	basismethods.cc
+	basismethods.cc \
+	installguiinstaller.cc \
+	installguiinstaller.h
 
 cloneme_LDFLAGS = 
 
