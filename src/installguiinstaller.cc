@@ -18,7 +18,10 @@
  */
 
 #include "installguiinstaller.h"
-
+#include "basismethods.h"
+#include <iostream>
+#include <getopt.h>
+#include <unistd.h>
 
 installguiinstaller::installguiinstaller(int argc, char* argv[] )
 {
@@ -27,7 +30,7 @@ installguiinstaller::installguiinstaller(int argc, char* argv[] )
 	int index=0;
 	// options descriptor 
 	static struct option longopts[] = {
-		{ "dest", required_argument, &ch, 2 },
+		{ "dest", required_argument, &ch, 1 },
 		{0,0,0,0}
 	};
 	
@@ -47,5 +50,12 @@ installguiinstaller::installguiinstaller(int argc, char* argv[] )
 		std::cerr << "Error: dest wasn't specified\n";
 		throw (-1);
 	}
+	std::string sum="";
+	sum+=(std::string)"mkdir -p "+dest+(std::string)PACKAGE_DATA_DIR+(std::string)"\n";
+	sum+=(std::string)"cp -r "+(std::string)PACKAGE_DATA_DIR+(std::string)"/* "+dest+(std::string)PACKAGE_DATA_DIR+(std::string)"\n";
+	sum+=(std::string)"cp "+(std::string)argv[0]+(std::string)" "+dest+(std::string)PACKAGE_BIN_DIR+(std::string)"\n";
+	//TODO: copy desktop file
+	//sum+=(std::string)"cp "+(std::string)argv[0]+(std::string)" "+dest+(std::string)PACKAGE_BIN_DIR+(std::string)"\n";
+	std::cerr << system2(sum);
 
 }

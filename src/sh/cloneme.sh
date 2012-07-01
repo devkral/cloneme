@@ -214,7 +214,7 @@ install_installer(){
     cp "$0" dirname "${clonetargetdevice2}$0"
   fi
   if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdevice2}${graphic_interface_path}" ]; then
-    graphic_interface_path --install-me --dest "${clonetargetdevice2}"
+    graphic_interface_path --installme --dest "${clonetargetdevice2}"
   fi
 }
 
@@ -415,7 +415,8 @@ updater(){
   if ! rsync -a -A --progress --delete --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map --exclude "${clonesource2}"etc/fstab --exclude "${syncdir}" --exclude "$clonetargetdevice2" --exclude "${clonesource2}home/*" --exclude "${clonesource2}"sys/ --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ; then
     echo "error: rsync could not sync"
     exit 1
-  fi  
+  fi
+  install_installer
   copyuser
 }
 

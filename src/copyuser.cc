@@ -117,6 +117,7 @@ void copyuser::explaining()
 copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 {
 	int ch=0;
+	int index=0;
 	// options descriptor 
 	static struct option longopts[] = {
 		{ "src", required_argument, &ch, 1 },
@@ -124,7 +125,7 @@ copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 		{ "user", required_argument, &ch, 3 },
 		{0,0,0,0}
 	};
-	int index=0;
+	
 	while (getopt_long(argc, argv, "", longopts, &index) != -1)
 	{
 		switch(ch)

@@ -1,6 +1,8 @@
 
 +make EDITOR fetch from main system working (see gui.cc)
-+rename name
++rename name (converter and copyuser)
++TODO: copy desktop file installguiinstaller
++rm files on systems with existing user acc (copyuser)
 
 not very important:
 
