@@ -16,7 +16,7 @@ usergroupargs="video,audio,optical,power"
 #graphic interface
 #don't comment or change this
 graphic_interface_path=""
-cloneme_ui_mode=false
+cloneme_ui_mode="false"
 clonesourceloop=""
 clonetargetloop=""
 #clonetargetdevice (don't change)
@@ -44,16 +44,18 @@ if [ "$1" = "mastergraphicmode" ]; then
   graphic_interface_path="$5"
   installbootloader="$6";
   if [ "$graphic_interface_path" != "" ] && [ -f "$graphic_interface_path" ] ;then
-    cloneme_ui_mode=true;
+    cloneme_ui_mode="true";
   fi
 
 elif [ "$1" = "---special-mode-graphic---" ]; then
+  choosemode="---special-mode-graphic---" 
   bootloaderpart="$2"
   graphic_interface_path="$3"
   if [ "$graphic_interface_path" != "" ] && [ -f "$graphic_interface_path" ] ;then
-    cloneme_ui_mode=true;
+    cloneme_ui_mode="true";
   fi
 elif [ "$1" = "---special-mode---" ]; then
+  choosemode="---special-mode-graphic---"
   bootloaderpart="$2"
 else
   choosemode="$1"
@@ -82,10 +84,12 @@ syncdir="$tempp"
 
 
 #loop shouldn't happen
-if [ "$clonetargetdevice" != "" ] && ( [ "$clonesource" = "$clonetargetdevice" ] || [ "$clonesource" = "$clonetargetdevice/" ] );then
-  echo "error: source = target"
-  echo "target: $clonetargetdevice"
-  exit 1
+if [ "$clonetargetdevice" != "" ]; then
+  if [ "$clonesource" = "$clonetargetdevice" ] || [ "$clonesource" = "$clonetargetdevice/" ];then
+    echo "error: source = target"
+    echo "target: $clonetargetdevice"
+    exit 1
+  fi
 fi
 
 #check if needed programs exists
@@ -152,7 +156,8 @@ mounting()
 
 #mount
 ##don't run this when a subprocess of itself
-if [ "$choosemode" != "---special-mode---" ] || [ "$choosemode" != "---special-mode-graphic---" ]; then
+echo "$1"
+if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-mode-graphic---" ]; then
   if [ -d "${clonesource}" ];then
     clonesource2="${clonesource}"
   elif [ -b "${clonesource}" ];then
@@ -209,9 +214,9 @@ fi
 
 
 install_installer(){
-  if [ ! -f "${clonetargetdevice2}$0" ]; then
-    mkdir -p dirname "${clonetargetdevice2}$0"
-    cp "$0" dirname "${clonetargetdevice2}$0"
+  if [ ! -f "${clonetargetdevice2}${0}" ]; then
+    mkdir -p dirname "${clonetargetdevice2}${0}"
+    cp "$0" $(dirname "${clonetargetdevice2}${0}")
   fi
   if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdevice2}${graphic_interface_path}" ]; then
     graphic_interface_path --installme --dest "${clonetargetdevice2}"
@@ -219,7 +224,7 @@ install_installer(){
 }
 
 addnewusers(){
-  if [ "$cloneme_ui_mode" = true ];then
+  if [ "$cloneme_ui_mode" = "true" ];then
     ${graphic_interface_path} --createuser
   else
     usercounter=0
@@ -263,7 +268,7 @@ copyuser(){
 
 for usertemp in $(ls "${clonesource2}"/home)
 do
-  if [ "$cloneme_ui_mode" = true ];then
+  if [ "$cloneme_ui_mode" = "true" ];then
     ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2}" --user "${usertemp}"
   else
     for (( ; ; ))
@@ -346,7 +351,7 @@ installer(){
     fi
   fi
 
-  if ! rsync -a -A --progress --delete --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdevice2}" --exclude "${clonesource2}home/*" --exclude "${clonesource2}sys/*" --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ;then
+  if ! rsync -a -A --progress --delete --exclude "${clonesource2}/run/*" --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdevice2}" --exclude "${clonesource2}home/*" --exclude "${clonesource2}sys/*" --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ;then
     echo "error: rsync could not sync"
     exit 1
   fi  
@@ -374,7 +379,7 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
   
   install_installer
 
-  if [ "$cloneme_ui_mode" = false ];then
+  if [ "$cloneme_ui_mode" = "false" ];then
     chroot "${clonetargetdevice2}" $0 "---special-mode---" "${clonetargetdevice2}"
   else
     chroot "${clonetargetdevice2}" $0 "---special-mode-graphic---" "${clonetargetdevice2}" "${graphic_interface_path}"
@@ -382,7 +387,7 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
 
   sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
   #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdevice2}"/boot/grub/device.map
-  if [ "$cloneme_ui_mode" = false ];then
+  if [ "$cloneme_ui_mode" = "false" ];then
     echo "if you want to use device.map please type \"yes\" and edit it now"
     read shall_devicemap
     if [ "$shall_devicemap" = "yes" ]; then
@@ -408,11 +413,11 @@ installer_grub2(){
   #get_part="$(grub-probe -t device ${bootloaderpart}" | sed "s/.\+([0-9]*)/${bootloaderpart}/")"
   grub-mkconfig -o /boot/grub/grub.cfg
   echo -e "grub installation finished.\nStart with the configuration of the new system"
-  $config_new_sys
+  "$config_new_sys"
 }
 
 updater(){
-  if ! rsync -a -A --progress --delete --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map --exclude "${clonesource2}"etc/fstab --exclude "${syncdir}" --exclude "$clonetargetdevice2" --exclude "${clonesource2}home/*" --exclude "${clonesource2}"sys/ --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ; then
+  if ! rsync -a -A --progress --delete --exclude "${clonesource2}/run/*" --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map --exclude "${clonesource2}"etc/fstab --exclude "${syncdir}" --exclude "$clonetargetdevice2" --exclude "${clonesource2}home/*" --exclude "${clonesource2}"sys/ --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ; then
     echo "error: rsync could not sync"
     exit 1
   fi
@@ -448,7 +453,7 @@ if [ "${clonetargetdevice2}" = "${syncdir}/dest" ]; then
 fi
 
 #doesn't exist in this mode
-if [ "${choosemode}" != "---special-mode---" ] || [ "$choosemode" != "---special-mode-graphic---" ]; then 
+if [ "${choosemode}" != "---special-mode---" ] && [ "$choosemode" != "---special-mode-graphic---" ]; then 
   rmdir "${syncdir}"
 fi
 exit 0

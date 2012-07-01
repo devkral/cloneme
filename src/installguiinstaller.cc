@@ -52,18 +52,19 @@ installguiinstaller::installguiinstaller(int argc, char* argv[] )
 	}
 	
 	if ( access(PACKAGE_DATA_DIR,F_OK)==0)
-		srcdata=PACKAGE_DATA_DIR;
+		srcdata=(std::string)PACKAGE_DATA_DIR;
 	else
 		srcdata="${PWD}/src";
-	destdata=dest+PACKAGE_DATA_DIR;
+	destdata=dest+(std::string)PACKAGE_DATA_DIR;
+	destbin=dest+(std::string)PACKAGE_BIN_DIR;
 
 	std::string sum="";
 	sum+="mkdir -p "+destdata+"\n";
-	sum+="cp -r "+srcdata+"/* "+dest+PACKAGE_DATA_DIR+"\n";
-	sum+="cp "+(std::string)argv[0]+" "+destdata+"\n";
+	sum+="cp -r "+srcdata+"/* "+destdata+"\n";
+	sum+="cp "+(std::string)argv[0]+" "+destbin+"\n";
 	//TODO: copy desktop file
 	//sum+=(std::string)"cp "+(std::string)argv[0]+(std::string)" "+dest+(std::string)PACKAGE_BIN_DIR+(std::string)"\n";
-	//what is wrong? logical nothing! memory corruption?
+	//what is wrong?
 	std::string log=system2(sum);
 	if (log.empty()==false)
 		std::cerr << log;

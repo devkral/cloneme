@@ -31,6 +31,7 @@ private:
 	std::string dest;
 	std::string srcdata;
 	std::string destdata;
+	std::string destbin;
 };
 
 #endif // _INSTALLGUIINSTALLER_H_

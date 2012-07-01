@@ -4,6 +4,10 @@
 +TODO: copy desktop file installguiinstaller
 +rm files on systems with existing user acc (copyuser)
 
++cloneme.sh doesn't work again because of missing detection ---special-mode---
+ +somewhere is something not enough commented
++fix new class
+
 not very important:
 
 make it working with raw files via loop (done but no interface)
