@@ -432,9 +432,10 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
   #else
   #  chroot "${clonetargetdevice2}" $0 "---special-mode-graphic---" "${graphic_interface_path}"
   #fi
-
+  echo "back from chroot"
   sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
   #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdevice2}"/boot/grub/device.map
+  echo "device.map cleaned"
   if [ "$cloneme_ui_mode" = "false" ];then
     echo "if you want to use device.map please type \"yes\" and edit it now"
     read shall_devicemap
@@ -506,4 +507,4 @@ if [ "${choosemode}" != "---special-mode---" ] && [ "$choosemode" != "---special
   rmdir "${syncdir}"
 fi
 
-exit 0
+exit 0;

@@ -221,6 +221,11 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	//Buttons
 	gparted=transform_to_rptr<Gtk::Button>(builder->get_object("gparted"));
 	gparted->signal_clicked ().connect(sigc::mem_fun(*this,&gui::opengparted));
+	if ( access("/usr/bin/gparted",F_OK)!=0)
+	{
+		std::cerr << "gparted not found";
+		gparted->hide();
+	}
 	installb=transform_to_rptr<Gtk::Button>(builder->get_object("installb"));
 	installb->signal_clicked ().connect(sigc::mem_fun(*this,&gui::install));
 	updateb=transform_to_rptr<Gtk::Button>(builder->get_object("updateb"));
