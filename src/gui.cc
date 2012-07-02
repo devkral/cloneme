@@ -90,14 +90,14 @@ void gui::opengparted()
 void gui::update()
 {
 	std::string sum="";
-	if ( access(PACKAGE_BIN_DIR"/cloneme.sh",F_OK)==0)
+	if ( access(PACKAGE_BIN_DIR"/clonemecmd.sh",F_OK)==0)
 		sum+=PACKAGE_BIN_DIR;
 	else
 	{
-		std::cerr << "cloneme.sh not found; fall back to src directory\n";
+		std::cerr << "clonemecmd.sh not found; fall back to src directory\n";
 		sum+="$PWD/src/sh";
 	}
-	sum+="/cloneme.sh mastergraphicmode update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
+	sum+="/clonemecmd.sh mastergraphicmode update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
@@ -105,14 +105,14 @@ void gui::install()
 {
 	std::string sum="";
 	sum+=(std::string)"graphic_interface_path=\""+home_path+(std::string)"\"\n";
-	if ( access(PACKAGE_BIN_DIR"/cloneme.sh",F_OK)==0)
+	if ( access(PACKAGE_BIN_DIR"/clonemecmd.sh",F_OK)==0)
 		sum+=PACKAGE_BIN_DIR;
 	else
 	{
-		std::cerr << "cloneme.sh not found; fall back to src directory\n";
+		std::cerr << "clonemecmd.sh not found; fall back to src directory\n";
 		sum+="$PWD/src/sh";
 	}
-	sum+="/cloneme.sh mastergraphicmode install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
+	sum+="/clonemecmd.sh mastergraphicmode install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 

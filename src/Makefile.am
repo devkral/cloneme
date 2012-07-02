@@ -9,6 +9,7 @@ AM_CPPFLAGS = \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
 	-DPACKAGE_BIN_DIR=\""$(bindir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
+	-DPACKAGE_LINK_DIR=\""$(datarootdir)/applications"\" \
 	$(CLONEME_CFLAGS)
 
 AM_CFLAGS =\
@@ -40,6 +41,7 @@ cloneme_LDADD = $(CLONEME_LIBS)
 
 SUBDIRS = \
 	ui \
-	sh
+	sh \
+	desktop
 
 AM_CXXFLAGS = -std=c++11 

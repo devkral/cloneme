@@ -1,15 +1,16 @@
 #include "basismethods.h"
 #include <cstdio>
+#include <iostream>
 
 std::string system2(std::string _tcommand)
 {
    FILE * proc;
-   std::string temp;
+   std::string temp="";
 
    proc = popen (_tcommand.c_str() , "r");
    if (proc == NULL)
 		{
-			perror ("Error opening command");
+			std::cerr << "Error opening command";
 			return NULL;
 		}
    else 
@@ -19,7 +20,14 @@ std::string system2(std::string _tcommand)
 					temp+=fgetc (proc);
 				}
 			fclose (proc);
-			temp.erase(temp.length()-2, temp.length()-1);
+			//some errors in the logic I fix via safeguards
+			int begin=temp.length()-2;
+			if (begin<0)
+				begin=0;
+			int end=temp.length()-1;
+			if (end<=0)
+				end=1;
+			temp.erase(begin, end);
 			return temp;
 		}
 }

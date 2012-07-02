@@ -2,4 +2,4 @@
 
 shdir = $(bindir)
 
-sh_SCRIPTS = cloneme.sh
+sh_SCRIPTS = clonemecmd.sh

@@ -43,5 +43,6 @@ src/Makefile
 po/Makefile.in
 src/ui/Makefile
 src/sh/Makefile
+src/desktop/Makefile
 tools/Makefile
 ])

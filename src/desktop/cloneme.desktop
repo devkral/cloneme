@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Cloneme
+Comment=Clone a system to an flashdrive or pc
+Comment[de]=Klone ein Betriebssystem auf einen USB-Stick oder PC
+Icon=cloneme.png
+Exec=cloneme
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Utility;
+X-Ubuntu-Gettext-Domain=cloneme

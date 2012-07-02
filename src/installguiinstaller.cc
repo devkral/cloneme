@@ -51,22 +51,32 @@ installguiinstaller::installguiinstaller(int argc, char* argv[] )
 		throw (-1);
 	}
 	
+	self=(std::string)argv[0];
 	if ( access(PACKAGE_DATA_DIR,F_OK)==0)
 		srcdata=(std::string)PACKAGE_DATA_DIR;
 	else
 		srcdata="${PWD}/src";
+	
+	
+	if ( access(PACKAGE_LINK_DIR"/cloneme.desktop",F_OK)==0)
+		srclinkdir=(std::string)PACKAGE_LINK_DIR;
+	else
+		srclinkdir="${PWD}/src/desktop";
+		
 	destdata=dest+(std::string)PACKAGE_DATA_DIR;
 	destbin=dest+(std::string)PACKAGE_BIN_DIR;
+	destlinkdir=dest+(std::string)PACKAGE_LINK_DIR;
 
 	std::string sum="";
 	sum+="mkdir -p "+destdata+"\n";
 	sum+="cp -r "+srcdata+"/* "+destdata+"\n";
-	sum+="cp "+(std::string)argv[0]+" "+destbin+"\n";
-	//TODO: copy desktop file
-	//sum+=(std::string)"cp "+(std::string)argv[0]+(std::string)" "+dest+(std::string)PACKAGE_BIN_DIR+(std::string)"\n";
-	//what is wrong?
+	sum+="mkdir -p "+destbin+"\n";
+	sum+="cp "+self+" "+destbin+"\n";
+	//copy desktop file
+	sum+="mkdir -p "+destlinkdir+"\n";
+	sum+="cp "+srclinkdir+"/cloneme.desktop "+destlinkdir+"\n";
 	std::string log=system2(sum);
-	if (log.empty()==false)
+	if (!log.empty())
 		std::cerr << log;
 
 }
