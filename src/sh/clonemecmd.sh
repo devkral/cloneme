@@ -241,7 +241,7 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
   tempp="$(echo "$clonesource2" | sed "s/\/$//")"
   clonesource2="$tempp/"
 else
-  clonetargetdevice2 = "$2"
+  clonetargetdevice2="$2"
 fi
 
 
