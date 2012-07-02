@@ -427,10 +427,11 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
   install_installer
 
 # bug: display can't be opened on target system
+  self1="$(echo "$0" | sed -e "s/$\./$PWD/")" 
   #if [ "$cloneme_ui_mode" = "false" ];then
-    chroot "${clonetargetdevice2}" $0 "---special-mode---"
+    chroot "${clonetargetdevice2}" $self1 "---special-mode---"
   #else
-  #  chroot "${clonetargetdevice2}" $0 "---special-mode-graphic---" "${graphic_interface_path}"
+  #  chroot "${clonetargetdevice2}" $self1 "---special-mode-graphic---" "${graphic_interface_path}"
   #fi
   echo "back from chroot"
   sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map

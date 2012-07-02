@@ -1,14 +1,15 @@
 
 +make EDITOR fetch from main system working (see gui.cc)
 +rename name (converter and copyuser)
-+TODO: copy desktop file installguiinstaller
-+rm files on systems with existing user acc (copyuser)
 
++make things running more stable
+
+less important
 +rework system2 output
 
 not very important:
-
-make it working with raw files via loop (done but no interface)
+loop other things than raw
+maybe detect via grub-probe or parted if nbd is mounted
 
 nbd stuff
 http://atrey.karlin.mff.cuni.cz/~pavel/nbd/nbd.html
