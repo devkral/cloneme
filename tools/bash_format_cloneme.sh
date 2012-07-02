@@ -8,5 +8,5 @@ fi
 
 echo "std::string sum=\"\";"
 
-sed  -e 's/\"/\\\"/g' -e 's/\${\?clonetargetdevice2}\?/\"+dest+\"/g' -e 's/\${\?clonesource2}\?/\"+src+\"/g' \
--e 's/\${\?usertemp}\?/\"+name+\"/g' -e 's/\${\?user_name}\?/\"+username->get_text()+\"/g' -e 's/#.*//' -e 's/\(.*\)$/\sum+=\"\1\\n\";/g' $@
+sed  -e 's/\"/\\\"/g' -e 's/\${\?clonetargetdevice2}\?/\"+dest+\"/g' -e 's/\${\?targetn}\?/\"+dest+\"/g' -e 's/\${\?clonesource2}\?/\"+src+\"/g' \
+-e 's/\${\?usertemp}\?/\"+name+\"/g' -e 's/\${\?user_name}\?/\"+username->get_text()+\"/g' -e 's/#.*//' -e '/^$/d' -e 's/\(.*\)$/\sum+=\"\1\\n\";/g' $@

@@ -45,10 +45,30 @@
 
 
 
+void copyuser::_cleanuser()
+{
+	std::string sum="";
+	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd\n";
+	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd-\n";
+	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group\n";
+	sum+="  sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group\n";
+	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group-\n";
+	sum+="  sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group-\n";
+	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow\n";
+	sum+="  sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow\n";
+	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow-\n";
+	sum+="  sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow-\n";
+	sum+="  if [ -d \""+dest+"\"/home/\""+name+"\" ];then\n";
+	sum+="    rm -r \""+dest+"\"/home/\""+name+"\"\n";
+	sum+="  fi\n";
+	sum+="  \n";
+	sum+="  shred -u \""+dest+"/var/spool/mail/"+name+"\" 2> /dev/null\n";
+	sum+="  echo \"cleaning finished\"\n";
+	system2(sum);
+}
 
 
-
-void copyuser::synch()
+void copyuser::copysynchf()
 {
 	std::string sum="";
 	sum+="        rsync -a -A --progress --delete --exclude \""+dest+"\" \""+src+"\"home/\""+name+"\" \""+dest+"\"/home/\n";
@@ -56,62 +76,48 @@ void copyuser::synch()
 	kitcopy.quit();
 }
 
-void copyuser::clean()
+void copyuser::ignoref()
 {
-	std::string sum="";
-	sum+="        if [ ! -d \""+dest+"\"/home/\""+name+"\" ];then\n";
-	if (deletepasswd->get_active ()==true)
-		sum+="question_delete=\"yes\"\n";
-	else
-		sum+="question_delete=\"no\"\n";
-		
-	sum+="          if [ \"$question_delete\" = \"yes\" ]; then\n";
-	sum+="            \n";
-	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd\n";
-	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd-\n";
-	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group\n";
-	sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group\n";
-	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group-\n";
-	sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group-\n";
-	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow\n";
-	sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow\n";
-	sum+="            sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow-\n";
-	sum+="            sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow-\n";
-	sum+="            shred -u \""+dest+"/var/spool/mail/"+name+"\" 2> /dev/null\n";
-	sum+="            echo \"cleaning finished\"\n";
-	sum+="          fi\n";
-	sum+="        fi\n";
-
-	system2(sum);
+	//user_exist==true has an extra button for this
+	if (cleantargetsys->get_active ()==true && user_exist==false)
+		_cleanuser();
 	kitcopy.quit();
-	
-
 }
 
-void copyuser::empty()
+void copyuser::emptyf()
 {
 	std::string sum="";
-	sum+="        mkdir -p \""+dest+"\"/home/\"$usertemp\"\n";
+	sum+="        rm -r \""+dest+"\"/home/\""+name+"\"\n";
+	sum+="        mkdir -p \""+dest+"\"/home/\""+name+"\"\n";
 	sum+="        \n";
-	sum+="        if grep \"$usertemp\" \""+src+"\"etc/passwd > /dev/null;then\n";
-	sum+="          chown $usertemp \""+dest+"\"/home/\"$usertemp\"\n";
+	sum+="        if grep \""+name+"\" \""+src+"\"etc/passwd > /dev/null;then\n";
+	sum+="          chown \""+name+"\" \""+dest+"\"/home/\""+name+"\"\n";
 	sum+="          \n";
-	sum+="          if grep \"$usertemp\" \""+src+"\"etc/group > /dev/null;then\n";
-	sum+="            chown $usertemp:$usertemp \""+dest+"\"/home/\"$usertemp\"\n";
+	sum+="          if grep \""+name+"\" \""+src+"\"etc/group > /dev/null;then\n";
+	sum+="            chown \""+name+":"+name+"\" \""+dest+"\"/home/\""+name+"\"\n";
 	sum+="          fi\n";
 	sum+="        fi\n";
+	sum+="        \n";
+	sum+="        shred -u \""+dest+"/var/spool/mail/"+name+"\" 2> /dev/null\n";
 
 	system2(sum);
 	kitcopy.quit();
 }
 
-void copyuser::explaining()
+void copyuser::explainf()
 {
 	if (explaination->get_visible())
 		explaination->hide();
 	else
 		explaination->show();
 
+}
+
+void copyuser::setactionspace(Gtk::Widget &actionbar)
+{
+	//pactions->remove();
+	pactions->add(actionbar);
+	pactions->show ();
 }
 
 copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
@@ -214,25 +220,44 @@ copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 	
 	username=transform_to_rptr<Gtk::Label>(builder->get_object("username"));
 	username->set_text(name);
-	copysynch=transform_to_rptr<Gtk::Button>(builder->get_object("copysynch"));
-	copysynch->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::synch));
-	createempty=transform_to_rptr<Gtk::Button>(builder->get_object("createempty"));
-	createempty->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::empty));
-	explain=transform_to_rptr<Gtk::Button>(builder->get_object("explain"));
-	explain->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::explaining));
+
+	//frame for actions
+	pactions=transform_to_rptr<Gtk::Alignment>(builder->get_object("pactions"));
+	
+	//userexist
+	userexist=transform_to_rptr<Gtk::Grid>(builder->get_object("userexist"));
+	
+	synch=transform_to_rptr<Gtk::Button>(builder->get_object("synch"));
+	synch->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::copysynchf));
+	empty=transform_to_rptr<Gtk::Button>(builder->get_object("empty"));
+	empty->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::emptyf));
 	ignoreuser=transform_to_rptr<Gtk::Button>(builder->get_object("ignoreuser"));
-	ignoreuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::clean));
-	deletepasswd=transform_to_rptr<Gtk::CheckButton>(builder->get_object("deletepasswd"));
+	ignoreuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::ignoref));
+	cleaner=transform_to_rptr<Gtk::Button>(builder->get_object("cleaner"));
+	cleaner->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::_cleanuser));
+
+	//usernotexist
+	usernotexist=transform_to_rptr<Gtk::Grid>(builder->get_object("usernotexist"));
+	copy=transform_to_rptr<Gtk::Button>(builder->get_object("copy"));
+	copy->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::copysynchf));
+	createempty=transform_to_rptr<Gtk::Button>(builder->get_object("createempty"));
+	createempty->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::emptyf));
+	nocopy=transform_to_rptr<Gtk::Button>(builder->get_object("nocopy"));
+	nocopy->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::ignoref));
+	cleantargetsys=transform_to_rptr<Gtk::CheckButton>(builder->get_object("cleantargetsys"));
+	explain=transform_to_rptr<Gtk::Button>(builder->get_object("explain"));
+	explain->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::explainf));
+	
+	
 	if ( access(((std::string)"/home/"+name).c_str(),F_OK)==0)
 	{
-		//hide
-		deletepasswd->set_active(false);
-		deletepasswd->hide();
-		explain->hide();
-		copysynch->set_label("Synchronize target account");
-		createempty->set_label("Delete the user files of the existing target account");
-		ignoreuser->set_label("Don't touch the existing target account");
-
+		setactionspace(*((Gtk::Widget *)userexist.operator->()));
+		user_exist=true;
+	}
+	else
+	{
+		setactionspace(*((Gtk::Widget *)usernotexist.operator->()));
+		user_exist=false;
 	}
 	copyuser_win->show();
 

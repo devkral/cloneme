@@ -53,17 +53,31 @@ private:
 	Gtk::Main kitcopy;
 	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> copyuser_win,explaination;
-	Glib::RefPtr<Gtk::Button> copysynch;
-	Glib::RefPtr<Gtk::Button> createempty;
+	Glib::RefPtr<Gtk::Alignment> pactions;
+	Glib::RefPtr<Gtk::Grid> userexist,usernotexist;
+	
+	Glib::RefPtr<Gtk::Button> copy, synch;
+	Glib::RefPtr<Gtk::Button> empty, createempty;
 	Glib::RefPtr<Gtk::Button> explain;
-	Glib::RefPtr<Gtk::Button> ignoreuser;
+	Glib::RefPtr<Gtk::Button> nocopy, ignoreuser;
+	Glib::RefPtr<Gtk::Button> cleaner;
 	Glib::RefPtr<Gtk::Label> username;
-	Glib::RefPtr<Gtk::CheckButton> deletepasswd;
+	Glib::RefPtr<Gtk::CheckButton> cleantargetsys;
 
-	void synch();
-	void clean();
-	void empty();
-	void explaining();
+	bool user_exist;
+
+	//little helper
+	
+	void setactionspace(Gtk::Widget &actionbar);
+	
+	//named after function in clonemecmd
+	void _cleanuser();
+	void copysynchf();
+	void cleanf();
+	void ignoref();
+	void emptyf();
+	void createemptyf();
+	void explainf();
 	
 	std::string src, dest;
 	std::string name;

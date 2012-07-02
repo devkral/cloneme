@@ -81,14 +81,12 @@ if [ "$1" = "mastergraphicmode" ]; then
 
 elif [ "$1" = "---special-mode-graphic---" ]; then
   choosemode="---special-mode-graphic---" 
-  bootloaderpart="$2"
-  graphic_interface_path="$3"
+  graphic_interface_path="$2"
   if [ "$graphic_interface_path" != "" ] && [ -f "$graphic_interface_path" ] ;then
     cloneme_ui_mode="true";
   fi
 elif [ "$1" = "---special-mode---" ]; then
-  choosemode="---special-mode-graphic---"
-  bootloaderpart="$2"
+  choosemode="---special-mode---"
 else
   choosemode="$1"
   case "$#" in
@@ -257,7 +255,7 @@ install_installer(){
 
 addnewusers(){
   if [ "$cloneme_ui_mode" = "true" ];then
-    ${graphic_interface_path} --createuser
+    "${graphic_interface_path}" --createuser
   else
     usercounter=0
     for (( ; ; ))
@@ -285,7 +283,7 @@ addnewusers(){
             usergroupargs+=",admin"
           fi
         fi
-        useradd -m -U "$user_name" -p "" -G $usergroupargs
+        useradd -m -U "$user_name" -p "" -G "$usergroupargs"
         passwd -e "$user_name"
       fi
       if [ "$n_user" = "no" ];then
@@ -295,9 +293,33 @@ addnewusers(){
   fi
 }
 
+# $1 username $2 prefix
+_cleanuser(){
+local usertemp=$1
+local targetn=$2
+  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd
+  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd-
+  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group
+  sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/group
+  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group-
+  sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/group-
+  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/gshadow
+  sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/gshadow
+  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/gshadow-
+  sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/gshadow-
+
+  if [ -d "${targetn}"/home/"$usertemp" ];then
+    rm -r "${targetn}"/home/"$usertemp"
+  fi
+  # and remove email folder
+  shred -u "${targetn}/var/spool/mail/${usertemp}" 2> /dev/null
+  echo "cleaning finished"
+}
+
+
 
 copyuser(){
-
+local usertemp
 for usertemp in $(ls "${clonesource2}"/home)
 do
   if [ "$cloneme_ui_mode" = "true" ];then
@@ -309,11 +331,13 @@ do
       if [ -d "${clonetargetdevice2}"/home/"$usertemp" ]; then
         echo -e "Synchronize user account. Type \"s\""
 		echo -e "Eradicate user files. Type \"e\""
-		echo -e "Don't change the user account. Type \"c\""
+		echo -e "Don't touch the user account. Type \"i\""
+        echo -e "Clean target system from user account. Type \"c\""
       else
         echo -e "Copy user account. Type \"s\""
         echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
-        echo -e "Don't copy the user account. Type \"c\""      
+        echo -e "Don't copy the user account. Type \"i\""  
+        echo -e "Clean target system from user account. Type \"c\""
       fi
       
       read -n 1 answer_useracc
@@ -341,28 +365,19 @@ do
         break
       fi
     
-      if [ "$answer_useracc" = "c" ]; then
+      if [ "$answer_useracc" = "i" ]; then
         if [ ! -d "${clonetargetdevice2}/home/$usertemp" ]; then
           # bug (not mine) if you use "i n" sourcehighlighting goes mad
           echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type \"yes\" (not the default)"
           read question_delete
           if [ "$question_delete" = "yes" ]; then
-            #still experimental
-            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/passwd
-            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/passwd-
-            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/group
-            sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/group
-            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/group-
-            sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/group-
-            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow
-            sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow
-            sed -i -e "/^${usertemp}/d" "${clonetargetdevice2}"/etc/gshadow-
-            sed -i -e "s/\b${usertemp}\b//g" "${clonetargetdevice2}"/etc/gshadow-
-            # and remove email folder
-            shred -u "${clonetargetdevice2}/var/spool/mail/${usertemp}" 2> /dev/null
-            echo "cleaning finished"
+            _cleanuser "$usertemp" "$clonetargetdevice2"
           fi
         fi
+        break
+      fi
+      if [ "$answer_useracc" = "c" ]; then
+        _cleanuser "$usertemp" "$clonetargetdevice2"
         break
       fi
     done
@@ -411,11 +426,12 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
   
   install_installer
 
-  if [ "$cloneme_ui_mode" = "false" ];then
-    chroot "${clonetargetdevice2}" $0 "---special-mode---" "${clonetargetdevice2}"
-  else
-    chroot "${clonetargetdevice2}" $0 "---special-mode-graphic---" "${clonetargetdevice2}" "${graphic_interface_path}"
-  fi
+# bug: display can't be opened on target system
+  #if [ "$cloneme_ui_mode" = "false" ];then
+    chroot "${clonetargetdevice2}" $0 "---special-mode---"
+  #else
+  #  chroot "${clonetargetdevice2}" $0 "---special-mode-graphic---" "${graphic_interface_path}"
+  #fi
 
   sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
   #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdevice2}"/boot/grub/device.map
@@ -433,16 +449,17 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
 }
 
 
+# installer routine creates correct bootloaderdev 
 installer_grub2(){
   echo "Install grub…"
-  get_dev="$(grub-probe -t device "${bootloaderpart}" | sed  -e "s|[0-9]*$||")"
-  if ! grub-install "$get_dev";then
-    echo "Error: $get_dev not found"
+    #/ is clonetargetdevice2
+    get_dev="$(grub-probe -t device "/" | sed  -e "s|[0-9]*$||")"
+  if ! grub-install "${get_dev}";then
+    echo "Error: ${get_dev} not found"
     echo "I failed please do it yourself"
     /bin/sh
   fi
   
-  #get_part="$(grub-probe -t device ${bootloaderpart}" | sed "s/.\+([0-9]*)/${bootloaderpart}/")"
   grub-mkconfig -o /boot/grub/grub.cfg
   echo -e "grub installation finished.\nStart with the configuration of the new system"
   "$config_new_sys"
@@ -488,4 +505,5 @@ fi
 if [ "${choosemode}" != "---special-mode---" ] && [ "$choosemode" != "---special-mode-graphic---" ]; then 
   rmdir "${syncdir}"
 fi
+
 exit 0
