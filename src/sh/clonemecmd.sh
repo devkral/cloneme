@@ -42,7 +42,7 @@ installbootloader="installer_grub2"
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
-syncdir="/syncdir"
+syncdir="/run/syncdir"
 #default groups of new users
 usergroupargs="video,audio,optical,power"
 #graphic interface
@@ -53,6 +53,10 @@ clonesourceloop=""
 clonetargetloop=""
 #clonetargetdevice (don't change)
 clonetargetdevice=""
+
+#create absolut path name for this program
+myself="$(realpath -L "$0")"
+
 
 help(){
   echo "$0 <mode> [<source>] <target>"
@@ -107,6 +111,7 @@ fi
 
 
 
+
 #check syncdir; it mustn't end with /"
 tempp="$(echo "$syncdir" | sed "s/\/$//")"
 syncdir="$tempp"
@@ -134,7 +139,7 @@ if [ ! -e /sbin/losetup ] && [ ! -e /usr/bin/losetup ]; then
   echo "Have you loop tools (name can differ) installed?"
   echo "no raw file mount is supported"
   if [ -f "$clonesource" ] || [ -f "$clonetargetdevice" ];then
-    echo "you use raw files; exit"
+    echo "you try to mount raw files. Exit"
     exit 1
   fi
 fi
@@ -266,9 +271,9 @@ else
 fi
 
 install_installer(){
-  if [ ! -f "${clonetargetdir}${0}" ]; then
-    mkdir -p "$(dirname "${clonetargetdir}${0}")"
-    cp "$0" $(dirname "${clonetargetdir}${0}")
+  if [ ! -f "${clonetargetdir}${myself}" ]; then
+    mkdir -p "$(dirname "${clonetargetdir}${myself}")"
+    cp "$myself" $(dirname "${clonetargetdir}${myself}")
   fi
   if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdir}${graphic_interface_path}" ]; then
     "$graphic_interface_path" --installme --dest "${clonetargetdir}"
@@ -359,7 +364,7 @@ do
         echo -e "Copy user account. Type \"s\""
         echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
         echo -e "Don't copy the user account. Type \"i\""  
-        echo -e "Clean target system from user account. Type \"c\""
+        echo -e "Clean target system from the user account. Type \"c\""
       fi
       
       read -n 1 answer_useracc
@@ -470,21 +475,25 @@ installer(){
     exit 1
   fi
   copyuser
+  install_installer
+
+
+
 
   mount -o bind /proc "${clonetargetdir}"/proc
   mount -o bind /sys "${clonetargetdir}"/sys
   mount -o bind /dev "${clonetargetdir}"/dev
 
   
-  install_installer
+  
 
 # bug: display can't be opened on target system; Maybe now
   if [ "$cloneme_ui_mode" = "false" ];then
-    chroot "${clonetargetdir}" "---special-mode---"
+    chroot "${clonetargetdir}" "${myself}" "---special-mode---"
   else
     mount -o bind /tmp "${clonetargetdir}"/tmp
     mount -o bind /run "${clonetargetdir}"/run
-    chroot "${clonetargetdir}" "---special-mode-graphic---" "${graphic_interface_path}"
+    chroot "${clonetargetdir}" "${myself}" "---special-mode-graphic---" "${graphic_interface_path}"
   fi
   echo "back from chroot"
   tempsed=$(sed -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map)
