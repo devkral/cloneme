@@ -210,11 +210,11 @@ mount_blockdevice()
 echo "$1"
 if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-mode-graphic---" ]; then
   if [ -d "${clonesource}" ];then
-    clonesource2="${clonesource}"
+    clonesourcedir="${clonesource}"
   elif [ -b "${clonesource}" ];then
     mkdir -p "${syncdir}/src" 2> /dev/null
     mount_blockdevice "${clonesource}" "${syncdir}/src"
-    clonesource2="${syncdir}/src"
+    clonesourcedir="${syncdir}/src"
   elif [ -f "${clonesource}" ];then
     mkdir -p "${syncdir}"/src 2> /dev/null
     if ! losetup -a | grep "${clonesource}" > /dev/null;then
@@ -229,18 +229,18 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
     echo "Please enter the partition number (beginning with p)"
     read parts
     mount_blockdevice "${clonesourceloop}$parts" "${syncdir}/src"
-    clonesource2="${syncdir}/src"
+    clonesourcedir="${syncdir}/src"
   else
     echo "source not recognized"
     exit 1
   fi
 
   if [ -d "${clonetargetdevice}" ];then
-    clonetargetdevice2="${clonetargetdevice}"
+    clonetargetdir="${clonetargetdevice}"
   elif [ -b "${clonetargetdevice}" ];then
     mkdir -p "${syncdir}/dest" 2> /dev/null
     mount_blockdevice "${clonetargetdevice}" "${syncdir}/dest"
-    clonetargetdevice2="${syncdir}/dest"
+    clonetargetdir="${syncdir}/dest"
   elif [ -f "${clonetargetdevice}" ];then
     mkdir -p "${syncdir}/dest" 2> /dev/null
     if ! losetup -a | grep "${clonetargetdevice}" > /dev/null;then
@@ -253,25 +253,25 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
     echo "Please enter the partition number (beginning with p)"
     read partd
     mount_blockdevice "${clonetargetloop}$partd" "${syncdir}/dest"
-    clonetargetdevice2="${syncdir}/dest"
+    clonetargetdir="${syncdir}/dest"
   else
     echo "target not recognized"
     exit 1
   fi
-#check clonesource2; it has to end with /"
-  tempp="$(echo "$clonesource2" | sed "s/\/$//")"
-  clonesource2="$tempp/"
+#check clonesourcedir; it has to end with /"
+  tempp="$(echo "$clonesourcedir" | sed "s/\/$//")"
+  clonesourcedir="$tempp/"
 else
-  clonetargetdevice2="$2"
+  clonetargetdir="$2"
 fi
 
 install_installer(){
-  if [ ! -f "${clonetargetdevice2}${0}" ]; then
-    mkdir -p "$(dirname "${clonetargetdevice2}${0}")"
-    cp "$0" $(dirname "${clonetargetdevice2}${0}")
+  if [ ! -f "${clonetargetdir}${0}" ]; then
+    mkdir -p "$(dirname "${clonetargetdir}${0}")"
+    cp "$0" $(dirname "${clonetargetdir}${0}")
   fi
-  if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdevice2}${graphic_interface_path}" ]; then
-    "$graphic_interface_path" --installme --dest "${clonetargetdevice2}"
+  if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdir}${graphic_interface_path}" ]; then
+    "$graphic_interface_path" --installme --dest "${clonetargetdir}"
   fi
 }
 
@@ -342,15 +342,15 @@ _cleanuser(){
 
 copyuser(){
 local usertemp
-for usertemp in $(ls "${clonesource2}"/home)
+for usertemp in $(ls "${clonesourcedir}"/home)
 do
   if [ "$cloneme_ui_mode" = "true" ];then
-    ${graphic_interface_path} --copyuser --src "${clonesource2}" --dest "${clonetargetdevice2}" --user "${usertemp}"
+    ${graphic_interface_path} --copyuser --src "${clonesourcedir}" --dest "${clonetargetdir}" --user "${usertemp}"
   else
     for (( ; ; ))
     do
       echo "What shall be done with user $usertemp?"
-      if [ -d "${clonetargetdevice2}"/home/"$usertemp" ]; then
+      if [ -d "${clonetargetdir}"/home/"$usertemp" ]; then
         echo -e "Synchronize user account. Type \"s\""
 		echo -e "Eradicate user files. Type \"e\""
 		echo -e "Don't touch the user account. Type \"i\""
@@ -364,7 +364,7 @@ do
       
       read -n 1 answer_useracc
       if [ "$answer_useracc" = "s" ]; then
-        if ! rsync -a -A --progress --delete --exclude "${clonetargetdevice2}" "${clonesource2}"home/"${usertemp}" "${clonetargetdevice2}"/home/ ;then
+        if ! rsync -a -A --progress --delete --exclude "${clonetargetdir}" "${clonesourcedir}"home/"${usertemp}" "${clonetargetdir}"/home/ ;then
           echo "error: rsync could not sync"
           exit 1
         fi  
@@ -372,33 +372,33 @@ do
       fi
     
       if [ "$answer_useracc" = "e" ]; then
-        rm -r "${clonetargetdevice2}"/home/"$usertemp"
-        mkdir -p "${clonetargetdevice2}"/home/"$usertemp"
+        rm -r "${clonetargetdir}"/home/"$usertemp"
+        mkdir -p "${clonetargetdir}"/home/"$usertemp"
         #
-        if grep "$usertemp" "${clonesource2}"etc/passwd > /dev/null;then
-          chown "$usertemp" "${clonetargetdevice2}"/home/"$usertemp"
+        if grep "$usertemp" "${clonesourcedir}"etc/passwd > /dev/null;then
+          chown "$usertemp" "${clonetargetdir}"/home/"$usertemp"
           #chown group
-          if grep "$usertemp" "${clonesource2}"etc/group > /dev/null;then
-            chown "${usertemp}:${usertemp}" "${clonetargetdevice2}"/home/"$usertemp"
+          if grep "$usertemp" "${clonesourcedir}"etc/group > /dev/null;then
+            chown "${usertemp}:${usertemp}" "${clonetargetdir}"/home/"$usertemp"
           fi
         fi
         # and remove email folder
-        shred -u "${clonetargetdevice2}/var/spool/mail/${usertemp}" 2> /dev/null
+        shred -u "${clonetargetdir}/var/spool/mail/${usertemp}" 2> /dev/null
         break
       fi
     
       if [ "$answer_useracc" = "i" ]; then
-        if [ ! -d "${clonetargetdevice2}/home/$usertemp" ]; then
+        if [ ! -d "${clonetargetdir}/home/$usertemp" ]; then
           echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type \"yes\" (not the default)"
           read question_delete
           if [ "$question_delete" = "yes" ]; then
-            _cleanuser "$usertemp" "$clonetargetdevice2"
+            _cleanuser "$usertemp" "$clonetargetdir"
           fi
         fi
         break
       fi
       if [ "$answer_useracc" = "c" ]; then
-        _cleanuser "$usertemp" "$clonetargetdevice2"
+        _cleanuser "$usertemp" "$clonetargetdir"
         break
       fi
     done
@@ -411,11 +411,11 @@ done
 installer(){
   rsyncing="true"
   if [ "$cloneme_ui_mode" = "false" ];then
-    if [ "$(ls -A "${clonetargetdevice2}")" != "" ];then
+    if [ "$(ls -A "${clonetargetdir}")" != "" ];then
       echo "The target partition is not empty. Shall I clean it? Type \"yes\""
       read shall_clean
       if [ "${shall_clean}" = "yes" ];then
-        rm -r "${clonetargetdevice2}"/*
+        rm -r "${clonetargetdir}"/*
       fi
       echo "Skip rsync? Type \"yes\""
       read rsyncing_quest
@@ -426,7 +426,7 @@ installer(){
     fi
   fi
   if [ "$rsyncing" = true ];then
-    if ! rsync -a -A --progress --delete --exclude "${clonesource2}/run/*" --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdevice2}" --exclude "${clonesource2}home/*" --exclude "${clonesource2}sys/*" --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ;then
+    if ! rsync -a -A --progress --delete --exclude "${clonesourcedir}/run/*" --exclude "${clonesourcedir}"boot/grub/grub.cfg --exclude "${clonesourcedir}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdir}" --exclude "${clonesourcedir}home/*" --exclude "${clonesourcedir}sys/*" --exclude "${clonesourcedir}dev/*" --exclude "${clonesourcedir}proc/*" --exclude "${clonesourcedir}var/log/*" --exclude "${clonesourcedir}tmp/*" --exclude "${clonesourcedir}run/*" --exclude "${clonesourcedir}var/run/*" --exclude "${clonesourcedir}var/tmp/*" "${clonesourcedir}"* "${clonetargetdir}" ;then
     echo "error: rsync could not sync"
     exit 1
     fi
@@ -434,73 +434,84 @@ installer(){
 
 
 
-  if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
-    tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdevice2}"/boot/grub/device.map)"
-    echo "$tempdev" > "${clonetargetdevice2}"/boot/grub/device.map
+  if [ -e "${clonetargetdir}"/boot/grub/device.map ];then
+    tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdir}"/boot/grub/device.map)"
+    echo "$tempdev" > "${clonetargetdir}"/boot/grub/device.map
+    sed -i -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map
   fi
 
 
-  sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
-  echo "some temporary adjustments to ${clonetargetdevice2}/boot/grub/device.map"
-  echo "(hd0) $(grub-probe -t device "${clonetargetdevice2}" | sed -e "s|[0-9]*$||") #--specialclone-me--" >> "${clonetargetdevice2}"/boot/grub/device.map
   
-  if [ -f "${clonetargetdevice2}"/etc/fstab ];then
-    sed -i -e "s/.\+\( \/ .\+\)/UUID=$(grub-probe -t fs_uuid ${clonetargetdevice2})\1/" "${clonetargetdevice2}"/etc/fstab
+  echo "some temporary adjustments to ${clonetargetdir}/boot/grub/device.map"
+  mkdir -p "${clonetargetdir}"/boot/grub/
+  local tempprobegrub="$(grub-probe -t device "${clonetargetdir}" | sed -e "s|[0-9]*$||")"
+  echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${clonetargetdir}"/boot/grub/device.map
+  echo "finished"
+  
+  if [ -f "${clonetargetdir}"/etc/fstab ];then
+    #can lead to a kill of an usb memory stick (some models?)
+    local tempprobefstab="$(grub-probe -t fs_uuid ${clonetargetdir})"
+    local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobe}\1/" "${clonetargetdir}"/etc/fstab)"
+    echo "$tempsed" > "${clonetargetdir}"/etc/fstab
 
     echo "root in fstab updated"
     if [ "$cloneme_ui_mode" = false ];then
       echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
       read shall_fstab
       if [ "$shall_fstab" = "yes" ]; then
-        if ! ${EDITOR} "${clonetargetdevice2}/etc/fstab"; then
+        if ! ${EDITOR} "${clonetargetdir}/etc/fstab"; then
           echo "Fall back to vi"
-          vi "${clonetargetdevice2}"/etc/fstab
+          vi "${clonetargetdir}"/etc/fstab
         fi
       fi
     fi
   else
     echo "no fstab found"
-    
+    exit 1
   fi
   copyuser
 
-  mount -o bind /proc "${clonetargetdevice2}"/proc
-  mount -o bind /sys "${clonetargetdevice2}"/sys
-  mount -o bind /dev "${clonetargetdevice2}"/dev
-  #mount -o bind /tmp "${clonetargetdevice2}"/tmp
-  #mount -o bind /run "${clonetargetdevice2}"/run
+  mount -o bind /proc "${clonetargetdir}"/proc
+  mount -o bind /sys "${clonetargetdir}"/sys
+  mount -o bind /dev "${clonetargetdir}"/dev
+
   
   install_installer
 
-# bug: display can't be opened on target system  TODO (tmp,run) needed
-  #if [ "$cloneme_ui_mode" = "false" ];then
-    chroot "${clonetargetdevice2}" "---special-mode---"
-  #else
-  #  chroot "${clonetargetdevice2}" "---special-mode-graphic---" "${graphic_interface_path}"
-  #fi
+# bug: display can't be opened on target system; Maybe now
+  if [ "$cloneme_ui_mode" = "false" ];then
+    chroot "${clonetargetdir}" "---special-mode---"
+  else
+    mount -o bind /tmp "${clonetargetdir}"/tmp
+    mount -o bind /run "${clonetargetdir}"/run
+    chroot "${clonetargetdir}" "---special-mode-graphic---" "${graphic_interface_path}"
+  fi
   echo "back from chroot"
-  sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
-  #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdevice2}"/boot/grub/device.map
+  tempsed=$(sed -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map)
+  echo "$tempsed" > "${clonetargetdir}"/boot/grub/device.map
+  #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdir}"/boot/grub/device.map
   echo "device.map cleaned"
   if [ "$cloneme_ui_mode" = "false" ];then
     echo "if you want to use device.map please type \"yes\" and edit it now"
     read shall_devicemap
     if [ "$shall_devicemap" = "yes" ]; then
-      if ! ${EDITOR} "${clonetargetdevice2}"/boot/grub/device.map; then
+      if ! ${EDITOR} "${clonetargetdir}"/boot/grub/device.map; then
         echo "Fall back to vi"
-        vi "${clonetargetdevice2}"/boot/grub/device.map
+        vi "${clonetargetdir}"/boot/grub/device.map
       fi
     fi
   fi
-  umount "${clonetargetdevice2}"/{proc,sys,dev}
-  #umount "${clonetargetdevice2}"/{tmp,run}
+  umount "${clonetargetdir}"/{proc,sys,dev}
+  if [ "$cloneme_ui_mode" = "true" ];then
+    umount "${clonetargetdir}"/{tmp,run}
+  fi
 }
 
 
 # installer routine creates correct bootloaderdev 
 installer_grub2(){
   echo "Install grub…"
-    #/ is clonetargetdevice2
+    #/ is clonetargetdir
     get_dev="$(grub-probe -t device "/" | sed  -e "s|[0-9]*$||")"
   if ! grub-install "${get_dev}";then
     echo "Error: ${get_dev} not found"
@@ -514,7 +525,7 @@ installer_grub2(){
 }
 
 updater(){
-  if ! rsync -a -A --progress --delete --exclude "${clonesource2}/run/*" --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map --exclude "${clonesource2}"etc/fstab --exclude "${syncdir}" --exclude "$clonetargetdevice2" --exclude "${clonesource2}home/*" --exclude "${clonesource2}"sys/ --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ; then
+  if ! rsync -a -A --progress --delete --exclude "${clonesourcedir}/run/*" --exclude "${clonesourcedir}"boot/grub/grub.cfg --exclude "${clonesourcedir}"boot/grub/device.map --exclude "${clonesourcedir}"etc/fstab --exclude "${syncdir}" --exclude "$clonetargetdir" --exclude "${clonesourcedir}home/*" --exclude "${clonesourcedir}"sys/ --exclude "${clonesourcedir}dev/*" --exclude "${clonesourcedir}proc/*" --exclude "${clonesourcedir}var/log/*" --exclude "${clonesourcedir}tmp/*" --exclude "${clonesourcedir}run/*" --exclude "${clonesourcedir}var/run/*" --exclude "${clonesourcedir}var/tmp/*" "${clonesourcedir}"* "${clonetargetdir}" ; then
     echo "error: rsync could not sync"
     exit 1
   fi
@@ -542,12 +553,12 @@ if [ "${clonetargetloop}" != "" ];then
 fi
 
 #clean up src
-if [ "${clonesource2}" = "${syncdir}/src" ]; then
-  umount "${clonesource2}"
-  rmdir "${clonesource2}"
-if [ "${clonetargetdevice2}" = "${syncdir}/dest" ]; then
-  umount "${clonetargetdevice2}"
-  rmdir "${clonetargetdevice2}"
+if [ "${clonesourcedir}" = "${syncdir}/src" ]; then
+  umount "${clonesourcedir}"
+  rmdir "${clonesourcedir}"
+if [ "${clonetargetdir}" = "${syncdir}/dest" ]; then
+  umount "${clonetargetdir}"
+  rmdir "${clonetargetdir}"
 fi
 
 #doesn't exist in this mode
