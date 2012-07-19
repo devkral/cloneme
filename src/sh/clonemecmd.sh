@@ -487,9 +487,9 @@ installer(){
   
   
 
-# bug: display can't be opened on target system; Maybe now
+# display can be opened with tmp and run
   if [ "$cloneme_ui_mode" = "false" ];then
-    chroot "${clonetargetdir}" "${myself}" "---special-mode---"
+    chroot "${clonetargetdir}" ${myself} "---special-mode---"
   else
     mount -o bind /tmp "${clonetargetdir}"/tmp
     mount -o bind /run "${clonetargetdir}"/run

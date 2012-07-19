@@ -5,4 +5,5 @@ ui_DATA = cloneme.ui \
 	copyuser.ui \
 	editor.ui \
 	createuser.ui \
-	myfiledialog.ui
+	myfiledialog.ui \
+	icon.png
