@@ -2,6 +2,7 @@
 +make EDITOR fetch from main system working (see gui.cc)
 +rename name (converter and copyuser)
 +split shellfile into bootloader specific installer e.g. grub, syslinux, lilo and adduserdialog and the normal part 
++recompile main program if not the same architecture
 
 +make things running more stable
 
