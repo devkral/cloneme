@@ -3,10 +3,11 @@
 +rename name (converter and copyuser)
 +split shellfile into bootloader specific installer e.g. grub, syslinux, lilo and adduserdialog and the normal part 
 +recompile main program if not the same architecture
++offer some special options for ssds/USB-flashdrives
 
 +make things running more stable
 
-less important
+less important:
 +rework system2 output
 
 not very important:
