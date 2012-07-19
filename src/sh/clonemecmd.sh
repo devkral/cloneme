@@ -42,7 +42,7 @@ installbootloader="installer_grub2"
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
-syncdir="/run/syncdir"
+syncdir="/syncdir"
 #default groups of new users
 usergroupargs="video,audio,optical,power"
 #graphic interface
@@ -130,10 +130,13 @@ if [ ! -e /usr/bin/rsync ] && [ ! -e /usr/sbin/rsync ]; then
 fi
 
 if [ ! -e /sbin/losetup ] && [ ! -e /usr/bin/losetup ]; then
-  echo "error command: /sbin/losetup not found"
-  echo "error command: /usr/bin/losetup not found"
+  echo "error command /sbin/losetup | /usr/bin/losetup not found"
   echo "Have you loop tools (name can differ) installed?"
-  exit 1
+  echo "no raw file mount is supported"
+  if [ -f "$clonesource" ] || [ -f "$clonetargetdevice" ];then
+    echo "you use raw files; exit"
+    exit 1
+  fi
 fi
 
 if [ ! -e /usr/bin/"$EDITOR" ] && [ ! -e /bin/"$EDITOR" ] && [ ! -e "$EDITOR" ]; then
@@ -159,26 +162,44 @@ fi
 
 
 
-#howto call mounting <"device"> <"mountpoint">
-#mount or use directory
-mounting()
+#mount_blockdevice <"device"> <"mountpoint">
+#mount blockdevices
+mount_blockdevice()
 {
   local device="$1"
   local mountpath="$2"
+#safeguard for not killing innocent mounts
+  if [ ! -b "$device" ];then
+    echo "mount_blockdevice error: $device is no block device"
+    exit 1
+  fi
+
+#sorry other mountpoints but we must be sure that this is the only mountpoint
+#/proc/mounts of the real running system is used
+  local pathtoumount="$(cat /proc/mounts | grep "$device" | sed -e "s/^[^ ]\+ \([^ ]\+\) .*/\1/g")"
+  if [ "$pathtoumount" != "" ]; then
+    for itemtoumount in $pathtoumount
+    do
+      echo "mount_blockdevice: umount $itemtoumount"
+      umount "$(echo "$itemtoumount" | sed -e 's/\\040/\ /g')"
+    done
+  fi
 
   if mountpoint "${mountpath}" &> /dev/null; then
 #sorry predecessor but we must be sure that is mounted as ROOT
     if ! umount "${mountpath}"; then
-      echo "can\'t unmount the partition"
-      echo "means: an other service depending on theis directory is still running"
+      echo "mount_blockdevice error: cannot unmount the mount directory"
+      echo "an other service depending on this directory is still running"
       echo "abort!"
       exit 1
+    else
+      echo "mount_blockdevice success: unmount ${mountpath}"
     fi
   fi
-
-  if ! mount "${clonetargetdevice}" "${mountpath}"; then
+  
+  if ! mount "${device}" "${mountpath}"; then
     # error message by mount itself
-    echo "Hint: have you restarted the kernel after last update?"
+    echo "mount_blockdevice hint: have you restarted the kernel after last update?"
     exit 1
   fi
   return 0
@@ -192,20 +213,22 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
     clonesource2="${clonesource}"
   elif [ -b "${clonesource}" ];then
     mkdir -p "${syncdir}/src" 2> /dev/null
-    mounting "${clonesource}" "${syncdir}/src"
+    mount_blockdevice "${clonesource}" "${syncdir}/src"
     clonesource2="${syncdir}/src"
   elif [ -f "${clonesource}" ];then
     mkdir -p "${syncdir}"/src 2> /dev/null
-    if ! losetup -a | grep "${clonesource}";then
+    if ! losetup -a | grep "${clonesource}" > /dev/null;then
       if ! losetup -f -P "${clonesource}";then
         echo "Hint: have you restarted the kernel after last update?"
         exit 1
       fi
+    else
+      echo "raw file already loop mounted but this is no issue"
     fi
-    clonesourceloop=$(losetup -a | grep "${clonesource}" | sed -e "s/:.*//")
+    clonesourceloop=$(losetup -a | grep "${clonesource}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')
     echo "Please enter the partition number (beginning with p)"
     read parts
-    mounting "${clonesourceloop}$parts" "${syncdir}/src"
+    mount_blockdevice "${clonesourceloop}$parts" "${syncdir}/src"
     clonesource2="${syncdir}/src"
   else
     echo "source not recognized"
@@ -216,11 +239,11 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
     clonetargetdevice2="${clonetargetdevice}"
   elif [ -b "${clonetargetdevice}" ];then
     mkdir -p "${syncdir}/dest" 2> /dev/null
-    mounting "${clonetargetdevice}" "${syncdir}/dest"
+    mount_blockdevice "${clonetargetdevice}" "${syncdir}/dest"
     clonetargetdevice2="${syncdir}/dest"
   elif [ -f "${clonetargetdevice}" ];then
     mkdir -p "${syncdir}/dest" 2> /dev/null
-    if ! losetup -a | grep "${clonetargetdevice}";then
+    if ! losetup -a | grep "${clonetargetdevice}" > /dev/null;then
       if ! losetup -f -P "${clonetargetdevice}";then 
         echo "Hint: have you restarted the kernel after last update?"
         exit 1
@@ -229,7 +252,7 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
     clonetargetloop=$(losetup -a | grep "${clonetargetdevice}" | sed -e "s/:.*//")
     echo "Please enter the partition number (beginning with p)"
     read partd
-    mounting "${clonetargetloop}$partd" "${syncdir}/dest"
+    mount_blockdevice "${clonetargetloop}$partd" "${syncdir}/dest"
     clonetargetdevice2="${syncdir}/dest"
   else
     echo "target not recognized"
@@ -242,14 +265,13 @@ else
   clonetargetdevice2="$2"
 fi
 
-
 install_installer(){
   if [ ! -f "${clonetargetdevice2}${0}" ]; then
-    mkdir -p dirname "${clonetargetdevice2}${0}"
+    mkdir -p "$(dirname "${clonetargetdevice2}${0}")"
     cp "$0" $(dirname "${clonetargetdevice2}${0}")
   fi
   if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdevice2}${graphic_interface_path}" ]; then
-    graphic_interface_path --installme --dest "${clonetargetdevice2}"
+    "$graphic_interface_path" --installme --dest "${clonetargetdevice2}"
   fi
 }
 
@@ -295,8 +317,8 @@ addnewusers(){
 
 # $1 username $2 prefix
 _cleanuser(){
-local usertemp=$1
-local targetn=$2
+  local usertemp=$1
+  local targetn=$2
   sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd
   sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd-
   sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group
@@ -367,7 +389,6 @@ do
     
       if [ "$answer_useracc" = "i" ]; then
         if [ ! -d "${clonetargetdevice2}/home/$usertemp" ]; then
-          # bug (not mine) if you use "i n" sourcehighlighting goes mad
           echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type \"yes\" (not the default)"
           read question_delete
           if [ "$question_delete" = "yes" ]; then
@@ -388,50 +409,74 @@ done
 }
 
 installer(){
-  if [ "$cloneme_ui_mode" = false ];then
+  rsyncing="true"
+  if [ "$cloneme_ui_mode" = "false" ];then
     if [ "$(ls -A "${clonetargetdevice2}")" != "" ];then
       echo "The target partition is not empty. Shall I clean it? Type \"yes\""
       read shall_clean
       if [ "${shall_clean}" = "yes" ];then
         rm -r "${clonetargetdevice2}"/*
       fi
+      echo "Skip rsync? Type \"yes\""
+      read rsyncing_quest
+      if [ "${rsyncing_quest}" = "yes" ];then
+        rsyncing="false"
+      fi
+      
+    fi
+  fi
+  if [ "$rsyncing" = true ];then
+    if ! rsync -a -A --progress --delete --exclude "${clonesource2}/run/*" --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdevice2}" --exclude "${clonesource2}home/*" --exclude "${clonesource2}sys/*" --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ;then
+    echo "error: rsync could not sync"
+    exit 1
     fi
   fi
 
-  if ! rsync -a -A --progress --delete --exclude "${clonesource2}/run/*" --exclude "${clonesource2}"boot/grub/grub.cfg --exclude "${clonesource2}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdevice2}" --exclude "${clonesource2}home/*" --exclude "${clonesource2}sys/*" --exclude "${clonesource2}dev/*" --exclude "${clonesource2}proc/*" --exclude "${clonesource2}var/log/*" --exclude "${clonesource2}tmp/*" --exclude "${clonesource2}run/*" --exclude "${clonesource2}var/run/*" --exclude "${clonesource2}var/tmp/*" "${clonesource2}"* "${clonetargetdevice2}" ;then
-    echo "error: rsync could not sync"
-    exit 1
-  fi  
-if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
-    sed -i -e "s/\((hd0)\)/# \1/" "${clonetargetdevice2}"/boot/grub/device.map
+
+
+  if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
+    tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdevice2}"/boot/grub/device.map)"
+    echo "$tempdev" > "${clonetargetdevice2}"/boot/grub/device.map
   fi
+
+
+  sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
+  echo "some temporary adjustments to ${clonetargetdevice2}/boot/grub/device.map"
   echo "(hd0) $(grub-probe -t device "${clonetargetdevice2}" | sed -e "s|[0-9]*$||") #--specialclone-me--" >> "${clonetargetdevice2}"/boot/grub/device.map
-  sed -i -e "s/.\+\( \/ .\+\)/UUID=$(grub-probe -t fs_uuid ${clonetargetdevice2})\1/" "${clonetargetdevice2}"/etc/fstab
-  echo "root in fstab updated"
-  if [ "$cloneme_ui_mode" = false ];then
-    echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
-    read shall_fstab
-    if [ "$shall_fstab" = "yes" ]; then
-      if ! ${EDITOR} "${clonetargetdevice2}/etc/fstab"; then
-        echo "Fall back to vi"
-        vi "${clonetargetdevice2}"/etc/fstab
+  
+  if [ -f "${clonetargetdevice2}"/etc/fstab ];then
+    sed -i -e "s/.\+\( \/ .\+\)/UUID=$(grub-probe -t fs_uuid ${clonetargetdevice2})\1/" "${clonetargetdevice2}"/etc/fstab
+
+    echo "root in fstab updated"
+    if [ "$cloneme_ui_mode" = false ];then
+      echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
+      read shall_fstab
+      if [ "$shall_fstab" = "yes" ]; then
+        if ! ${EDITOR} "${clonetargetdevice2}/etc/fstab"; then
+          echo "Fall back to vi"
+          vi "${clonetargetdevice2}"/etc/fstab
+        fi
       fi
     fi
+  else
+    echo "no fstab found"
+    
   fi
   copyuser
 
   mount -o bind /proc "${clonetargetdevice2}"/proc
   mount -o bind /sys "${clonetargetdevice2}"/sys
   mount -o bind /dev "${clonetargetdevice2}"/dev
+  #mount -o bind /tmp "${clonetargetdevice2}"/tmp
+  #mount -o bind /run "${clonetargetdevice2}"/run
   
   install_installer
 
-# bug: display can't be opened on target system
-  self1="$(echo "$0" | sed -e "s/$\./$PWD/")" 
+# bug: display can't be opened on target system  TODO (tmp,run) needed
   #if [ "$cloneme_ui_mode" = "false" ];then
-    chroot "${clonetargetdevice2}" $self1 "---special-mode---"
+    chroot "${clonetargetdevice2}" "---special-mode---"
   #else
-  #  chroot "${clonetargetdevice2}" $self1 "---special-mode-graphic---" "${graphic_interface_path}"
+  #  chroot "${clonetargetdevice2}" "---special-mode-graphic---" "${graphic_interface_path}"
   #fi
   echo "back from chroot"
   sed -i -e "/#--specialclone-me--/d" "${clonetargetdevice2}"/boot/grub/device.map
@@ -448,6 +493,7 @@ if [ -e "${clonetargetdevice2}"/boot/grub/device.map ];then
     fi
   fi
   umount "${clonetargetdevice2}"/{proc,sys,dev}
+  #umount "${clonetargetdevice2}"/{tmp,run}
 }
 
 
@@ -458,7 +504,7 @@ installer_grub2(){
     get_dev="$(grub-probe -t device "/" | sed  -e "s|[0-9]*$||")"
   if ! grub-install "${get_dev}";then
     echo "Error: ${get_dev} not found"
-    echo "I failed please do it yourself"
+    echo "I failed please do it yourself or type \"exit\" and press <enter> to escape"
     /bin/sh
   fi
   
@@ -484,6 +530,7 @@ case "$choosemode" in
   "install")installer;;
   *)help;exit 1;;
 esac
+
 
 #unmount loops
 if [ "${clonesourceloop}" != "" ];then
