@@ -39,6 +39,8 @@ config_new_sys="addnewusers"
 #the command to install the bootloader
 installbootloader="installer_grub2"
 #defaults
+#scriptdirectory
+scriptdir="./src/sh"
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
