@@ -57,6 +57,7 @@ clonetargetdevice=""
 #create absolut path name for this program
 myself="$(realpath -L "$0")"
 
+echo "$myself"
 
 help(){
   echo "$0 <mode> [<source>] <target>"
@@ -128,13 +129,20 @@ if [ "$clonetargetdevice" != "" ]; then
 fi
 
 #check if needed programs exists
-if [ ! -e /usr/bin/rsync ] && [ ! -e /usr/sbin/rsync ]; then
+if [ ! -e "/usr/bin/rsync" ] && [ ! -e "/usr/sbin/rsync" ]; then
   echo "error command: rsync not found"
   echo "please install rsync"
   exit 1
 fi
 
-if [ ! -e /sbin/losetup ] && [ ! -e /usr/bin/losetup ]; then
+if [ ! -e "/usr/bin/realpath" ]; then
+  echo "error command realpath not found"
+  echo "Have you coreutils (name can differ) installed?"
+  exit 1
+fi
+
+
+if [ ! -e "/sbin/losetup" ] && [ ! -e "/usr/bin/losetup" ]; then
   echo "error command /sbin/losetup | /usr/bin/losetup not found"
   echo "Have you loop tools (name can differ) installed?"
   echo "no raw file mount is supported"
@@ -144,7 +152,7 @@ if [ ! -e /sbin/losetup ] && [ ! -e /usr/bin/losetup ]; then
   fi
 fi
 
-if [ ! -e /usr/bin/"$EDITOR" ] && [ ! -e /bin/"$EDITOR" ] && [ ! -e "$EDITOR" ]; then
+if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ]; then
   echo "error: no default editor found"
   echo "please enter your favourite editor"
   read EDITOR
@@ -155,12 +163,12 @@ if [ ! -e /usr/bin/"$EDITOR" ] && [ ! -e /bin/"$EDITOR" ] && [ ! -e "$EDITOR" ];
   fi
 fi
 
-if [ ! -e /bin/mount ] && [ ! -e /usr/bin/mount ]; then
+if [ ! -e "/bin/mount" ] && [ ! -e "/usr/bin/mount" ]; then
   echo "error command: mount not found"
   exit 1
 fi
 
-if [ ! -e /bin/mountpoint ] && [ ! -e /usr/bin/mountpoint ]; then
+if [ ! -e "/bin/mountpoint" ] && [ ! -e "/usr/bin/mountpoint" ]; then
   echo "error command: mountpoint not found"
   exit 1
 fi
@@ -230,7 +238,7 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
     else
       echo "raw file already loop mounted but this is no issue"
     fi
-    clonesourceloop=$(losetup -a | grep "${clonesource}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')
+    clonesourceloop="$(losetup -a | grep "${clonesource}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
     echo "Please enter the partition number (beginning with p)"
     read parts
     mount_blockdevice "${clonesourceloop}$parts" "${syncdir}/src"
@@ -254,7 +262,7 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
         exit 1
       fi
     fi
-    clonetargetloop=$(losetup -a | grep "${clonetargetdevice}" | sed -e "s/:.*//")
+    clonetargetloop="$(losetup -a | grep "${clonetargetdevice}" | sed -e "s/:.*//")"
     echo "Please enter the partition number (beginning with p)"
     read partd
     mount_blockdevice "${clonetargetloop}$partd" "${syncdir}/dest"
@@ -273,16 +281,16 @@ fi
 install_installer(){
   if [ ! -f "${clonetargetdir}${myself}" ]; then
     mkdir -p "$(dirname "${clonetargetdir}${myself}")"
-    cp "$myself" $(dirname "${clonetargetdir}${myself}")
+    cp "$myself" "$(dirname "${clonetargetdir}${myself}")"
   fi
   if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdir}${graphic_interface_path}" ]; then
-    "$graphic_interface_path" --installme --dest "${clonetargetdir}"
+    "$graphic_interface_path" "--installme" "--dest" "${clonetargetdir}"
   fi
 }
 
 addnewusers(){
   if [ "$cloneme_ui_mode" = "true" ];then
-    "${graphic_interface_path}" --createuser
+    "${graphic_interface_path}" "--createuser"
   else
     usercounter=0
     for (( ; ; ))
@@ -552,14 +560,6 @@ case "$choosemode" in
 esac
 
 
-#unmount loops
-if [ "${clonesourceloop}" != "" ];then
-  losetup -d "${clonesourceloop}"
-fi
-
-if [ "${clonetargetloop}" != "" ];then
-  losetup -d "${clonetargetloop}"
-fi
 
 #clean up src
 if [ "${clonesourcedir}" = "${syncdir}/src" ]; then
@@ -568,6 +568,16 @@ if [ "${clonesourcedir}" = "${syncdir}/src" ]; then
 if [ "${clonetargetdir}" = "${syncdir}/dest" ]; then
   umount "${clonetargetdir}"
   rmdir "${clonetargetdir}"
+fi
+
+
+#unmount loops
+if [ "${clonesourceloop}" != "" ];then
+  losetup -d "${clonesourceloop}"
+fi
+
+if [ "${clonetargetloop}" != "" ];then
+  losetup -d "${clonetargetloop}"
 fi
 
 #doesn't exist in this mode
