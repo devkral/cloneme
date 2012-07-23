@@ -1,10 +1,15 @@
 #! /bin/bash
 
+#usage: grub-installer.sh [command for sysconfig like adding users]
+
 #dir where the cloneme files are located
 share_dir="$(dirname "$(dirname "$(realpath "$0")")")"
 #the command which configures the target system
-config_new_sys="${share_dir}/sh/addnewusers.sh"
-
+if [ "x$1" = "x" ]; then
+  config_new_sys="${share_dir}/sh/addnewusers.sh"
+else
+  config_new_sys="$1"
+fi
 
 echo "Install grub…"
   #/ is clonetargetdir

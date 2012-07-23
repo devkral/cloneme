@@ -42,8 +42,7 @@ scriptdir = $(bindir)
 script_SCRIPTS = clonemecmd.sh
 
 SUBDIRS = \
-	ui \
-	sh \
-	desktop
+	desktop \
+	share
 
 AM_CXXFLAGS = -std=c++11 

@@ -40,7 +40,7 @@ config_new_sys="addnewusers"
 installbootloader="installer_grub2"
 #defaults
 #scriptdirectory (changed by installer)
-scriptdir="./src/sh"
+sharedir="./src/share"
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
@@ -75,20 +75,20 @@ help(){
 # basic checks
 
 # translate into more informative names and check arguments
-if [ "$1" = "mastergraphicmode" ]; then
+if [ "x$1" = "xmastergraphicmode" ]; then
   choosemode="$2";
   clonesource="$3";
   clonetargetdevice="$4";
   graphic_interface_path="$5"
   installbootloader="$6";
-  if [ "$graphic_interface_path" != "" ] && [ -f "$graphic_interface_path" ] ;then
+  if [ "x$graphic_interface_path" != "x" ] && [ -f "$graphic_interface_path" ] ;then
     cloneme_ui_mode="true";
   fi
 
 elif [ "$1" = "---special-mode-graphic---" ]; then
   choosemode="---special-mode-graphic---" 
   graphic_interface_path="$2"
-  if [ "$graphic_interface_path" != "" ] && [ -f "$graphic_interface_path" ] ;then
+  if [ "x$graphic_interface_path" != "x" ] && [ -f "$graphic_interface_path" ] ;then
     cloneme_ui_mode="true";
   fi
 elif [ "$1" = "---special-mode---" ]; then
@@ -122,7 +122,7 @@ syncdir="$tempp"
 
 
 #loop shouldn't happen
-if [ "$clonetargetdevice" != "" ]; then
+if [ "x$clonetargetdevice" != "x" ]; then
   if [ "$clonesource" = "$clonetargetdevice" ] || [ "$clonesource" = "$clonetargetdevice/" ];then
     echo "error: source = target"
     echo "target: $clonetargetdevice"
@@ -426,7 +426,7 @@ done
 installer(){
   rsyncing="true"
   if [ "$cloneme_ui_mode" = "false" ];then
-    if [ "$(ls -A "${clonetargetdir}")" != "" ];then
+    if [ "x$(ls -A "${clonetargetdir}")" != "x" ];then
       echo "The target partition is not empty. Shall I clean it? Type \"yes\""
       read shall_clean
       if [ "${shall_clean}" = "yes" ];then
@@ -562,29 +562,6 @@ case "$choosemode" in
 esac
 
 
-
-#clean up src
-if [ "${clonesourcedir}" = "${syncdir}/src" ]; then
-  umount "${clonesourcedir}"
-  rmdir "${clonesourcedir}"
-if [ "${clonetargetdir}" = "${syncdir}/dest" ]; then
-  umount "${clonetargetdir}"
-  rmdir "${clonetargetdir}"
-fi
-
-
-#unmount loops
-if [ "${clonesourceloop}" != "" ];then
-  losetup -d "${clonesourceloop}"
-fi
-
-if [ "${clonetargetloop}" != "" ];then
-  losetup -d "${clonetargetloop}"
-fi
-
-#doesn't exist in this mode
-if [ "${choosemode}" != "---special-mode---" ] && [ "$choosemode" != "---special-mode-graphic---" ]; then 
-  rmdir "${syncdir}"
-fi
+?????/sh/umountscript.sh
 
 exit 0;
