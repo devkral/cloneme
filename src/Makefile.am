@@ -37,7 +37,9 @@ cloneme_LDFLAGS =
 
 cloneme_LDADD = $(CLONEME_LIBS)
 
+scriptdir = $(bindir)
 
+script_SCRIPTS = clonemecmd.sh
 
 SUBDIRS = \
 	ui \

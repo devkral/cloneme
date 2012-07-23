@@ -95,7 +95,7 @@ void gui::update()
 	else
 	{
 		std::cerr << "clonemecmd.sh not found; fall back to src directory\n";
-		sum+="$PWD/src/sh";
+		sum+="$PWD/src";
 	}
 	sum+="/clonemecmd.sh mastergraphicmode update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
@@ -110,7 +110,7 @@ void gui::install()
 	else
 	{
 		std::cerr << "clonemecmd.sh not found; fall back to src directory\n";
-		sum+="$PWD/src/sh";
+		sum+="$PWD/src";
 	}
 	sum+="/clonemecmd.sh mastergraphicmode install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
