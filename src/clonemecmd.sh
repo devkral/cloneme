@@ -39,7 +39,7 @@ config_new_sys="addnewusers"
 #the command to install the bootloader
 installbootloader="installer_grub2"
 #defaults
-#scriptdirectory
+#scriptdirectory (changed by installer)
 scriptdir="./src/sh"
 #folder which is copied
 clonesource="/"
@@ -53,7 +53,6 @@ graphic_interface_path=""
 cloneme_ui_mode="false"
 clonesourceloop=""
 clonetargetloop=""
-#clonetargetdevice (don't change)
 clonetargetdevice=""
 
 #create absolut path name for this program
@@ -106,8 +105,9 @@ else
     help; exit 0;
   fi
 fi
+
 #check if runs with root permission
-if [ ! "$UID" = "0" ]; then
+if [ ! "$UID" = "0" ] && [ ! "$EUID" = "0" ]; then
   echo "error: needs root permissions"
   exit 1;
 fi
