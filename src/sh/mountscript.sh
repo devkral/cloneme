@@ -1,26 +1,19 @@
 #! /bin/bash
 
-if [ ! -e "/bin/mount" ] && [ ! -e "/usr/bin/mount" ]; then
-  echo "error command: mount not found"
-  exit 1
-fi
-
-if [ ! -e "/bin/mountpoint" ] && [ ! -e "/usr/bin/mountpoint" ]; then
-  echo "error command: mountpoint not found"
-  exit 1
-fi
-
-
+#usage: mountscript <"device"> <"mountpoint"> ["partition"]
+#don't use; too hacky
+thingtomount="$1"
+mountpath="$2"
+partition="$3"
 
 #mount_blockdevice <"device"> <"mountpoint">
 #mount blockdevices
 mount_blockdevice()
 {
   local device="$1"
-  local mountpath="$2"
 #safeguard for not killing innocent mounts
   if [ ! -b "$device" ];then
-    echo "mount_blockdevice error: $device is no block device"
+    echo "mount_blockdevice error: $device is no block device" 1>&2 
     exit 1
   fi
 
@@ -30,7 +23,7 @@ mount_blockdevice()
   if [ "$pathtoumount" != "" ]; then
     for itemtoumount in $pathtoumount
     do
-      echo "mount_blockdevice: umount $itemtoumount"
+      #echo "mount_blockdevice: umount $itemtoumount"
       umount "$(echo "$itemtoumount" | sed -e 's/\\040/\ /g')"
     done
   fi
@@ -42,8 +35,6 @@ mount_blockdevice()
       echo "an other service depending on this directory is still running"
       echo "abort!"
       exit 1
-    else
-      echo "mount_blockdevice success: unmount ${mountpath}"
     fi
   fi
   
@@ -52,66 +43,34 @@ mount_blockdevice()
     echo "mount_blockdevice hint: have you restarted the kernel after last update?"
     exit 1
   fi
-  return 0
 }
 
-#mount
-##don't run this when a subprocess of itself
-echo "$1"
-if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-mode-graphic---" ]; then
-  if [ -d "${clonesource}" ];then
-    clonesourcedir="${clonesource}"
-  elif [ -b "${clonesource}" ];then
-    mkdir -p "${syncdir}/src" 2> /dev/null
-    mount_blockdevice "${clonesource}" "${syncdir}/src"
-    clonesourcedir="${syncdir}/src"
-  elif [ -f "${clonesource}" ];then
-    mkdir -p "${syncdir}"/src 2> /dev/null
-    if ! losetup -a | grep "${clonesource}" > /dev/null;then
-      if ! losetup -f -P "${clonesource}";then
-        echo "Hint: have you restarted the kernel after last update?"
-        exit 1
-      fi
-    else
-      echo "raw file already loop mounted but this is no issue"
+if [ -d "${thingtomount}" ];then
+  mountdir="${thingtomount}"
+elif [ -b "${thingtomount}" ];then
+  mkdir -p "${mountpath}" 2> /dev/null
+  mount_blockdevice "${thingtomount}"
+  mountdir="${mountpath}"
+elif [ -f "${thingtomount}" ];then
+  mkdir -p "${mountpath}" 2> /dev/null
+  if ! losetup -a | grep "${thingtomount}" > /dev/null;then
+    if ! losetup -f -P "${thingtomount}";then
+      echo "Hint: have you restarted the kernel after last update?"
+      exit 1
     fi
-    clonesourceloop="$(losetup -a | grep "${clonesource}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
-    echo "Please enter the partition number (beginning with p)"
-    read parts
-    mount_blockdevice "${clonesourceloop}$parts" "${syncdir}/src"
-    clonesourcedir="${syncdir}/src"
-  else
-    echo "source not recognized"
-    exit 1
+  #else
+  #  echo "raw file already loop mounted but this is no issue" 1>&2 
   fi
-
-  if [ -d "${clonetargetdevice}" ];then
-    clonetargetdir="${clonetargetdevice}"
-  elif [ -b "${clonetargetdevice}" ];then
-    mkdir -p "${syncdir}/dest" 2> /dev/null
-    mount_blockdevice "${clonetargetdevice}" "${syncdir}/dest"
-    clonetargetdir="${syncdir}/dest"
-  elif [ -f "${clonetargetdevice}" ];then
-    mkdir -p "${syncdir}/dest" 2> /dev/null
-    if ! losetup -a | grep "${clonetargetdevice}" > /dev/null;then
-      if ! losetup -f -P "${clonetargetdevice}";then 
-        echo "Hint: have you restarted the kernel after last update?"
-        exit 1
-      fi
-    fi
-    clonetargetloop="$(losetup -a | grep "${clonetargetdevice}" | sed -e "s/:.*//")"
+  loopmount="$(losetup -a | grep "${thingtomount}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
+  if [ "$partition" = "" ]; then
     echo "Please enter the partition number (beginning with p)"
-    read partd
-    mount_blockdevice "${clonetargetloop}$partd" "${syncdir}/dest"
-    clonetargetdir="${syncdir}/dest"
-  else
-    echo "target not recognized"
-    exit 1
+    read partition
   fi
-#check clonesourcedir; it has to end with /"
-  tempp="$(echo "$clonesourcedir" | sed "s/\/$//")"
-  clonesourcedir="$tempp/"
+  mount_blockdevice "${loopmount}$partition"
+  mountdir="${mountpath}"
 else
-  clonetargetdir="$2"
+  echo "source not recognized"
+  exit 1
 fi
-
+echo "$mountdir"
+exit 0
