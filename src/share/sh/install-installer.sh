@@ -13,10 +13,9 @@ programdir="$(realpath "$1")"
 targetdir="$(echo "$2" | sed "s/\/$//")"
 
 cp "$programdir"/clonemecmd.sh "$targetdir"/"$programdir"
+sed -i -e "s|.* #--replacepattern--|sharedir=\"${share_dir}\" #--replacepattern--|" "$targetdir"/"$programdir"/clonemecmd.sh
 if [ -e "$programdir"/cloneme ];then
-  if ! cp "$programdir"/cloneme "$targetdir"/"$programdir";then
-    exit 1
-  fi
+  cp "$programdir"/cloneme "$targetdir"/"$programdir"
 fi
 
 mkdir -p "$targetdir"/"$share_dir" 2> /dev/null
