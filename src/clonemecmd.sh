@@ -37,8 +37,8 @@
 
 #create absolut path name for this program
 myself="$(realpath -L "$0")"
-#scriptdirectory (changed by installer)
-sharedir="./src/share"
+#scriptdirectory (changed by installer, TODO)
+sharedir="./src/share" #--replacepattern--
 
 
 #defaults

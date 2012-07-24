@@ -17,12 +17,12 @@ AC_PROG_CXX
 dnl ***************************************************************************
 dnl Internationalization
 dnl ***************************************************************************
-IT_PROG_INTLTOOL([0.35.0])
+dnl IT_PROG_INTLTOOL([0.35.0])
 
-GETTEXT_PACKAGE=cloneme
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
-AM_GLIB_GNU_GETTEXT
+dnl GETTEXT_PACKAGE=cloneme
+dnl AC_SUBST(GETTEXT_PACKAGE)
+dnl AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
+dnl AM_GLIB_GNU_GETTEXT
 
 
 
