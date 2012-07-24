@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#usage: grub-installer.sh [command for sysconfig like adding users]
+#usage: grub-installer.sh [command for sysconfig like adding users] [ args ] (current just one)
 
 #dir where the cloneme files are located
 share_dir="$(dirname "$(dirname "$(realpath "$0")")")"
@@ -22,4 +22,4 @@ fi
   
 grub-mkconfig -o /boot/grub/grub.cfg
 echo -e "grub installation finished.\nStart with the configuration of the new system"
-"$config_new_sys"
+"$config_new_sys" "$2"

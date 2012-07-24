@@ -45,8 +45,6 @@ sharedir="./src/share"
 clonesource="/"
 #folder where sync takes place
 syncdir="/run/syncdir"
-#default groups of new users
-usergroupargs="video,audio,optical,power"
 #graphic interface
 #don't comment or change this
 graphic_interface_path=""
@@ -292,45 +290,6 @@ install_installer(){
   fi
 }
 
-addnewusers(){
-  if [ "$cloneme_ui_mode" = "true" ];then
-    "${graphic_interface_path}" "--createuser"
-  else
-    usercounter=0
-    for (( ; ; ))
-    do
-      if [ ${usercounter} = 0 ];then
-        usercounter=1;
-        echo "Create new user? [yes/no]"
-      else
-        echo "Create another new user? [yes/no]"
-      fi
-      read n_user
-      if [ "$n_user" = "yes" ];then
-        echo "Enter user name"
-        read user_name;
-        echo "Shall this user account have admin (can change to root) permissions? [yes] default: no"
-        read admin_perm
-        if [ "$admin_perm" = "yes" ];then
-          if grep "wheel" /etc/group > /dev/null;then
-            usergroupargs+=",wheel"
-          fi
-          if grep "adm" /etc/group > /dev/null;then
-            usergroupargs+=",adm"
-          fi
-          if grep "admin" /etc/group > /dev/null;then
-            usergroupargs+=",admin"
-          fi
-        fi
-        useradd -m -U "$user_name" -p "" -G "$usergroupargs"
-        passwd -e "$user_name"
-      fi
-      if [ "$n_user" = "no" ];then
-        break
-      fi
-    done
-  fi
-}
 
 # $1 username $2 prefix
 _cleanuser(){
@@ -472,6 +431,11 @@ installer(){
   fi
   copyuser
   install_installer
+  
+  mount -o bind /proc "${clonetargetdir}"/proc
+  mount -o bind /sys "${clonetargetdir}"/sys
+  mount -o bind /dev "${clonetargetdir}"/dev
+
 
   if [ -e "${clonetargetdir}"/boot/grub/device.map ];then
     tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdir}"/boot/grub/device.map)"
@@ -485,21 +449,13 @@ installer(){
   echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${clonetargetdir}"/boot/grub/device.map
   echo "finished"
 
-
-  mount -o bind /proc "${clonetargetdir}"/proc
-  mount -o bind /sys "${clonetargetdir}"/sys
-  mount -o bind /dev "${clonetargetdir}"/dev
-
-  
-  
-
 # display can be opened with tmp and run
   if [ "$cloneme_ui_mode" = "false" ];then
-    chroot "${clonetargetdir}" ${myself} "---special-mode---"
+    chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer.sh
   else
     mount -o bind /tmp "${clonetargetdir}"/tmp
     mount -o bind /run "${clonetargetdir}"/run
-    chroot "${clonetargetdir}" "${myself}" "---special-mode-graphic---" "${graphic_interface_path}"
+    chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer.sh "${graphic_interface_path}" "--createuser"
   fi
   echo "back from chroot"
   tempsed=$(sed -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map)
