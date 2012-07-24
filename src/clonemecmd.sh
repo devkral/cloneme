@@ -61,7 +61,7 @@ clonetargetdevice=""
 
 
 help(){
-  echo "$0 <mode> [<source>] <target>"
+  echo "$0 <mode> [<source>] <target> [ graphic bootloader ]"
   echo "valid modes are:"
   echo "update: updates the target system to the level of the source"
   echo "install: clone running system with respect for privacy of users"
