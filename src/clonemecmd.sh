@@ -96,8 +96,8 @@ elif [ "$1" = "---special-mode---" ]; then
 else
   choosemode="$1"
   case "$#" in
-    3)clonesource="$2";clonetargetdevice="$3";;
-    2)clonetargetdevice="$2";;
+    "3")clonesource="$2";clonetargetdevice="$3";;
+    "2")clonetargetdevice="$2";;
     *)help;exit 1;;
   esac
 
