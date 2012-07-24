@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#usage: grub-installer.sh [command for sysconfig like adding users] [ args ] (current just one)
+#usage: grub-installer_phase_2.sh [command for sysconfig like adding users] [ args ] (currently just one)
 
 #dir where the cloneme files are located
 share_dir="$(dirname "$(dirname "$(realpath "$0")")")"

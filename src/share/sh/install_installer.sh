@@ -4,7 +4,7 @@
 #dir where the cloneme files are located
 share_dir="$(dirname "$(dirname "$(realpath "$0")")")"
 
-programdir="$1"
+programdir="$(realpath "$1")"
 
 #if [ $# > 2 ];then
   linkdir="$3"

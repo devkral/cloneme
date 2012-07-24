@@ -34,13 +34,18 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+#create absolut path name for this program
+myself="$(realpath -L "$0")"
+#scriptdirectory (changed by installer)
+sharedir="./src/share"
+
+
+#defaults
 #the command which configures the target system
 config_new_sys="addnewusers"
 #the command to install the bootloader
 installbootloader="installer_grub2"
-#defaults
-#scriptdirectory (changed by installer)
-sharedir="./src/share"
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
@@ -53,8 +58,7 @@ clonesourceloop=""
 clonetargetloop=""
 clonetargetdevice=""
 
-#create absolut path name for this program
-myself="$(realpath -L "$0")"
+
 
 echo "$myself"
 
@@ -73,31 +77,21 @@ help(){
 # basic checks
 
 # translate into more informative names and check arguments
-if [ "x$1" = "xmastergraphicmode" ]; then
-  choosemode="$2";
-  clonesource="$3";
-  clonetargetdevice="$4";
-  graphic_interface_path="$5"
-  installbootloader="$6";
-  if [ "x$graphic_interface_path" != "x" ] && [ -f "$graphic_interface_path" ] ;then
-    cloneme_ui_mode="true";
-  fi
-
-elif [ "$1" = "---special-mode-graphic---" ]; then
-  choosemode="---special-mode-graphic---" 
-  graphic_interface_path="$2"
-  if [ "x$graphic_interface_path" != "x" ] && [ -f "$graphic_interface_path" ] ;then
-    cloneme_ui_mode="true";
-  fi
-elif [ "$1" = "---special-mode---" ]; then
-  choosemode="---special-mode---"
-else
-  choosemode="$1"
-  case "$#" in
-    "3")clonesource="$2";clonetargetdevice="$3";;
-    "2")clonetargetdevice="$2";;
-    *)help;exit 1;;
-  esac
+choosemode="$1"
+case "$#" in
+  "5")
+    clonesource="$(realpath "$2")";
+    clonetargetdevice="$(realpath "$3")";
+    graphic_interface_path="$(realpath "$4")"
+    installbootloader="$(realpath "$5")";
+    if [ "x$graphic_interface_path" != "x" ] && [ -f "$graphic_interface_path" ] ;then
+      cloneme_ui_mode="true";
+    fi
+    ;;
+  "3")clonesource="$(realpath "$2")";clonetargetdevice="$(realpath "$3")";;
+  "2")clonetargetdevice="$(realpath "$2")";;
+  *)help;exit 1;;
+esac
 
   if [ "$choosemode" = "--help" ]; then
     help; exit 0;
@@ -111,14 +105,9 @@ if [ ! "$UID" = "0" ] && [ ! "$EUID" = "0" ]; then
 fi
 
 
-
-
 #check syncdir; it mustn't end with /"
 tempp="$(echo "$syncdir" | sed "s/\/$//")"
 syncdir="$tempp"
-
-
-
 
 
 #check if needed programs exists
@@ -280,17 +269,6 @@ fi
 
 
 
-install_installer(){
-  if [ ! -f "${clonetargetdir}${myself}" ]; then
-    mkdir -p "$(dirname "${clonetargetdir}${myself}")"
-    cp "$myself" "$(dirname "${clonetargetdir}${myself}")"
-  fi
-  if [ "$cloneme_ui_mode" = true ] && [ ! -f "${clonetargetdir}${graphic_interface_path}" ]; then
-    "$graphic_interface_path" "--installme" "--dest" "${clonetargetdir}"
-  fi
-}
-
-
 # $1 username $2 prefix
 _cleanuser(){
   local usertemp=$1
@@ -380,8 +358,6 @@ do
     done
   fi
 done
-
-
 }
 
 installer(){
@@ -435,64 +411,20 @@ installer(){
   mount -o bind /proc "${clonetargetdir}"/proc
   mount -o bind /sys "${clonetargetdir}"/sys
   mount -o bind /dev "${clonetargetdir}"/dev
-
-
-  if [ -e "${clonetargetdir}"/boot/grub/device.map ];then
-    tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdir}"/boot/grub/device.map)"
-    echo "$tempdev" > "${clonetargetdir}"/boot/grub/device.map
-    sed -i -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map
-  fi
-
-  echo "some temporary adjustments to ${clonetargetdir}/boot/grub/device.map"
-  mkdir -p "${clonetargetdir}"/boot/grub/
-  local tempprobegrub="$("$sharedir"/sh/devicefinder.sh dev "${clonetargetdir}" | sed -e "s|[0-9]*$||")"
-  echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${clonetargetdir}"/boot/grub/device.map
-  echo "finished"
-
-# display can be opened with tmp and run
-  if [ "$cloneme_ui_mode" = "false" ];then
-    chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer.sh
-  else
+ 
+  if [ "$cloneme_ui_mode" = "true" ];then
     mount -o bind /tmp "${clonetargetdir}"/tmp
     mount -o bind /run "${clonetargetdir}"/run
-    chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer.sh "${graphic_interface_path}" "--createuser"
+    "$share_dir"/sh/grub-installer_phase1 "${clonetargetdir}" "${graphic_interface_path}" "--createuser"
+  else
+    "$share_dir"/sh/grub-installer_phase1 "${clonetargetdir}"
   fi
-  echo "back from chroot"
-  tempsed=$(sed -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map)
-  echo "$tempsed" > "${clonetargetdir}"/boot/grub/device.map
-  #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdir}"/boot/grub/device.map
-  echo "device.map cleaned"
-  if [ "$cloneme_ui_mode" = "false" ];then
-    echo "if you want to use device.map please type \"yes\" and edit it now"
-    read shall_devicemap
-    if [ "$shall_devicemap" = "yes" ]; then
-      if ! ${EDITOR} "${clonetargetdir}"/boot/grub/device.map; then
-        echo "Fall back to vi"
-        vi "${clonetargetdir}"/boot/grub/device.map
-      fi
-    fi
-  fi
+  
+  
   umount "${clonetargetdir}"/{proc,sys,dev}
   if [ "$cloneme_ui_mode" = "true" ];then
     umount "${clonetargetdir}"/{tmp,run}
   fi
-}
-
-
-# installer routine creates correct bootloaderdev 
-installer_grub2(){
-  echo "Install grub…"
-    #/ is clonetargetdir
-    get_dev="$(grub-probe -t device "/" | sed  -e "s|[0-9]*$||")"
-  if ! grub-install "${get_dev}";then
-    echo "Error: ${get_dev} not found"
-    echo "I failed please do it yourself or type \"exit\" and press <enter> to escape"
-    /bin/sh
-  fi
-  
-  grub-mkconfig -o /boot/grub/grub.cfg
-  echo -e "grub installation finished.\nStart with the configuration of the new system"
-  "$config_new_sys"
 }
 
 updater(){
