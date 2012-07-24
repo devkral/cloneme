@@ -41,6 +41,13 @@ cmdverdir = $(bindir)
 
 cmdver_SCRIPTS = clonemecmd.sh
 
+#adjust path
+###	sed -i -e "s|.* #--replacepattern--|sharedir=\"$(bindir)\" #--replacepattern--|" "$(bindir)"/clonemecmd.sh
+#/usr/bin/install -m 744 -c  clonemecmd.sh "$(bindir)"
+# install own way
+install-data-local:
+	sed -i -e "s|.* #--replacepattern--|sharedir=\"$(bindir)\" #--replacepattern--|" "$(bindir)"/clonemecmd.sh
+		
 SUBDIRS = \
 	desktop \
 	share

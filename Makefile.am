@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## Created by Anjuta
 
-SUBDIRS = src po tools
+SUBDIRS = src tools # po
 
 clonemedocdir = $(pkgdatadir)/doc/cloneme
 clonemedoc_DATA = \
@@ -14,17 +14,17 @@ clonemedoc_DATA = \
 	TODO
 
 
-INTLTOOL_FILES = intltool-extract.in \
-	intltool-merge.in \
-	intltool-update.in
+#INTLTOOL_FILES = intltool-extract.in \
+#	intltool-merge.in \
+#	intltool-update.in
 
-EXTRA_DIST = $(clonemedoc_DATA) \
-	$(INTLTOOL_FILES)
+EXTRA_DIST = $(clonemedoc_DATA)
+#	$(INTLTOOL_FILES)
 
-DISTCLEANFILES = intltool-extract \
-	intltool-merge \
-	intltool-update \
-	po/.intltool-merge-cache
+#DISTCLEANFILES = intltool-extract \
+#	intltool-merge \
+#	intltool-update \
+#	po/.intltool-merge-cache
 
 
 # Remove doc directory on uninstall

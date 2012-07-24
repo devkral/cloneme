@@ -156,4 +156,3 @@ else
   echo Skipping configure process.
 fi
 
-sed -i -e "s/.* #--replacepattern--/${pkgdatadir}/" "sharedir=\"${bindir}\" #--replacepattern--"/clonemecmd.sh

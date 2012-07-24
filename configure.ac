@@ -17,16 +17,16 @@ AC_PROG_CXX
 dnl ***************************************************************************
 dnl Internationalization
 dnl ***************************************************************************
-dnl IT_PROG_INTLTOOL([0.35.0])
+# IT_PROG_INTLTOOL([0.35.0])
 
-dnl GETTEXT_PACKAGE=cloneme
-dnl AC_SUBST(GETTEXT_PACKAGE)
-dnl AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
-dnl AM_GLIB_GNU_GETTEXT
+# GETTEXT_PACKAGE=cloneme
+# AC_SUBST(GETTEXT_PACKAGE)
+# AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
+# AM_GLIB_GNU_GETTEXT
 
 
 
-LT_INIT
+# LT_INIT
 
 
 
@@ -34,13 +34,10 @@ PKG_CHECK_MODULES(CLONEME, gtksourceview-3.0
 vte-2.90
 [gtkmm-3.0 ])
 
-
-
-
+# po/Makefile.in
 AC_OUTPUT([
 Makefile
 src/Makefile
-po/Makefile.in
 src/share/Makefile
 src/share/ui/Makefile
 src/share/sh/Makefile
