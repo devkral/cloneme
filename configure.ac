@@ -41,8 +41,9 @@ AC_OUTPUT([
 Makefile
 src/Makefile
 po/Makefile.in
-src/ui/Makefile
-src/sh/Makefile
+src/share/Makefile
+src/share/ui/Makefile
+src/share/sh/Makefile
 src/desktop/Makefile
 tools/Makefile
 ])

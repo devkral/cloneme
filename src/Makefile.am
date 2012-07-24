@@ -37,9 +37,9 @@ cloneme_LDFLAGS =
 
 cloneme_LDADD = $(CLONEME_LIBS)
 
-scriptdir = $(bindir)
+cmdverdir = $(bindir)
 
-script_SCRIPTS = clonemecmd.sh
+cmdver_SCRIPTS = clonemecmd.sh
 
 SUBDIRS = \
 	desktop \
