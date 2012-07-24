@@ -43,9 +43,9 @@ sharedir="./src/share"
 
 #defaults
 #the command which configures the target system
-config_new_sys="addnewusers"
+config_new_sys="$share_dir/sh/addnewusers.sh"
 #the command to install the bootloader
-installbootloader="installer_grub2"
+installbootloader="$share_dir/sh/grub-installer_phase_1.sh"
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
@@ -59,8 +59,6 @@ clonetargetloop=""
 clonetargetdevice=""
 
 
-
-echo "$myself"
 
 help(){
   echo "$0 <mode> [<source>] <target>"
@@ -156,109 +154,40 @@ if [ ! -e "/bin/mountpoint" ] && [ ! -e "/usr/bin/mountpoint" ]; then
 fi
 
 
-
-#mount_blockdevice <"device"> <"mountpoint">
-#mount blockdevices
-mount_blockdevice()
-{
-  local device="$1"
-  local mountpath="$2"
-#safeguard for not killing innocent mounts
-  if [ ! -b "$device" ];then
-    echo "mount_blockdevice error: $device is no block device"
+ 
+if "$share_dir"/sh/mountscript.sh needpart "$clonesource"; then
+  echo "Please enter the partition number (beginning with p)"
+  read partitions
+  if ! clonesourcedir=$("$share_dir"/sh/mountscript.sh mount "$clonesource" "$partitions" "$syncdir"/src)"; then
+    echo "$clonesourcedir"
     exit 1
   fi
-
-#sorry other mountpoints but we must be sure that this is the only mountpoint
-#/proc/mounts of the real running system is used
-  local pathtoumount="$(cat /proc/mounts | grep "$device" | sed -e "s/^[^ ]\+ \([^ ]\+\) .*/\1/g")"
-  if [ "$pathtoumount" != "" ]; then
-    for itemtoumount in $pathtoumount
-    do
-      echo "mount_blockdevice: umount $itemtoumount"
-      umount "$(echo "$itemtoumount" | sed -e 's/\\040/\ /g')"
-    done
-  fi
-
-  if mountpoint "${mountpath}" &> /dev/null; then
-#sorry predecessor but we must be sure that is mounted as ROOT
-    if ! umount "${mountpath}"; then
-      echo "mount_blockdevice error: cannot unmount the mount directory"
-      echo "an other service depending on this directory is still running"
-      echo "abort!"
-      exit 1
-    else
-      echo "mount_blockdevice success: unmount ${mountpath}"
-    fi
-  fi
-  
-  if ! mount "${device}" "${mountpath}"; then
-    # error message by mount itself
-    echo "mount_blockdevice hint: have you restarted the kernel after last update?"
-    exit 1
-  fi
-  return 0
-}
-
-#mount
-##don't run this when a subprocess of itself
-echo "$1"
-if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-mode-graphic---" ]; then
-  if [ -d "${clonesource}" ];then
-    clonesourcedir="${clonesource}"
-  elif [ -b "${clonesource}" ];then
-    mkdir -p "${syncdir}/src" 2> /dev/null
-    mount_blockdevice "${clonesource}" "${syncdir}/src"
-    clonesourcedir="${syncdir}/src"
-  elif [ -f "${clonesource}" ];then
-    mkdir -p "${syncdir}"/src 2> /dev/null
-    if ! losetup -a | grep "${clonesource}" > /dev/null;then
-      if ! losetup -f -P "${clonesource}";then
-        echo "Hint: have you restarted the kernel after last update?"
-        exit 1
-      fi
-    else
-      echo "raw file already loop mounted but this is no issue"
-    fi
-    clonesourceloop="$(losetup -a | grep "${clonesource}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
-    echo "Please enter the partition number (beginning with p)"
-    read parts
-    mount_blockdevice "${clonesourceloop}$parts" "${syncdir}/src"
-    clonesourcedir="${syncdir}/src"
-  else
-    echo "source not recognized"
-    exit 1
-  fi
-
-  if [ -d "${clonetargetdevice}" ];then
-    clonetargetdir="${clonetargetdevice}"
-  elif [ -b "${clonetargetdevice}" ];then
-    mkdir -p "${syncdir}/dest" 2> /dev/null
-    mount_blockdevice "${clonetargetdevice}" "${syncdir}/dest"
-    clonetargetdir="${syncdir}/dest"
-  elif [ -f "${clonetargetdevice}" ];then
-    mkdir -p "${syncdir}/dest" 2> /dev/null
-    if ! losetup -a | grep "${clonetargetdevice}" > /dev/null;then
-      if ! losetup -f -P "${clonetargetdevice}";then 
-        echo "Hint: have you restarted the kernel after last update?"
-        exit 1
-      fi
-    fi
-    clonetargetloop="$(losetup -a | grep "${clonetargetdevice}" | sed -e "s/:.*//")"
-    echo "Please enter the partition number (beginning with p)"
-    read partd
-    mount_blockdevice "${clonetargetloop}$partd" "${syncdir}/dest"
-    clonetargetdir="${syncdir}/dest"
-  else
-    echo "target not recognized"
-    exit 1
-  fi
-#check clonesourcedir; it has to end with /"
-  tempp="$(echo "$clonesourcedir" | sed "s/\/$//")"
-  clonesourcedir="$tempp/"
 else
-  clonetargetdir="$2"
+  if ! clonesourcedir=$("$share_dir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src)"; then
+    echo "$clonesourcedir"
+    exit 1
+  fi
 fi
+
+if "$share_dir"/sh/mountscript.sh needpart "$clonetarget"; then
+  echo "Please enter the partition number (beginning with p)"
+  read partitiond
+fi
+
+if "$share_dir"/sh/mountscript.sh needpart "$clonetarget"; then
+  echo "Please enter the partition number (beginning with p)"
+  read partitiond
+  if ! clonedestdir=$("$share_dir"/sh/mountscript.sh mount "$clonetarget" "$partitiond" "$syncdir"/dest)"; then
+    echo "$clonedestdir"
+    exit 1
+  fi
+else
+  if ! clonedestdir=$("$share_dir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest)"; then
+    echo "$clonedestdir"
+    exit 1
+  fi
+fi
+
 
 #loop shouldn't happen
 if [ "$clonesourcedir" = "$clonetargetdir" ] || [ "$clonesourcedir" = "$clonetargetdir/" ];then
@@ -385,7 +314,7 @@ installer(){
   fi
   
   if [ -f "${clonetargetdir}"/etc/fstab ];then
-    #grub-probe can lead to a kill of an usb memory stick (some models?); now replaced!
+   
     local tempprobefstab="$("$sharedir"/sh/devicefinder.sh uuid "${clonetargetdir}")"
     local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobe}\1/" "${clonetargetdir}"/etc/fstab)"
     echo "$tempsed" > "${clonetargetdir}"/etc/fstab
@@ -415,9 +344,9 @@ installer(){
   if [ "$cloneme_ui_mode" = "true" ];then
     mount -o bind /tmp "${clonetargetdir}"/tmp
     mount -o bind /run "${clonetargetdir}"/run
-    "$share_dir"/sh/grub-installer_phase1 "${clonetargetdir}" "${graphic_interface_path}" "--createuser"
+    $installbootloader "${clonetargetdir}" "${graphic_interface_path}" "--createuser"
   else
-    "$share_dir"/sh/grub-installer_phase1 "${clonetargetdir}"
+    $installbootloader "${clonetargetdir}" "$config_new_sys"
   fi
   
   

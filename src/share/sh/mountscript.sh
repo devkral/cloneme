@@ -1,10 +1,29 @@
 #! /bin/bash
 
-#usage: mountscript <"device"> <"mountpoint"> ["partition"]
-#don't use; too hacky
-thingtomount="$1"
-mountpath="$2"
-partition="$3"
+#usage: mountscript <mode> <device> [partition] <mountpoint> 
+#modes:
+#needpart
+#mount
+#debug
+
+case "$#" in
+4)
+  mode="$1"
+  thingtomount="$(realpath "$2")"
+  partition="$(realpath "$3")"
+  mountpath="$(realpath "$4")"
+  ;;
+3)
+  mode="$1"
+  thingtomount="$(realpath "$2")"
+  mountpath="$(realpath "$3")"
+  ;;
+2)
+  mode="$1"
+  thingtomount="$(realpath "$2")"
+  mountpath="" #for needpart only!!!!
+  ;;
+esac
 
 #mount_blockdevice <"device"> <"mountpoint">
 #mount blockdevices
@@ -45,32 +64,40 @@ mount_blockdevice()
   fi
 }
 
-if [ -d "${thingtomount}" ];then
-  mountdir="${thingtomount}"
-elif [ -b "${thingtomount}" ];then
-  mkdir -p "${mountpath}" 2> /dev/null
-  mount_blockdevice "${thingtomount}"
-  mountdir="${mountpath}"
-elif [ -f "${thingtomount}" ];then
-  mkdir -p "${mountpath}" 2> /dev/null
-  if ! losetup -a | grep "${thingtomount}" > /dev/null;then
-    if ! losetup -f -P "${thingtomount}";then
-      echo "Hint: have you restarted the kernel after last update?"
-      exit 1
-    fi
-  #else
-  #  echo "raw file already loop mounted but this is no issue" 1>&2 
+if [ "$mode" = "needpart" ]; then
+  if [ -f "${thingtomount} ]; then
+    return 0
+  else
+    return 1
   fi
-  loopmount="$(losetup -a | grep "${thingtomount}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
-  if [ "$partition" = "" ]; then
-    echo "Please enter the partition number (beginning with p)"
-    read partition
-  fi
-  mount_blockdevice "${loopmount}$partition"
-  mountdir="${mountpath}"
-else
-  echo "source not recognized"
-  exit 1
 fi
-echo "$mountdir"
-exit 0
+
+if [ "$mode" = "mount" ]; then
+  if [ -d "${thingtomount}" ];then
+    mountdir="${thingtomount}"
+  elif [ -b "${thingtomount}" ];then
+    mkdir -p "${mountpath}" 2> /dev/null
+    mount_blockdevice "${thingtomount}"
+    mountdir="${mountpath}"
+  elif [ -f "${thingtomount}" ];then
+    mkdir -p "${mountpath}" 2> /dev/null
+    if ! losetup -a | grep "${thingtomount}" > /dev/null;then
+      if ! losetup -f -P "${thingtomount}";then
+        echo "Hint: have you restarted the kernel after last update?"
+        exit 1
+      fi
+    #else
+    #  echo "raw file already loop mounted but this is no issue" 1>&2 
+    fi
+    loopmount="$(losetup -a | grep "${thingtomount}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
+
+    mount_blockdevice "${loopmount}$partition"
+    mountdir="${mountpath}"
+  else
+    echo "source not recognized"
+    exit 1
+  fi
+  echo "$mountdir"
+  exit 0
+fi
+
