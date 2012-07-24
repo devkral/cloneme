@@ -121,14 +121,7 @@ syncdir="$tempp"
 
 
 
-#loop shouldn't happen
-if [ "x$clonetargetdevice" != "x" ]; then
-  if [ "$clonesource" = "$clonetargetdevice" ] || [ "$clonesource" = "$clonetargetdevice/" ];then
-    echo "error: source = target"
-    echo "target: $clonetargetdevice"
-    exit 1
-  fi
-fi
+
 
 #check if needed programs exists
 if [ ! -e "/usr/bin/rsync" ] && [ ! -e "/usr/sbin/rsync" ]; then
@@ -279,6 +272,15 @@ if [ "$choosemode" != "---special-mode---" ] && [ "$choosemode" != "---special-m
 else
   clonetargetdir="$2"
 fi
+
+#loop shouldn't happen
+if [ "$clonesourcedir" = "$clonetargetdir" ] || [ "$clonesourcedir" = "$clonetargetdir/" ];then
+  echo "error: source = target"
+  echo "target: $clonetargetdir"
+  exit 1
+fi
+
+
 
 install_installer(){
   if [ ! -f "${clonetargetdir}${myself}" ]; then
@@ -446,26 +448,10 @@ installer(){
     exit 1
     fi
   fi
-
-
-
-  if [ -e "${clonetargetdir}"/boot/grub/device.map ];then
-    tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdir}"/boot/grub/device.map)"
-    echo "$tempdev" > "${clonetargetdir}"/boot/grub/device.map
-    sed -i -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map
-  fi
-
-
-  
-  echo "some temporary adjustments to ${clonetargetdir}/boot/grub/device.map"
-  mkdir -p "${clonetargetdir}"/boot/grub/
-  local tempprobegrub="$(grub-probe -t device "${clonetargetdir}" | sed -e "s|[0-9]*$||")"
-  echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${clonetargetdir}"/boot/grub/device.map
-  echo "finished"
   
   if [ -f "${clonetargetdir}"/etc/fstab ];then
-    #can lead to a kill of an usb memory stick (some models?)
-    local tempprobefstab="$(grub-probe -t fs_uuid ${clonetargetdir})"
+    #grub-probe can lead to a kill of an usb memory stick (some models?); now replaced!
+    local tempprobefstab="$("$sharedir"/sh/devicefinder.sh uuid "${clonetargetdir}")"
     local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobe}\1/" "${clonetargetdir}"/etc/fstab)"
     echo "$tempsed" > "${clonetargetdir}"/etc/fstab
 
@@ -487,7 +473,17 @@ installer(){
   copyuser
   install_installer
 
+  if [ -e "${clonetargetdir}"/boot/grub/device.map ];then
+    tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdir}"/boot/grub/device.map)"
+    echo "$tempdev" > "${clonetargetdir}"/boot/grub/device.map
+    sed -i -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map
+  fi
 
+  echo "some temporary adjustments to ${clonetargetdir}/boot/grub/device.map"
+  mkdir -p "${clonetargetdir}"/boot/grub/
+  local tempprobegrub="$("$sharedir"/sh/devicefinder.sh dev "${clonetargetdir}" | sed -e "s|[0-9]*$||")"
+  echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${clonetargetdir}"/boot/grub/device.map
+  echo "finished"
 
 
   mount -o bind /proc "${clonetargetdir}"/proc
@@ -562,6 +558,6 @@ case "$choosemode" in
 esac
 
 
-?????/sh/umountscript.sh
+"$sharedir"/sh/umountscript.sh
 
 exit 0;

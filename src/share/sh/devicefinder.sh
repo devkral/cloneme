@@ -39,7 +39,7 @@ fi
 
 for (( ; ; ))
 do
-#check if the goal is reached
+#check if the dirtemp version is in /proc/mounts
   if dirtemp2="$(echo "$staticmounts" | grep "^[^ ]\+ $dirtemp ")"; then
     cleaned="$(echo "$dirtemp2" | sed "s/^\([^ ]\+\) .*/\1/")"
     UUID="$(lsblk --output UUID -n "$cleaned")"
