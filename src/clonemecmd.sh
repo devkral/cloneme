@@ -43,9 +43,9 @@ sharedir="./src/share" #--replacepattern--
 
 #defaults
 #the command which configures the target system
-config_new_sys="$share_dir/sh/addnewusers.sh"
+config_new_sys="$sharedir/sh/addnewusers.sh"
 #the command to install the bootloader
-installbootloader="$share_dir/sh/grub-installer_phase_1.sh"
+installbootloader="$sharedir/sh/grub-installer_phase_1.sh"
 #folder which is copied
 clonesource="/"
 #folder where sync takes place
@@ -86,7 +86,7 @@ case "$#" in
       cloneme_ui_mode="true";
     fi
     ;;
-  "3")clonesource="$(realpath "$2")";clonetargetdevice="$(realpath "$3")";;
+  "3")clonesource="$(realpath "$2")"; clonetargetdevice="$(realpath "$3")";;
   "2")clonetargetdevice="$(realpath "$2")";;
   *)help;exit 1;;
 esac
@@ -94,7 +94,6 @@ esac
   if [ "$choosemode" = "--help" ]; then
     help; exit 0;
   fi
-fi
 
 #check if runs with root permission
 if [ ! "$UID" = "0" ] && [ ! "$EUID" = "0" ]; then
@@ -107,30 +106,6 @@ fi
 tempp="$(echo "$syncdir" | sed "s/\/$//")"
 syncdir="$tempp"
 
-
-#check if needed programs exists
-if [ ! -e "/usr/bin/rsync" ] && [ ! -e "/usr/sbin/rsync" ]; then
-  echo "error command: rsync not found"
-  echo "please install rsync"
-  exit 1
-fi
-
-if [ ! -e "/usr/bin/realpath" ]; then
-  echo "error command realpath not found"
-  echo "Have you coreutils (name can differ) installed?"
-  exit 1
-fi
-
-
-if [ ! -e "/sbin/losetup" ] && [ ! -e "/usr/bin/losetup" ]; then
-  echo "error command /sbin/losetup | /usr/bin/losetup not found"
-  echo "Have you loop tools (name can differ) installed?"
-  echo "no raw file mount is supported"
-  if [ -f "$clonesource" ] || [ -f "$clonetargetdevice" ];then
-    echo "you try to mount raw files. Exit"
-    exit 1
-  fi
-fi
 
 if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ]; then
   echo "error: no default editor found"
@@ -154,35 +129,30 @@ if [ ! -e "/bin/mountpoint" ] && [ ! -e "/usr/bin/mountpoint" ]; then
 fi
 
 
- 
-if "$share_dir"/sh/mountscript.sh needpart "$clonesource"; then
+if "$sharedir"/sh/mountscript.sh needpart "$clonesource"; then
   echo "Please enter the partition number (beginning with p)"
   read partitions
-  if ! clonesourcedir=$("$share_dir"/sh/mountscript.sh mount "$clonesource" "$partitions" "$syncdir"/src)"; then
+  if ! clonesourcedir=$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$partitions" "$syncdir"/src)"; then
     echo "$clonesourcedir"
     exit 1
   fi
 else
-  if ! clonesourcedir=$("$share_dir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src)"; then
+  if ! clonesourcedir=$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src)"; then
     echo "$clonesourcedir"
     exit 1
   fi
 fi
 
-if "$share_dir"/sh/mountscript.sh needpart "$clonetarget"; then
-  echo "Please enter the partition number (beginning with p)"
-  read partitiond
-fi
 
-if "$share_dir"/sh/mountscript.sh needpart "$clonetarget"; then
+if "$sharedir"/sh/mountscript.sh needpart "$clonetarget"; then
   echo "Please enter the partition number (beginning with p)"
   read partitiond
-  if ! clonedestdir=$("$share_dir"/sh/mountscript.sh mount "$clonetarget" "$partitiond" "$syncdir"/dest)"; then
+  if ! clonedestdir=$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$partitiond" "$syncdir"/dest)"; then
     echo "$clonedestdir"
     exit 1
   fi
 else
-  if ! clonedestdir=$("$share_dir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest)"; then
+  if ! clonedestdir=$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest)"; then
     echo "$clonedestdir"
     exit 1
   fi
@@ -335,7 +305,7 @@ installer(){
     exit 1
   fi
   copyuser
-  install_installer
+  "$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop
   
   mount -o bind /proc "${clonetargetdir}"/proc
   mount -o bind /sys "${clonetargetdir}"/sys
@@ -361,14 +331,13 @@ updater(){
     echo "error: rsync could not sync"
     exit 1
   fi
-  install_installer
+  
+  #"$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop
   copyuser
 }
 
 
 case "$choosemode" in
-  "---special-mode---") ${installbootloader};;
-  "---special-mode-graphic---") ${installbootloader};;
   "update")updater;;
   "install")installer;;
   *)help;exit 1;;

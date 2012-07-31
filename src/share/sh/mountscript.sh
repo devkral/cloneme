@@ -6,11 +6,13 @@
 #mount
 #debug
 
+
+
 case "$#" in
 4)
   mode="$1"
   thingtomount="$(realpath "$2")"
-  partition="$(realpath "$3")"
+  partition="$3"
   mountpath="$(realpath "$4")"
   ;;
 3)
@@ -25,8 +27,8 @@ case "$#" in
   ;;
 esac
 
-#mount_blockdevice <"device"> <"mountpoint">
-#mount blockdevices
+
+#new:  "$mountpath" <dest>
 mount_blockdevice()
 {
   local device="$1"
@@ -65,10 +67,10 @@ mount_blockdevice()
 }
 
 if [ "$mode" = "needpart" ]; then
-  if [ -f "${thingtomount} ]; then
-    return 0
+  if [ -f "${thingtomount}" ]; then
+    exit 0
   else
-    return 1
+    exit 1
   fi
 fi
 
@@ -90,8 +92,10 @@ if [ "$mode" = "mount" ]; then
     #  echo "raw file already loop mounted but this is no issue" 1>&2 
     fi
     loopmount="$(losetup -a | grep "${thingtomount}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
+    
+    echo "ggog ${loopmount}${partition}"
 
-    mount_blockdevice "${loopmount}$partition"
+    mount_blockdevice "${loopmount}${partition}"
     mountdir="${mountpath}"
   else
     echo "source not recognized"

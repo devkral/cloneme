@@ -8,6 +8,7 @@ supportscripts_SCRIPTS = \
 	grub-installer_phase_1.sh \
 	grub-installer_phase_2.sh \
 	install-installer.sh \
+	install-installer-compiler.sh \
 	lilo-installer.sh \
 	mountscript.sh \
 	umountscript.sh

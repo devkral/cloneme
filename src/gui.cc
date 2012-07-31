@@ -97,7 +97,7 @@ void gui::update()
 		std::cerr << "clonemecmd.sh not found; fall back to src directory\n";
 		sum+="$PWD/src";
 	}
-	sum+="/clonemecmd.sh mastergraphicmode update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
+	sum+="/clonemecmd.sh update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
@@ -112,7 +112,7 @@ void gui::install()
 		std::cerr << "clonemecmd.sh not found; fall back to src directory\n";
 		sum+="$PWD/src";
 	}
-	sum+="/clonemecmd.sh mastergraphicmode install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
+	sum+="/clonemecmd.sh install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
@@ -151,6 +151,7 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	}
 	catch(const Glib::FileError& ex)
 	{
+
 		//std::cerr << ENOENT;
 		//if (ex.code()==ENOENT)
 		//	std::cerr << "good";
@@ -160,11 +161,10 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 			std::cerr << "cloneme.ui not found; fall back to src directory\n";
 			try
 			{
-				builder->add_from_file("./src/ui/cloneme.ui");
+				builder->add_from_file("./src/share/ui/cloneme.ui");
 			}
 			catch(const Glib::FileError& ex)
 			{
-				std::cerr << "FileError: " << ex.what() << std::endl;
 				throw(ex);
 			}
 			catch(const Glib::MarkupError& ex)
