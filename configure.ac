@@ -41,6 +41,7 @@ src/Makefile
 src/share/Makefile
 src/share/ui/Makefile
 src/share/sh/Makefile
+src/share/src/Makefile
 src/desktop/Makefile
 tools/Makefile
 ])

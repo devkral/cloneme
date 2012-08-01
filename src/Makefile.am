@@ -16,6 +16,8 @@ AM_CFLAGS =\
 	 -Wall\
 	 -g
 
+AM_CXXFLAGS = -std=c++11 
+
 bin_PROGRAMS = cloneme
 
 cloneme_SOURCES = \
@@ -48,5 +50,3 @@ install-data-hook:
 SUBDIRS = \
 	desktop \
 	share
-
-AM_CXXFLAGS = -std=c++11 

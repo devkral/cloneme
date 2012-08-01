@@ -2,6 +2,7 @@
 
 ## Created by Anjuta
 
+clonesrcdir = $(pkgdatadir)/src
 #for compiling if not right architecture
 clonesrc_DATA =  \
 	../../main.cc \
@@ -18,5 +19,4 @@ clonesrc_DATA =  \
 	../../installguiinstaller.cc \
 	../../installguiinstaller.h
 	
-clonesrcdir = = $(pkgdatadir)/src
 
