@@ -1,14 +1,16 @@
-#! /bin/bash
-
-
+#! /bin/sh
 
 #echo list of missing packages
-#returns 0 if no compilation is needed
-#returns 2 if compiled versiion has been installed
 
 does_not_exist=false
 
 #check if needed programs exists
+
+if [ ! -e "/bin/mountpoint" ] && [ ! -e "/usr/bin/mountpoint" ] && [ ! -e "/bin/mount" ] && [ ! -e "/usr/bin/mount" ]; then
+  echo "util-linux"
+  does_not_exist=true
+fi
+
 if [ ! -e "/usr/bin/rsync" ] && [ ! -e "/usr/sbin/rsync" ]; then
   echo "rsync"
   does_not_exist=true

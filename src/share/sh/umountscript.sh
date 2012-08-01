@@ -1,8 +1,8 @@
-#! /bin/bash
+#! /bin/sh
 
 #usage: umountscript.sh <syncdir>
 
-syncdir="$1"
+syncdir="$(realpath "$1")"
 staticmounts="$(cat /proc/mounts)"
 
 if [ -d "${syncdir}/src" ]; then

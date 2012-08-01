@@ -8,7 +8,7 @@
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 architecture="$1"
-output="$2"
+output="$(realpath "$2")"
 
 
 

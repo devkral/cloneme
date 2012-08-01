@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 #usage: mountscript <mode> <device> [partition] <mountpoint> 
 #modes:
@@ -92,8 +92,6 @@ if [ "$mode" = "mount" ]; then
     #  echo "raw file already loop mounted but this is no issue" 1>&2 
     fi
     loopmount="$(losetup -a | grep "${thingtomount}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
-    
-    echo "ggog ${loopmount}${partition}"
 
     mount_blockdevice "${loopmount}${partition}"
     mountdir="${mountpath}"

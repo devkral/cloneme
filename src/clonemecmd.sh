@@ -118,17 +118,6 @@ if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ];
   fi
 fi
 
-if [ ! -e "/bin/mount" ] && [ ! -e "/usr/bin/mount" ]; then
-  echo "error command: mount not found"
-  exit 1
-fi
-
-if [ ! -e "/bin/mountpoint" ] && [ ! -e "/usr/bin/mountpoint" ]; then
-  echo "error command: mountpoint not found"
-  exit 1
-fi
-
-
 if "$sharedir"/sh/mountscript.sh needpart "$clonesource"; then
   echo "Please enter the partition number (beginning with p)"
   read partitions
@@ -168,31 +157,6 @@ fi
 
 
 
-# $1 username $2 prefix
-_cleanuser(){
-  local usertemp=$1
-  local targetn=$2
-  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd
-  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd-
-  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group
-  sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/group
-  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group-
-  sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/group-
-  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/gshadow
-  sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/gshadow
-  sed -i -e "/^${usertemp}/d" "${targetn}"/etc/gshadow-
-  sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/gshadow-
-
-  if [ -d "${targetn}"/home/"$usertemp" ];then
-    rm -r "${targetn}"/home/"$usertemp"
-  fi
-  # and remove email folder
-  shred -u "${targetn}/var/spool/mail/${usertemp}" 2> /dev/null
-  echo "cleaning finished"
-}
-
-
-
 copyuser(){
 local usertemp
 for usertemp in $(ls "${clonesourcedir}"/home)
@@ -200,61 +164,7 @@ do
   if [ "$cloneme_ui_mode" = "true" ];then
     ${graphic_interface_path} --copyuser --src "${clonesourcedir}" --dest "${clonetargetdir}" --user "${usertemp}"
   else
-    for (( ; ; ))
-    do
-      echo "What shall be done with user $usertemp?"
-      if [ -d "${clonetargetdir}"/home/"$usertemp" ]; then
-        echo -e "Synchronize user account. Type \"s\""
-		echo -e "Eradicate user files. Type \"e\""
-		echo -e "Don't touch the user account. Type \"i\""
-        echo -e "Clean target system from user account. Type \"c\""
-      else
-        echo -e "Copy user account. Type \"s\""
-        echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
-        echo -e "Don't copy the user account. Type \"i\""  
-        echo -e "Clean target system from the user account. Type \"c\""
-      fi
-      
-      read -n 1 answer_useracc
-      if [ "$answer_useracc" = "s" ]; then
-        if ! rsync -a -A --progress --delete --exclude "${clonetargetdir}" "${clonesourcedir}"home/"${usertemp}" "${clonetargetdir}"/home/ ;then
-          echo "error: rsync could not sync"
-          exit 1
-        fi  
-        break
-      fi
-    
-      if [ "$answer_useracc" = "e" ]; then
-        rm -r "${clonetargetdir}"/home/"$usertemp"
-        mkdir -p "${clonetargetdir}"/home/"$usertemp"
-        #
-        if grep "$usertemp" "${clonesourcedir}"etc/passwd > /dev/null;then
-          chown "$usertemp" "${clonetargetdir}"/home/"$usertemp"
-          #chown group
-          if grep "$usertemp" "${clonesourcedir}"etc/group > /dev/null;then
-            chown "${usertemp}:${usertemp}" "${clonetargetdir}"/home/"$usertemp"
-          fi
-        fi
-        # and remove email folder
-        shred -u "${clonetargetdir}/var/spool/mail/${usertemp}" 2> /dev/null
-        break
-      fi
-    
-      if [ "$answer_useracc" = "i" ]; then
-        if [ ! -d "${clonetargetdir}/home/$usertemp" ]; then
-          echo "Delete superfluous user entries in passwd, shadow, etc. on the target system? Type \"yes\" (not the default)"
-          read question_delete
-          if [ "$question_delete" = "yes" ]; then
-            _cleanuser "$usertemp" "$clonetargetdir"
-          fi
-        fi
-        break
-      fi
-      if [ "$answer_useracc" = "c" ]; then
-        _cleanuser "$usertemp" "$clonetargetdir"
-        break
-      fi
-    done
+    "${sharedir}"/sh/copyuser.sh "${clonesourcedir}" "${clonetargetdir}" "${usertemp}"
   fi
 done
 }
@@ -262,7 +172,7 @@ done
 installer(){
   rsyncing="true"
   if [ "$cloneme_ui_mode" = "false" ];then
-    if [ "x$(ls -A "${clonetargetdir}")" != "x" ];then
+    if [ "$(ls -A "${clonetargetdir}")" != "" ];then
       echo "The target partition is not empty. Shall I clean it? Type \"yes\""
       read shall_clean
       if [ "${shall_clean}" = "yes" ];then
@@ -276,11 +186,10 @@ installer(){
       
     fi
   fi
-  if [ "$rsyncing" = true ];then
-    if ! rsync -a -A --progress --delete --exclude "${clonesourcedir}/run/*" --exclude "${clonesourcedir}"boot/grub/grub.cfg --exclude "${clonesourcedir}"boot/grub/device.map  --exclude "${syncdir}" --exclude "${clonetargetdir}" --exclude "${clonesourcedir}home/*" --exclude "${clonesourcedir}sys/*" --exclude "${clonesourcedir}dev/*" --exclude "${clonesourcedir}proc/*" --exclude "${clonesourcedir}var/log/*" --exclude "${clonesourcedir}tmp/*" --exclude "${clonesourcedir}run/*" --exclude "${clonesourcedir}var/run/*" --exclude "${clonesourcedir}var/tmp/*" "${clonesourcedir}"* "${clonetargetdir}" ;then
-    echo "error: rsync could not sync"
-    exit 1
-    fi
+  if [ "$rsyncing" = "true" ];then
+     if ! "$sharedir"/sh/rsyncci.sh install "${clonesourcedir}" "${clonetargetdir}";then
+       exit 1;
+     fi
   fi
   
   if [ -f "${clonetargetdir}"/etc/fstab ];then
@@ -305,7 +214,7 @@ installer(){
     exit 1
   fi
   copyuser
-  "$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop
+  "$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop "${clonetargetdir}"
   
   mount -o bind /proc "${clonetargetdir}"/proc
   mount -o bind /sys "${clonetargetdir}"/sys
@@ -327,12 +236,10 @@ installer(){
 }
 
 updater(){
-  if ! rsync -a -A --progress --delete --exclude "${clonesourcedir}/run/*" --exclude "${clonesourcedir}"boot/grub/grub.cfg --exclude "${clonesourcedir}"boot/grub/device.map --exclude "${clonesourcedir}"etc/fstab --exclude "${syncdir}" --exclude "$clonetargetdir" --exclude "${clonesourcedir}home/*" --exclude "${clonesourcedir}"sys/ --exclude "${clonesourcedir}dev/*" --exclude "${clonesourcedir}proc/*" --exclude "${clonesourcedir}var/log/*" --exclude "${clonesourcedir}tmp/*" --exclude "${clonesourcedir}run/*" --exclude "${clonesourcedir}var/run/*" --exclude "${clonesourcedir}var/tmp/*" "${clonesourcedir}"* "${clonetargetdir}" ; then
-    echo "error: rsync could not sync"
+  if ! "$sharedir"/sh/rsyncci.sh update "${clonesourcedir}" "${clonetargetdir}"; then
     exit 1
   fi
-  
-  #"$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop
+  #"$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop "${clonetargetdir}"
   copyuser
 }
 

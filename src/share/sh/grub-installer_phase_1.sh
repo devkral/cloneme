@@ -1,9 +1,9 @@
-#! /bin/bash
+#! /bin/sh
 
 #usage: grub-installer_phase_1.sh <targetsystem> [command for sysconfig like adding users] [ args ] (currently just one)
 #dir where the cloneme files are located
 share_dir="$(dirname "$(dirname "$(realpath "$0")")")"
-clonetargetdir="$1"
+clonetargetdir="$(realpath "$1")"
 
 if [ -e "${clonetargetdir}"/boot/grub/device.map ];then
   tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdir}"/boot/grub/device.map)"

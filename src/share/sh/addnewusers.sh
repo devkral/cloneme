@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 #default groups of new users
 usergroupargs="video,audio,optical,power"

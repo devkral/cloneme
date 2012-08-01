@@ -3,6 +3,7 @@
 supportscriptsdir = $(pkgdatadir)/sh
 supportscripts_SCRIPTS = \
 	addnewusers.sh \
+	cleanuser.sh \
 	copyuser.sh \
 	devicefinder.sh \
 	grub-installer_phase_1.sh \
@@ -12,4 +13,5 @@ supportscripts_SCRIPTS = \
 	lilo-installer.sh \
 	mountscript.sh \
 	report-missing-packages.sh \
+	rsynci.sh \
 	umountscript.sh
