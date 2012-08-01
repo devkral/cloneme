@@ -30,9 +30,9 @@ dnl ***************************************************************************
 
 
 
-PKG_CHECK_MODULES(CLONEME, gtksourceview-3.0
-vte-2.90
-[gtkmm-3.0 ])
+PKG_CHECK_MODULES(CLONEME, vte-2.90
+gtkmm-3.0
+[ ])
 
 # po/Makefile.in
 AC_OUTPUT([

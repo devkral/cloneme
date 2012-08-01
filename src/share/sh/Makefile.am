@@ -11,4 +11,5 @@ supportscripts_SCRIPTS = \
 	install-installer-compiler.sh \
 	lilo-installer.sh \
 	mountscript.sh \
+	report-missing-packages.sh \
 	umountscript.sh

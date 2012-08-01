@@ -21,7 +21,7 @@ fi
 cp "$programdir"/clonemecmd.sh "$targetdir"/"$programdir"
 sed -i -e "s|.* #--replacepattern--|sharedir=\"${sharedir}\" #--replacepattern--|" "$targetdir"/"$programdir"/clonemecmd.sh
 
-if [ -e "$programdir"/cloneme ] && "${sharedir}"/sh/install-installer-compiler.sh;then
+if [ -e "$programdir"/cloneme ] && "${sharedir}"/sh/install-installer-compiler.sh "$(uname -m)" "$targetdir"/"$programdir"/cloneme;then
   cp "$programdir"/cloneme "$targetdir"/"$programdir"
 fi
 

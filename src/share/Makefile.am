@@ -4,5 +4,6 @@
 
 SUBDIRS = \
 	ui \
-	sh
+	sh \
+	src
 

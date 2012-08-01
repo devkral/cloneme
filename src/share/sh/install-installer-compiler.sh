@@ -14,6 +14,6 @@ output="$2"
 
 if [ "$(uname -m)" != "$architecture" ];then
   #cd "$sharedir/src"
-  #gcc -o "$output" --libs "" main.cc
+  #gcc -o "$output" main.cc `pkg-config --libs --cflags vte-2.90,gtkmm-3.0`
   return 2
 fi
