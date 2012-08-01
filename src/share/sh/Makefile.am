@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 supportscriptsdir = $(pkgdatadir)/sh
+
 supportscripts_SCRIPTS = \
 	addnewusers.sh \
 	cleanuser.sh \
@@ -13,5 +14,5 @@ supportscripts_SCRIPTS = \
 	lilo-installer.sh \
 	mountscript.sh \
 	report-missing-packages.sh \
-	rsynci.sh \
+	rsyncci.sh \
 	umountscript.sh
