@@ -121,36 +121,35 @@ if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ];
     echo "EDITOR=\"$EDITOR\"" >> ~/.bashrc
   fi
 fi
-
-if "$sharedir"/sh/mountscript.sh needpart "$clonesource"; then
-  echo "Please enter the partition number (beginning with p)"
-  read partitions
-  if ! clonesourcedir=$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$partitions" "$syncdir"/src)"; then
-    echo "$clonesourcedir"
-    exit 1
+if [ "$cloneme_ui_mode" = "false" ];then
+  if "$sharedir"/sh/mountscript.sh needpart "$clonesource"; then
+    echo "Please enter the partition number (beginning with p)"
+    read partitions
+    if ! clonesourcedir=$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$partitions" "$syncdir"/src)"; then
+      echo "$clonesourcedir"
+      exit 1
+    fi
+  else
+    if ! clonesourcedir=$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src)"; then
+      echo "$clonesourcedir"
+      exit 1
+    fi
   fi
-else
-  if ! clonesourcedir=$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src)"; then
-    echo "$clonesourcedir"
-    exit 1
+
+  if "$sharedir"/sh/mountscript.sh needpart "$clonetarget"; then
+    echo "Please enter the partition number (beginning with p)"
+    read partitiond
+    if ! clonedestdir=$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$partitiond" "$syncdir"/dest)"; then
+      echo "$clonedestdir"
+      exit 1
+    fi
+  else
+    if ! clonedestdir=$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest)"; then
+      echo "$clonedestdir"
+      exit 1
+    fi
   fi
 fi
-
-
-if "$sharedir"/sh/mountscript.sh needpart "$clonetarget"; then
-  echo "Please enter the partition number (beginning with p)"
-  read partitiond
-  if ! clonedestdir=$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$partitiond" "$syncdir"/dest)"; then
-    echo "$clonedestdir"
-    exit 1
-  fi
-else
-  if ! clonedestdir=$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest)"; then
-    echo "$clonedestdir"
-    exit 1
-  fi
-fi
-
 
 #loop shouldn't happen
 if [ "$clonesourcedir" = "$clonetargetdir" ] || [ "$clonesourcedir" = "$clonetargetdir/" ];then
@@ -254,7 +253,8 @@ case "$choosemode" in
   *)help;exit 1;;
 esac
 
-
-"$sharedir"/sh/umountscript.sh
+if [ "$cloneme_ui_mode" = "false" ];then
+  "$sharedir"/sh/umountsyncscript.sh
+fi
 
 exit 0;
