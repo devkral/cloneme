@@ -1,10 +1,11 @@
 #! /bin/sh
 
 #usage: mountscript <mode> <device> [partition] <mountpoint> 
+#device can be a raw file (with use of partition!) or a blockdevice or something mount can mount
 #modes:
-#needpart
-#mount
-#debug
+#needpart : return 0 if partition doesn't need to be specified
+#mount : mount the device and partition
+#debug : return debug infos
 
 
 
