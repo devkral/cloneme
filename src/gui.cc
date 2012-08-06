@@ -35,15 +35,16 @@
  *
  */
 
+#include "basismethods.h"
 #include "gui.h"
 #include "myfilechooser.h"
-#include "basismethods.h"
 
-#include <iostream>
+//#include <iostream>
+//#include <unistd.h>
+
 #include <cstdlib>
 #include <cassert>
 #include <thread>
-#include <unistd.h>
 #include <vte/vte.h>
 
 //#include <cerrno>
@@ -147,42 +148,12 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	builder = Gtk::Builder::create();
 	try
 	{
-		builder->add_from_file(PACKAGE_DATA_DIR"/ui/cloneme.ui");
+		builder->add_from_file(sharedir()+"/ui/cloneme.ui");
 	}
 	catch(const Glib::FileError& ex)
 	{
-
-		//std::cerr << ENOENT;
-		//if (ex.code()==ENOENT)
-		//	std::cerr << "good";
-		//strange ENOENT doesn't work even it should correspond
-		if (ex.code()==4)
-		{
-			std::cerr << "cloneme.ui not found; fall back to src directory\n";
-			try
-			{
-				builder->add_from_file("./src/share/ui/cloneme.ui");
-			}
-			catch(const Glib::FileError& ex)
-			{
-				throw(ex);
-			}
-			catch(const Glib::MarkupError& ex)
-			{
-				std::cerr << "MarkupError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-			catch(const Gtk::BuilderError& ex)
-			{
-				std::cerr << "BuilderError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-		}
-		else
-		{
-			std::cerr << "FileError: " << ex.what() << std::endl;
-			throw(ex);
-		}
+		std::cerr << "FileError: " << ex.what() << std::endl;
+		throw(ex);
 	}
 	catch(const Glib::MarkupError& ex)
 	{

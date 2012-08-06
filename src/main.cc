@@ -122,7 +122,7 @@ main (int argc, char *argv[])
 		//needs args but this is handled by copyuser directly
         { "copyuser", no_argument, &ch, 1 },
         { "createuser", no_argument, &ch, 2 },
-		{ "installme", no_argument, &ch, 3 },
+//		{ "installme", no_argument, &ch, 3 },
 		{0, 0, 0, 0}
 	};
 	int index=1;
@@ -133,8 +133,8 @@ main (int argc, char *argv[])
 			case 1: copyuser(argc,argv);
 				break;
 			case 2: createuser(argc,argv);
-				break;
-			case 3: installguiinstaller (argc, argv);
+//				break;
+//			case 3: installguiinstaller (argc, argv);
 				break;
 //			case 'e': //not ready
 //				break;

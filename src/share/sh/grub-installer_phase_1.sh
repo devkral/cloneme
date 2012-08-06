@@ -13,7 +13,7 @@ fi
 
 echo "some temporary adjustments to ${clonetargetdir}/boot/grub/device.map"
 mkdir -p "${clonetargetdir}"/boot/grub/
-local tempprobegrub="$("$sharedir"/sh/devicefinder.sh dev "${clonetargetdir}" | sed -e "s|[0-9]*$||")"
+tempprobegrub="$("$sharedir"/sh/devicefinder.sh dev "${clonetargetdir}" | sed -e "s|[0-9]*$||")"
 echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${clonetargetdir}"/boot/grub/device.map
 echo "finished"
 

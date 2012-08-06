@@ -1,7 +1,14 @@
 #! /bin/sh
 
+sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
+
 #default groups of new users
-usergroupargs="video,audio,optical,power"
+usergroup="video audio optical power"
+admingroup="wheel adm admin"
+
+
+
+usergroupargs="$("${sharedir}"/sh/groupexist.sh $usergroup)"
 usercounter=0
 for (( ; ; ))
 do
@@ -18,15 +25,7 @@ do
     echo "Shall this user account have admin (can change to root) permissions? [yes] default: no"
     read admin_perm
     if [ "$admin_perm" = "yes" ];then
-      if grep "wheel" /etc/group > /dev/null;then
-        usergroupargs+=",wheel"
-      fi
-      if grep "adm" /etc/group > /dev/null;then
-        usergroupargs+=",adm"
-      fi
-      if grep "admin" /etc/group > /dev/null;then
-        usergroupargs+=",admin"
-      fi
+      usergroupargs+="$usergroupargs,$("${sharedir}"/sh/groupexist.sh $admingroup)"
     fi
     useradd -m -U "$user_name" -p "" -G "$usergroupargs"
     passwd -e "$user_name"

@@ -37,9 +37,9 @@
 
 #include "installguiinstaller.h"
 #include "basismethods.h"
-#include <iostream>
+//#include <iostream> //not needed basismethods
+//#include <unistd.h> //not needed basismethods
 #include <getopt.h>
-#include <unistd.h>
 
 installguiinstaller::installguiinstaller(int argc, char* argv[] )
 {

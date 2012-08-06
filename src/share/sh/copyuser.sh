@@ -17,28 +17,28 @@ sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 for (( ; ; ))
 do
-  echo "What shall be done with user ${curuser}?"
-  if [ -d "${destsys}"/home/"${curuser}" ]; then
-    if [ -d "${srcsys}"/home/"${curuser}" ]; then
-      echo -e "Synchronize user account. Type \"s\""
-    fi
-    echo -e "Eradicate user files. Type \"e\""
-    echo -e "Don't touch the user account. Type \"i\""
-    echo -e "Clean target system from user account. Type \"c\""
-  else
-    if [ -d "${srcsys}"/home/"${curuser}" ]; then
-      echo -e "Copy user account. Type \"s\""
-    fi
-    echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
-    if [ -d "${srcsys}"/home/"${curuser}" ]; then
-      echo -e "Go on without copying the user account. Type \"i\""  
-    else
-      echo -e "Go on. Type \"i\""
-    fi
-    echo -e "Clean target system from the user. Type \"c\""
-  fi
-  
   if [ "$action" = "" ];then
+    echo "What shall be done with user ${curuser}?"
+    if [ -d "${destsys}"/home/"${curuser}" ]; then
+      if [ -d "${srcsys}"/home/"${curuser}" ]; then
+        echo -e "Synchronize user account. Type \"s\""
+      fi
+      echo -e "Eradicate user files. Type \"e\""
+      echo -e "Don't touch the user account. Type \"i\""
+      echo -e "Clean target system from user account. Type \"c\""
+    else
+      if [ -d "${srcsys}"/home/"${curuser}" ]; then
+        echo -e "Copy user account. Type \"s\""
+      fi
+      echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
+      if [ -d "${srcsys}"/home/"${curuser}" ]; then
+        echo -e "Go on without copying the user account. Type \"i\""  
+      else
+        echo -e "Go on. Type \"i\""
+      fi
+      echo -e "Clean target system from the user. Type \"c\""
+    fi
+    
     read -n 1 answer_useracc
   else
     answer_useracc="$action"

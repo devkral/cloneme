@@ -106,6 +106,10 @@ fi
 tempp="$(echo "$syncdir" | sed "s/\/$//")"
 syncdir="$tempp"
 
+if ! "$sharedir"/sh/report-missing-packages.sh; then
+  exit 1
+
+fi
 
 if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ]; then
   echo "error: no default editor found"

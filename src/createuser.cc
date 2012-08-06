@@ -37,34 +37,25 @@
 
 #include "createuser.h"
 #include "basismethods.h"
-#include <string>
-//#include <unistd.h>
+//#include <string> //not needed basismethods
+//#include <unistd.h> //not needed basismethods
 //#include <getopt.h>
-#include <iostream>
+//#include <iostream>
 
 int createuser::makeuser()
 {
 	if (username->get_text_length () ==0)
 		return 2;
 	std::string sum="";
-	sum+="usergroupargs=\"video,audio,optical,power\"\n";
+	std::string supplement_groups="video audio optical power";
 	if (admswitch->get_state()==true)
 	{
-		sum+="admin_perm=\"yes\"\n";
+		supplement_groups+=" wheel adm admin";
 	}
-	sum+="        if [ \"$admin_perm\" = \"yes\" ];then\n";
-	sum+="          if grep \"wheel\" /etc/group > /dev/null;then\n";
-	sum+="            usergroupargs+=\",wheel\"\n";
-	sum+="          fi\n";
-	sum+="          if grep \"adm\" /etc/group > /dev/null;then\n";
-	sum+="            usergroupargs+=\",adm\"\n";
-	sum+="          fi\n";
-	sum+="          if grep \"admin\" /etc/group > /dev/null;then\n";
-	sum+="            usergroupargs+=\",admin\"\n";
-	sum+="          fi\n";
-	sum+="        fi\n";
-	sum+="        useradd -m -U \""+username->get_text()+"\" -p \"\" -G $usergroupargs\n";
-	sum+="        passwd -e \""+username->get_text()+"\"\n";
+	sum+="useradd -m -U \""+(std::string)username->get_text()+"\" -p \"\" -G $("\
+		+sharedir()+\
+		"/sh/groupexist.sh"+supplement_groups+")\n";
+	sum+="passwd -e \""+username->get_text()+"\"\n";
 	std::string log=system2(sum);
 	username->set_text("");
 	// cout returned messages
@@ -107,42 +98,12 @@ createuser::createuser(int argc, char* argv[]): kitcreate(argc, argv)
 	builder = Gtk::Builder::create();
 	try
 	{
-		builder->add_from_file(PACKAGE_DATA_DIR"/ui/createuser.ui");
+		builder->add_from_file(sharedir()+"/ui/createuser.ui");
 	}
 	catch(const Glib::FileError& ex)
 	{
-		//std::cerr << ENOENT;
-		//if (ex.code()==ENOENT)
-		//	std::cerr << "good";
-		//strange ENOENT doesn't work even it should correspond
-		if (ex.code()==4)
-		{
-			std::cerr << "createuser.ui not found; fall back to src directory\n";
-			try
-			{
-				builder->add_from_file("./src/ui/createuser.ui");
-			}
-			catch(const Glib::FileError& ex)
-			{
-				std::cerr << "FileError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-			catch(const Glib::MarkupError& ex)
-			{
-				std::cerr << "MarkupError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-			catch(const Gtk::BuilderError& ex)
-			{
-				std::cerr << "BuilderError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-		}
-		else
-		{
-			std::cerr << "FileError: " << ex.what() << std::endl;
-			throw(ex);
-		}
+		std::cerr << "FileError: " << ex.what() << std::endl;
+		throw(ex);
 	}
 	catch(const Glib::MarkupError& ex)
 	{

@@ -70,8 +70,7 @@ private:
 	
 	void setactionspace(Gtk::Widget &actionbar);
 	
-	//named after function in clonemecmd
-	void _cleanuser();
+	void cleanuser();
 	void copysynchf();
 	void cleanf();
 	void ignoref();

@@ -37,7 +37,7 @@
 
 #include "myfilechooser.h"
 #include "basismethods.h"
-#include <iostream>
+//#include <iostream> //not needed basismethods
 
 
 void myfilechooser::usefile()
@@ -74,42 +74,12 @@ myfilechooser::myfilechooser()
 	builder = Gtk::Builder::create();
 	try
 	{
-		builder->add_from_file(PACKAGE_DATA_DIR"/ui/myfiledialog.ui");
+		builder->add_from_file(sharedir()+"/ui/myfiledialog.ui");
 	}
 	catch(const Glib::FileError& ex)
 	{
-		//std::cerr << ENOENT;
-		//if (ex.code()==ENOENT)
-		//	std::cerr << "good";
-		//strange ENOENT doesn't work even it should correspond
-		if (ex.code()==4)
-		{
-			std::cerr << "myfiledialog.ui not found; fall back to src directory\n";
-			try
-			{
-				builder->add_from_file("./src/ui/myfiledialog.ui");
-			}
-			catch(const Glib::FileError& ex)
-			{
-				std::cerr << "FileError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-			catch(const Glib::MarkupError& ex)
-			{
-				std::cerr << "MarkupError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-			catch(const Gtk::BuilderError& ex)
-			{
-				std::cerr << "BuilderError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-		}
-		else
-		{
-			std::cerr << "FileError: " << ex.what() << std::endl;
-			throw(ex);
-		}
+		std::cerr << "FileError: " << ex.what() << std::endl;
+		throw(ex);
 	}
 	catch(const Glib::MarkupError& ex)
 	{

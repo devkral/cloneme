@@ -37,41 +37,24 @@
 
 #include "copyuser.h"
 #include "basismethods.h"
-#include <iostream>
-#include <string>
-#include <unistd.h>
+//#include <iostream>
+//#include <string>
+//#include <unistd.h>
 #include <getopt.h>
 
 
 
 
-void copyuser::_cleanuser()
+void copyuser::cleanuser()
 {
-	std::string sum="";
-	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd\n";
-	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/passwd-\n";
-	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group\n";
-	sum+="  sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group\n";
-	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/group-\n";
-	sum+="  sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/group-\n";
-	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow\n";
-	sum+="  sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow\n";
-	sum+="  sed -i -e \"/^"+name+"/d\" \""+dest+"\"/etc/gshadow-\n";
-	sum+="  sed -i -e \"s/\b"+name+"\b//g\" \""+dest+"\"/etc/gshadow-\n";
-	sum+="  if [ -d \""+dest+"\"/home/\""+name+"\" ];then\n";
-	sum+="    rm -r \""+dest+"\"/home/\""+name+"\"\n";
-	sum+="  fi\n";
-	sum+="  \n";
-	sum+="  shred -u \""+dest+"/var/spool/mail/"+name+"\" 2> /dev/null\n";
-	sum+="  echo \"cleaning finished\"\n";
+	std::string sum=sharedir()+"/sh/cleanuser.sh "+name+" "+dest+"\n";
 	system2(sum);
 }
 
 
 void copyuser::copysynchf()
 {
-	std::string sum="";
-	sum+="        rsync -a -A --progress --delete --exclude \""+dest+"\" \""+src+"\"home/\""+name+"\" \""+dest+"\"/home/\n";
+	std::string sum=sharedir()+"/sh/copyuser.sh "+src+" "+dest+" "+name+" s\n";
 	std::cerr << system2(sum);
 	kitcopy.quit();
 }
@@ -80,26 +63,13 @@ void copyuser::ignoref()
 {
 	//user_exist==true has an extra button for this
 	if (cleantargetsys->get_active ()==true && user_exist==false)
-		_cleanuser();
+		cleanuser();
 	kitcopy.quit();
 }
 
 void copyuser::emptyf()
 {
-	std::string sum="";
-	sum+="        rm -r \""+dest+"\"/home/\""+name+"\"\n";
-	sum+="        mkdir -p \""+dest+"\"/home/\""+name+"\"\n";
-	sum+="        \n";
-	sum+="        if grep \""+name+"\" \""+src+"\"etc/passwd > /dev/null;then\n";
-	sum+="          chown \""+name+"\" \""+dest+"\"/home/\""+name+"\"\n";
-	sum+="          \n";
-	sum+="          if grep \""+name+"\" \""+src+"\"etc/group > /dev/null;then\n";
-	sum+="            chown \""+name+":"+name+"\" \""+dest+"\"/home/\""+name+"\"\n";
-	sum+="          fi\n";
-	sum+="        fi\n";
-	sum+="        \n";
-	sum+="        shred -u \""+dest+"/var/spool/mail/"+name+"\" 2> /dev/null\n";
-
+	std::string sum=sharedir()+"/sh/copyuser.sh "+src+" "+dest+" "+name+" e\n";
 	system2(sum);
 	kitcopy.quit();
 }
@@ -161,49 +131,19 @@ copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 
 	if (name.empty())
 	{
-		std::cerr << "Error: User wasn't specified\n";
+		std::cerr << "Error: user wasn't specified\n";
 		throw (-1);
 	}
 
 	builder = Gtk::Builder::create();
 	try
 	{
-		builder->add_from_file(PACKAGE_DATA_DIR"/ui/copyuser.ui");
+		builder->add_from_file(sharedir()+"/ui/copyuser.ui");
 	}
 	catch(const Glib::FileError& ex)
 	{
-		//std::cerr << ENOENT;
-		//if (ex.code()==ENOENT)
-		//	std::cerr << "good";
-		//strange ENOENT doesn't work even it should correspond
-		if (ex.code()==4)
-		{
-			std::cerr << "copyuser.ui not found; fall back to src directory\n";
-			try
-			{
-				builder->add_from_file("./src/ui/copyuser.ui");
-			}
-			catch(const Glib::FileError& ex)
-			{
-				std::cerr << "FileError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-			catch(const Glib::MarkupError& ex)
-			{
-				std::cerr << "MarkupError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-			catch(const Gtk::BuilderError& ex)
-			{
-				std::cerr << "BuilderError: " << ex.what() << std::endl;
-				throw(ex);
-			}
-		}
-		else
-		{
-			std::cerr << "FileError: " << ex.what() << std::endl;
-			throw(ex);
-		}
+		std::cerr << "FileError: " << ex.what() << std::endl;
+		throw(ex);
 	}
 	catch(const Glib::MarkupError& ex)
 	{
@@ -234,7 +174,7 @@ copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 	ignoreuser=transform_to_rptr<Gtk::Button>(builder->get_object("ignoreuser"));
 	ignoreuser->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::ignoref));
 	cleaner=transform_to_rptr<Gtk::Button>(builder->get_object("cleaner"));
-	cleaner->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::_cleanuser));
+	cleaner->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::cleanuser));
 
 	//usernotexist
 	usernotexist=transform_to_rptr<Gtk::Grid>(builder->get_object("usernotexist"));
