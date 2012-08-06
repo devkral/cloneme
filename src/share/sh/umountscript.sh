@@ -1,6 +1,7 @@
 #! /bin/sh
 
 #usage: umountscript.sh <syncdir>
+#just use in the special case you have dest and src under a sync folder
 
 syncdir="$(realpath "$1")"
 staticmounts="$(cat /proc/mounts)"

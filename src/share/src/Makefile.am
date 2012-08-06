@@ -15,8 +15,6 @@ clonesrc_DATA =  \
 	../../myfilechooser.cc \
 	../../myfilechooser.h \
 	../../basismethods.h \
-	../../basismethods.cc \
-	../../installguiinstaller.cc \
-	../../installguiinstaller.h
+	../../basismethods.cc
 	
 

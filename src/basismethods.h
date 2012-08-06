@@ -25,6 +25,7 @@ inline std::string sharedir()
 		std::string tempt=(std::string)PACKAGE_DATA_DIR;
 		if (tempt[tempt.length()-1]=='/')
 			tempt.erase(tempt.length()-1);
+		return tempt;
 	}
 	else
 		return (std::string)"./src/share";

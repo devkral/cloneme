@@ -41,7 +41,6 @@
 #include "gui.h"
 #include "copyuser.h"
 #include "createuser.h"
-#include "installguiinstaller.h"
 
 #include <getopt.h>
 #include <unistd.h>
