@@ -25,7 +25,7 @@ if [ -e "$programdir"/cloneme ] && "${sharedir}"/sh/install-installer-compiler.s
 fi
 
 mkdir -p "$targetdir$share_dir" 2> /dev/null
-if ! cp -r "$share_dir"/* "$targetdir$sharedir";then
+if ! cp -r "$sharedir"/* "$targetdir$sharedir";then
   exit 1
 fi
 
