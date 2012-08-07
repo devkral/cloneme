@@ -6,9 +6,7 @@
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
-echo "$sharedir"
 programdir="$(realpath "$1")"
-echo "$programdir"
 
 if [[ $# > 2 ]];then
   linkdir="$(realpath "$2")"
@@ -16,8 +14,6 @@ if [[ $# > 2 ]];then
 else
   targetdir="$(realpath "$2")"
 fi
-echo "$linkdir"
-exit 0
 
 mkdir -p "${targetdir}${programdir}" 2> /dev/null
 mkdir -p "${targetdir}${sharedir}" 2> /dev/null
@@ -33,7 +29,7 @@ if ! cp -r "$share_dir"/* "$targetdir$sharedir";then
   exit 1
 fi
 
-if [ "x$linkdir" != "x" ];then
+if [ "$linkdir" != "" ];then
   mkdir -p "$targetdir$linkdir" 2> /dev/null
   cp "$linkdir"/cloneme.desktop "$targetdir$linkdir"
 fi
