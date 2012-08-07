@@ -188,11 +188,14 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	{
 		std::cerr << "Terminal child didn't start.\n";
 	}
+
+	//initialize syncdir
+	std::cerr << system2(sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n");
 	
 	//Buttons
 	gparted=transform_to_rptr<Gtk::Button>(builder->get_object("gparted"));
 	gparted->signal_clicked ().connect(sigc::mem_fun(*this,&gui::opengparted));
-	if ( access("/usr/bin/gparted",F_OK)!=0)
+	if ( access("/usr/sbin/gparted",F_OK)!=0)
 	{
 		std::cerr << "gparted not found";
 		gparted->hide();
@@ -205,13 +208,13 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	//Filechooser
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
 	src->set_text("/");
-	src->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updatedsrc));
+	//src->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updatedsrc));
 	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
 	srcselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosesrc));
 	
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
 	dest->set_text("/dev/sdb1");
-	dest->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updateddest));
+	//dest->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updateddest));
 	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
 	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
 
@@ -228,5 +231,6 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 gui::~gui()
 {
 	//cleanup
-	system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
+	std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
+	//std::cout << sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n";
 }

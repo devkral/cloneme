@@ -17,15 +17,7 @@ if [ ! -e "$mountpointt" ] && [[ $(echo "$mountpointt" | wc -l) = 1 ]]; then
 fi
 staticmounts="$(cat /proc/mounts)"
 
-if [ -b "$mountpointt" ];then
-  blockdevice="$mountpointt"
-else
-  blockdevice="$(grep "$mountpointt " /proc/mounts | grep "^/" | sed -e "s/^\([^ ]\+\) [^ ]\+ .*/\1/g")"
-  if [ "$blockdevice" = "" ]; then
-    echo "$mountpointt is no mountpoint"
-    exit 1
-  fi
-fi
+
 
 
 
@@ -33,24 +25,35 @@ fi
 #usage: un_mount <mountpoint>
 un_mount()
 {
-umountpoint="${1}"
-if [ -d "${umountpoint}" ]; then
-  if ! umount "${umountpoint}"; then
-    echo "cannot unmount the mount directory"
-    echo "an other service depending on this directory is still running"
-    echo "abort!"
-    exit 1
-  fi
+  umountpoint="${1}"
+  if [ -d "${umountpoint}" ]; then
+    if mountpoint "${umountpoint}" > /dev/null; then
+      if ! umount "${umountpoint}"; then
+        echo "cannot unmount the mount directory"
+        echo "an other service depending on this directory is still running"
+        echo "abort!"
+        exit 1
+      fi
   
-  mountpointold="$(echo "$staticmounts" | grep "${umountpoint}" | sed "s/^\([^ ]\+\) .*/\1/")"
-  if losetup -a | grep "$(echo "${mountpointold} " | sed "s/p[0-9]\+$//")"  > /dev/null;then
-    losetup -d "$(echo "$mountpointold" | sed "s/p[0-9]\+$//")";
+      mountpointold="$(echo "$staticmounts" | grep "${umountpoint}" | sed "s/^\([^ ]\+\) .*/\1/")"
+      if losetup -a | grep "$(echo "${mountpointold} " | sed "s/p[0-9]\+$//")"  > /dev/null;then
+        losetup -d "$(echo "$mountpointold" | sed "s/p[0-9]\+$//")";
+      fi
+    fi
   fi
-fi
 }
 
 umount_all()
 {
+  if [ -b "$mountpointt" ];then
+    local blockdevice="$mountpointt"
+  else
+    local blockdevice="$(grep "$mountpointt " /proc/mounts | grep "^/" | sed -e "s/^\([^ ]\+\) [^ ]\+ .*/\1/g")"
+    if [ "$blockdevice" = "" ]; then
+      echo "$mountpointt is no mountpoint"
+      exit 1
+    fi
+  fi
   local pathtoumount="$(grep "$blockdevice" /proc/mounts | sed -e "s/^[^ ]\+ \([^ ]\+\) .*/\1/g")"
   if [ "$pathtoumount" != "" ]; then
     for itemtoumount in $pathtoumount
@@ -64,7 +67,7 @@ umount_all()
 
 case "$mode" in
   "n")un_mount "$mountpointt";;
-  "rm")un_mount "$mountpointt";rmdir "$mountpointt";;
+  "rm")un_mount "$mountpointt"; rmdir "$mountpointt";;
   "uad")umount_all;;
   *)echo "usage: umountscript.sh <mode> <mountpoint>";;
 esac

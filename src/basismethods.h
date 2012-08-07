@@ -40,10 +40,8 @@ inline std::string bindir()
 
 inline std::string syncdir()
 {
-	if (access(PACKAGE_BIN_DIR,F_OK)==0)
-		return system2(bindir()+"/clonemecmd.sh syncdir");
-	else
-		return (std::string)"/run/syndir";
+	return "/run/syncdir";
+	//return system2(bindir()+"/clonemecmd.sh syncdir\n");
 }
 
 #endif // _BASISMETHODS_H_
