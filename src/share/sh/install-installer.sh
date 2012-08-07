@@ -2,7 +2,8 @@
 
 #usage: install-installer.sh <programdir> [linkdir] <targetsystem>
 #dir where the cloneme files are located
-#TODO: recompile when another version compare uname -m
+#intern dependencies: install-installer-compiler.sh clonemecmd.sh
+
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 programdir="$(realpath "$1")"

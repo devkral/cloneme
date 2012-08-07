@@ -1,27 +1,15 @@
 #! /bin/sh
 
-#usage: umountscript.sh <syncdir>
+#usage: umountsyncscript.sh <syncdir>
 
+#intern dependencies: umountscript.sh
+
+sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 syncdir="$(realpath "$1")"
-staticmounts="$(cat /proc/mounts)"
 
-if [ -d "${syncdir}/src" ]; then
-  umount "${syncdir}/src"
-  srcmountpoint="$(echo "$staticmounts" | grep "${syncdir}/src" | sed "s/^\([^ ]\+\) .*/\1/")"
-  if losetup -a | grep "$(echo "$srcmountpoint" | sed "s/p[0-9]\+$//")"  > /dev/null;then
-    losetup -d "$(echo "$srcmountpoint" | sed "s/p[0-9]\+$//")";
-  fi
-  
-fi
+"$sharedir"/sh/umountscript.sh rm "${syncdir}/src"
 
-if [ -d "${syncdir}/dest" ]; then
-  umount "${syncdir}/dest"
-  destmountpoint="$(echo "$staticmounts" | grep "${syncdir}/dest" | sed "s/^\([^ ]\+\) .*/\1/")"
-  if losetup -a | grep "$(echo "$destmountpoint" | sed "s/p[0-9]\+$//")"  > /dev/null;then
-    losetup -d "$(echo "$destmountpoint" | sed "s/p[0-9]\+$//")";
-  fi
-fi
-
+"$sharedir"/sh/umountscript.sh rm "${syncdir}/dest"
 
 #delete if exist
 if [ -d "${syncdir}" ]; then 

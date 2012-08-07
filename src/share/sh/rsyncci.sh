@@ -1,6 +1,7 @@
 #! /bin/sh
 
 #usage: rsyncci.sh <mode> <src> <dest>
+#intern dependencies: -
 
 mode="$1"
 src="$(realpath "$2")"

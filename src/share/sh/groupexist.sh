@@ -4,6 +4,8 @@
 #returns all existing groups (which are specified via args) commaseparated
 #exit 2 when a group doesn't exist; exit 0 when every group exist
 
+#intern dependencies: -
+
 missing_group=false
 existing_groups=""
 

@@ -1,6 +1,7 @@
 #! /bin/sh
 #usage: devicefinder [options] <directory>
 
+#intern dependencies: -
 
 options=""
 

@@ -7,6 +7,7 @@
 # i: breaks loop
 # c: clean dest system from user
 
+#intern dependencies: cleanuser.sh
 
 srcsys="$(realpath "$1")"
 destsys="$(realpath "$2")"

@@ -1,6 +1,7 @@
 #! /bin/sh
 
 #usage: cleanuser.sh <user> <targetsystem>
+#intern dependencies: -
 
 usertemp="$1"
 targetn="$(realpath "$2")"

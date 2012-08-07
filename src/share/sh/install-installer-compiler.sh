@@ -4,6 +4,7 @@
 #returns: 0 copy it yourself
 #         2 compiled
 
+#intern dependencies: src dir
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 

@@ -16,4 +16,5 @@ supportscripts_SCRIPTS = \
 	mountscript.sh \
 	report-missing-packages.sh \
 	rsyncci.sh \
+	umountscript.sh \
 	umountsyncscript.sh

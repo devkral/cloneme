@@ -2,6 +2,10 @@
 
 #usage: grub-installer_phase_1.sh <targetsystem> [command for sysconfig like adding users] [ args ] (currently just one)
 #dir where the cloneme files are located
+
+#intern dependencies: grub-installer_phase_2.sh
+
+
 share_dir="$(dirname "$(dirname "$(realpath "$0")")")"
 clonetargetdir="$(realpath "$1")"
 

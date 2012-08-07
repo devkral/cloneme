@@ -1,11 +1,14 @@
 #! /bin/sh
 
+#usage: addnewuser.sh
+#intern dependencies: groupexist.sh
+
+
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 #default groups of new users
 usergroup="video audio optical power"
 admingroup="wheel adm admin"
-
 
 
 usergroupargs="$("${sharedir}"/sh/groupexist.sh $usergroup)"

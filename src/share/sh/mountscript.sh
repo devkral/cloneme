@@ -3,11 +3,13 @@
 #usage: mountscript <mode> <device> [partition] <mountpoint> 
 #device can be a raw file (with use of partition!) or a blockdevice or something mount can mount
 #modes:
-#needpart : return 0 if partition doesn't need to be specified
+#needpart : return 0 if partition doesn't need to be specified (needs just device)
 #mount : mount the device and partition
 #debug : return debug infos
 
+#intern dependencies: umountscript.sh
 
+sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 case "$#" in
 4)
@@ -40,30 +42,14 @@ staticmounts="$(cat /proc/mounts)"
     exit 1
   fi
 
-#sorry other mountpoints but we must be sure that this is the only mountpoint
+#sorry other mountpoints but we must be sure that this is the only mountpoint;
 #/proc/mounts of the real running system is used
-  local pathtoumount="$(cat /proc/mounts | grep "$device" | sed -e "s/^[^ ]\+ \([^ ]\+\) .*/\1/g")"
-  if [ "$pathtoumount" != "" ]; then
-    for itemtoumount in $pathtoumount
-    do
-      #echo "mount_blockdevice: umount $itemtoumount"
-      umount "$(echo "$itemtoumount" | sed -e 's/\\040/\ /g')"
-    done
-  fi
+  "$sharedir"/sh/umountscript.sh uad "$device"
 
   if mountpoint "${mountpath}" &> /dev/null; then
 #sorry predecessor but we must be sure that is mounted as ROOT
-    if ! umount "${mountpath}"; then
-      echo "mount_blockdevice error: cannot unmount the mount directory"
-      echo "an other service depending on this directory is still running"
-      echo "abort!"
+    if ! "$sharedir"/sh/umountscript.sh n "${mountpath}"; then
       exit 1
-    fi
-    #TODO: make a nice umount script
-    #umount eventual loop
-    oldmountpoint="$(echo "$staticmounts" | grep "${mountpath}" | sed "s/^\([^ ]\+\) .*/\1/")"
-    if losetup -a | grep "$(echo "$oldmountpoint" | sed "s/p[0-9]\+$//")"  > /dev/null;then
-      losetup -d "$(echo "$oldmountpoint" | sed "s/p[0-9]\+$//")";
     fi
   fi
   
