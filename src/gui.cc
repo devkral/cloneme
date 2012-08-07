@@ -90,55 +90,54 @@ void gui::opengparted()
 
 void gui::update()
 {
-	std::string sum="";
-	if ( access(PACKAGE_BIN_DIR"/clonemecmd.sh",F_OK)==0)
-		sum+=PACKAGE_BIN_DIR;
-	else
-	{
-		std::cerr << "clonemecmd.sh not found; fall back to src directory\n";
-		sum+="$PWD/src";
-	}
-	sum+="/clonemecmd.sh update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
+	std::string sum=bindir()+"/clonemecmd.sh update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
 void gui::install()
 {
-	std::string sum="";
-	sum+=(std::string)"graphic_interface_path=\""+home_path+(std::string)"\"\n";
-	if ( access(PACKAGE_BIN_DIR"/clonemecmd.sh",F_OK)==0)
-		sum+=PACKAGE_BIN_DIR;
-	else
-	{
-		std::cerr << "clonemecmd.sh not found; fall back to src directory\n";
-		sum+="$PWD/src";
-	}
-	sum+="/clonemecmd.sh install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
+	std::string sum=bindir()+"/clonemecmd.sh install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
 void gui::choosesrc()
+{
+	
+	myfilechooser select;
+	std::string temp=select.run();
+	if (!temp.empty())
 	{
-		
-		myfilechooser select;
-		std::string temp=select.run();
-		if (!temp.empty())
-		{
-			src->set_text(temp);
-			srcdestobject.src=temp;
-		}
+		src->set_text(temp);
+		srcdestobject.src=temp;
 	}
+}
 
-	void gui::choosedest()
+void gui::choosedest()
+{
+	myfilechooser select;
+	std::string temp=select.run();
+	if (!temp.empty())
 	{
-		myfilechooser select;
-		std::string temp=select.run();
-		if (!temp.empty())
-		{
-			dest->set_text(temp);
-			srcdestobject.dest=temp;
-		}
+		dest->set_text(temp);
+		srcdestobject.dest=temp;
 	}
+}
+
+void gui::updatedsrc()
+{
+	srcdestobject.src=src->get_text();
+	std::string sum=sharedir()+"/sh/mountscript.sh mount "+srcdestobject.src;+" "+syncdir()+"/src";
+	//cerr << 
+	system2(sum);
+}
+
+void gui::updateddest()
+{
+	srcdestobject.dest=dest->get_text();
+	std::string sum=sharedir()+"/sh/mountscript.sh mount "+srcdestobject.dest;+" "+syncdir()+"/dest";
+	//cerr << 
+	system2(sum);
+}
 
 
 gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this),createdialog(this)
@@ -205,11 +204,13 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	//Filechooser
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
 	src->set_text("/");
+	src->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updatedsrc));
 	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
 	srcselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosesrc));
 	
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
 	dest->set_text("/dev/sdb1");
+	dest->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updateddest));
 	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
 	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
 
@@ -221,4 +222,9 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	{
 		kit.run(*main_win.operator->());
 	}
+}
+
+gui::~gui()
+{
+	system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
 }

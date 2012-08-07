@@ -66,6 +66,7 @@ class gui
 {
 public:
 	gui(int argc, char** argv);
+	~gui();
 	std::mutex gpartmut;
 protected:
 
@@ -90,6 +91,7 @@ private:
 	
 	//src, dest
 	Glib::RefPtr<Gtk::Entry> src, dest;
+	void updatedsrc(), updateddest();
 	srcdest srcdestobject;
 	Glib::RefPtr<Gtk::Button> srcselect, destselect;
 	void choosesrc ();

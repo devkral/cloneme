@@ -88,6 +88,7 @@ case "$#" in
     ;;
   "3")clonesource="$(realpath "$2")"; clonetargetdevice="$(realpath "$3")";;
   "2")clonetargetdevice="$(realpath "$2")";;
+  "1");; # because of syncdir
   *)help;exit 1;;
 esac
 
@@ -121,7 +122,7 @@ if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ];
     echo "EDITOR=\"$EDITOR\"" >> ~/.bashrc
   fi
 fi
-if [ "$cloneme_ui_mode" = "false" ];then
+if [ "$cloneme_ui_mode" = "false" ] && [ "$choosemode" != "syncdir" ];then
   if "$sharedir"/sh/mountscript.sh needpart "$clonesource"; then
     echo "Please enter the partition number (beginning with p)"
     read partitions
@@ -157,7 +158,6 @@ if [ "$clonesourcedir" = "$clonetargetdir" ] || [ "$clonesourcedir" = "$clonetar
   echo "target: $clonetargetdir"
   exit 1
 fi
-
 
 
 copyuser(){
@@ -250,10 +250,11 @@ updater(){
 case "$choosemode" in
   "update")updater;;
   "install")installer;;
+  "syncdir")echo "$syncdir";;
   *)help;exit 1;;
 esac
 
-if [ "$cloneme_ui_mode" = "false" ];then
+if [ "$cloneme_ui_mode" = "false" ] && [ "$choosemode" != "syncdir" ];then
   "$sharedir"/sh/umountsyncscript.sh
 fi
 

@@ -38,4 +38,12 @@ inline std::string bindir()
 		return (std::string)"./src";
 }
 
+inline std::string syncdir()
+{
+	if (access(PACKAGE_BIN_DIR,F_OK)==0)
+		return system2(bindir()+"/clonemecmd.sh syncdir");
+	else
+		return (std::string)"/run/syndir";
+}
+
 #endif // _BASISMETHODS_H_

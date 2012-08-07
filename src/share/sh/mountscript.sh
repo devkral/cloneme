@@ -32,6 +32,7 @@ esac
 #new:  "$mountpath" <dest>
 mount_blockdevice()
 {
+staticmounts="$(cat /proc/mounts)"
   local device="$1"
 #safeguard for not killing innocent mounts
   if [ ! -b "$device" ];then
@@ -57,6 +58,12 @@ mount_blockdevice()
       echo "an other service depending on this directory is still running"
       echo "abort!"
       exit 1
+    fi
+    #TODO: make a nice umount script
+    #umount eventual loop
+    oldmountpoint="$(echo "$staticmounts" | grep "${mountpath}" | sed "s/^\([^ ]\+\) .*/\1/")"
+    if losetup -a | grep "$(echo "$oldmountpoint" | sed "s/p[0-9]\+$//")"  > /dev/null;then
+      losetup -d "$(echo "$oldmountpoint" | sed "s/p[0-9]\+$//")";
     fi
   fi
   

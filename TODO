@@ -1,9 +1,10 @@
 
 +make EDITOR fetch from main system working (see gui.cc)
 +rename name (converter and copyuser)
-+split shellfile into bootloader specific installer e.g. grub, syslinux, lilo and adduserdialog and the normal part 
++add support for other bootloaders
 +offer some special options for ssds/USB-flashdrives
-+automount: split the mount functions off the skript and use them whenever a new directory/file is selected
++automount: split the mount functions off the skript and use them whenever a new directory/file is selected (in progress)
++++automount: make safeguard so dir not changes while installing
 +somehow chroot on target system has no root rights (maybe ubutuntu specific)
 
 +make things running more stable
