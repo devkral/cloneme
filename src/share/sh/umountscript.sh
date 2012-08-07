@@ -36,8 +36,9 @@ un_mount()
       fi
   
       mountpointold="$(echo "$staticmounts" | grep "${umountpoint}" | sed "s/^\([^ ]\+\) .*/\1/")"
-      if losetup -a | grep "$(echo "${mountpointold} " | sed "s/p[0-9]\+$//")"  > /dev/null;then
-        losetup -d "$(echo "$mountpointold" | sed "s/p[0-9]\+$//")";
+      if losetup -a | grep "$(echo "${mountpointold}" | sed 's/p[0-9]\+$//')"  > /dev/null;then
+        #echo "$(echo "${mountpointold}" | sed 's/p[0-9]\+$//')"
+        losetup -d "$(echo "${mountpointold}" | sed 's/p[0-9]\+$//')";
       fi
     fi
   fi
