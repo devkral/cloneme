@@ -258,7 +258,7 @@ case "$choosemode" in
 esac
 
 if [ "$cloneme_ui_mode" = "false" ];then
-  "$sharedir"/sh/umountsyncscript.sh
+  "$sharedir"/sh/umountsyncscript.sh "$syncdir"
 fi
 
 exit 0;

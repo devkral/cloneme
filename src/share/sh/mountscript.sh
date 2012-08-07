@@ -5,7 +5,7 @@
 #modes:
 #needpart : return 0 if partition doesn't need to be specified (needs just device)
 #mount : mount the device and partition
-#debug : return debug infos
+#debug : return debug infos (but mounts real)
 
 #intern dependencies: umountscript.sh
 
@@ -68,7 +68,7 @@ if [ "$mode" = "needpart" ]; then
   fi
 fi
 
-if [ "$mode" = "mount" ]; then
+if [ "$mode" = "mount" ] || [ "$mode" = "debug" ]; then
   if [ -d "${thingtomount}" ];then
     mountdir="${thingtomount}"
   elif [ -b "${thingtomount}" ];then
@@ -82,8 +82,8 @@ if [ "$mode" = "mount" ]; then
         echo "Hint: have you restarted the kernel after last update?"
         exit 1
       fi
-    #else
-    #  echo "raw file already loop mounted but this is no issue" 1>&2 
+    elif [ "${mode}" = "debug" ];then
+      echo "raw file already loop mounted but this is no issue" 1>&2 
     fi
     loopmount="$(losetup -a | grep "${thingtomount}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
 

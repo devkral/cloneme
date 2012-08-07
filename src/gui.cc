@@ -232,5 +232,4 @@ gui::~gui()
 {
 	//cleanup
 	std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
-	//std::cout << sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n";
 }
