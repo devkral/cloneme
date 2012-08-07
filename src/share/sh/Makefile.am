@@ -14,6 +14,7 @@ supportscripts_SCRIPTS = \
 	install-installer-compiler.sh \
 	lilo-installer.sh \
 	mountscript.sh \
+	prepsyncscript.sh \
 	report-missing-packages.sh \
 	rsyncci.sh \
 	umountscript.sh \

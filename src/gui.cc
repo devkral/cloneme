@@ -127,8 +127,8 @@ void gui::updatedsrc()
 {
 	srcdestobject.src=src->get_text();
 	std::string sum=sharedir()+"/sh/mountscript.sh mount "+srcdestobject.src;+" "+syncdir()+"/src";
-	//cerr << 
-	system2(sum);
+	std::cerr << "test"; 
+	//system2(sum);
 }
 
 void gui::updateddest()
@@ -136,7 +136,8 @@ void gui::updateddest()
 	srcdestobject.dest=dest->get_text();
 	std::string sum=sharedir()+"/sh/mountscript.sh mount "+srcdestobject.dest;+" "+syncdir()+"/dest";
 	//cerr << 
-	system2(sum);
+	std::cerr << "test";
+	//system2(sum);
 }
 
 
@@ -226,5 +227,6 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 
 gui::~gui()
 {
+	//cleanup
 	system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
 }

@@ -56,7 +56,7 @@ graphic_interface_path=""
 cloneme_ui_mode="false"
 clonesourceloop=""
 clonetargetloop=""
-clonetargetdevice=""
+clonetarget=""
 
 
 
@@ -79,22 +79,22 @@ choosemode="$1"
 case "$#" in
   "5")
     clonesource="$(realpath "$2")";
-    clonetargetdevice="$(realpath "$3")";
+    clonetarget="$(realpath "$3")";
     graphic_interface_path="$(realpath "$4")"
     installbootloader="$(realpath "$5")";
     if [ "x$graphic_interface_path" != "x" ] && [ -f "$graphic_interface_path" ] ;then
       cloneme_ui_mode="true";
     fi
     ;;
-  "3")clonesource="$(realpath "$2")"; clonetargetdevice="$(realpath "$3")";;
-  "2")clonetargetdevice="$(realpath "$2")";;
+  "3")clonesource="$(realpath "$2")"; clonetarget="$(realpath "$3")";;
+  "2")clonetarget="$(realpath "$2")";;
   "1");; # because of syncdir
   *)help;exit 1;;
 esac
 
-  if [ "$choosemode" = "--help" ]; then
-    help; exit 0;
-  fi
+if [ "$choosemode" = "--help" ]; then
+  help; exit 0;
+fi
 
 #check if runs with root permission
 if [ ! "$UID" = "0" ] && [ ! "$EUID" = "0" ]; then
@@ -109,8 +109,8 @@ syncdir="$tempp"
 
 if ! "$sharedir"/sh/report-missing-packages.sh; then
   exit 1
-
 fi
+
 
 if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ]; then
   echo "error: no default editor found"
@@ -122,30 +122,33 @@ if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ];
     echo "EDITOR=\"$EDITOR\"" >> ~/.bashrc
   fi
 fi
+
 if [ "$cloneme_ui_mode" = "false" ] && [ "$choosemode" != "syncdir" ];then
+  "$sharedir"/sh/prepsyncscript.sh "${syncdir}"
   if "$sharedir"/sh/mountscript.sh needpart "$clonesource"; then
     echo "Please enter the partition number (beginning with p)"
     read partitions
-    if ! clonesourcedir=$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$partitions" "$syncdir"/src)"; then
+    if ! clonesourcedir="$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$partitions" "$syncdir"/src)"; then
       echo "$clonesourcedir"
       exit 1
     fi
   else
-    if ! clonesourcedir=$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src)"; then
+    if ! clonesourcedir="$("$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src)"; then
       echo "$clonesourcedir"
       exit 1
     fi
   fi
-
+ 
   if "$sharedir"/sh/mountscript.sh needpart "$clonetarget"; then
     echo "Please enter the partition number (beginning with p)"
     read partitiond
-    if ! clonedestdir=$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$partitiond" "$syncdir"/dest)"; then
+    if ! clonedestdir="$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$partitiond" "$syncdir"/dest)"; then
       echo "$clonedestdir"
       exit 1
     fi
+
   else
-    if ! clonedestdir=$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest)"; then
+    if ! clonedestdir="$("$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest)"; then
       echo "$clonedestdir"
       exit 1
     fi
@@ -153,9 +156,9 @@ if [ "$cloneme_ui_mode" = "false" ] && [ "$choosemode" != "syncdir" ];then
 fi
 
 #loop shouldn't happen
-if [ "$clonesourcedir" = "$clonetargetdir" ] || [ "$clonesourcedir" = "$clonetargetdir/" ];then
+if [ "$clonesourcedir" = "$clonedestdir" ] || [ "$clonesourcedir" = "$clonedestdir/" ];then
   echo "error: source = target"
-  echo "target: $clonetargetdir"
+  echo "target: $clonedestdir"
   exit 1
 fi
 
@@ -165,50 +168,52 @@ local usertemp
 for usertemp in $(ls "${clonesourcedir}"/home)
 do
   if [ "$cloneme_ui_mode" = "true" ];then
-    ${graphic_interface_path} --copyuser --src "${clonesourcedir}" --dest "${clonetargetdir}" --user "${usertemp}"
+    ${graphic_interface_path} --copyuser --src "${clonesourcedir}" --dest "${clonedestdir}" --user "${usertemp}"
   else
-    "${sharedir}"/sh/copyuser.sh "${clonesourcedir}" "${clonetargetdir}" "${usertemp}"
+    "${sharedir}"/sh/copyuser.sh "${clonesourcedir}" "${clonedestdir}" "${usertemp}"
   fi
 done
 }
 
 installer(){
   rsyncing="true"
+
   if [ "$cloneme_ui_mode" = "false" ];then
-    if [ "$(ls -A "${clonetargetdir}")" != "" ];then
+    if [ "$(ls -A "${clonedestdir}")" != "" ];then
       echo "The target partition is not empty. Shall I clean it? Type \"yes\""
       read shall_clean
       if [ "${shall_clean}" = "yes" ];then
-        rm -r "${clonetargetdir}"/*
+        rm -r "${clonedestdir}"/*
       fi
       echo "Skip rsync? Type \"yes\""
       read rsyncing_quest
       if [ "${rsyncing_quest}" = "yes" ];then
         rsyncing="false"
       fi
-      
     fi
   fi
+
+  
   if [ "$rsyncing" = "true" ];then
-     if ! "$sharedir"/sh/rsyncci.sh install "${clonesourcedir}" "${clonetargetdir}";then
+     if ! "$sharedir"/sh/rsyncci.sh install "${clonesourcedir}" "${clonedestdir}";then
        exit 1;
      fi
   fi
   
-  if [ -f "${clonetargetdir}"/etc/fstab ];then
+  if [ -f "${clonedestdir}"/etc/fstab ];then
    
-    local tempprobefstab="$("$sharedir"/sh/devicefinder.sh uuid "${clonetargetdir}")"
-    local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobe}\1/" "${clonetargetdir}"/etc/fstab)"
-    echo "$tempsed" > "${clonetargetdir}"/etc/fstab
+    local tempprobefstab="$("$sharedir"/sh/devicefinder.sh uuid "${clonedestdir}")"
+    local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobe}\1/" "${clonedestdir}"/etc/fstab)"
+    echo "$tempsed" > "${clonedestdir}"/etc/fstab
 
     echo "root in fstab updated"
     if [ "$cloneme_ui_mode" = false ];then
       echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
       read shall_fstab
       if [ "$shall_fstab" = "yes" ]; then
-        if ! ${EDITOR} "${clonetargetdir}/etc/fstab"; then
+        if ! ${EDITOR} "${clonedestdir}"/etc/fstab; then
           echo "Fall back to vi"
-          vi "${clonetargetdir}"/etc/fstab
+          vi "${clonedestdir}"/etc/fstab
         fi
       fi
     fi
@@ -217,32 +222,32 @@ installer(){
     exit 1
   fi
   copyuser
-  "$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop "${clonetargetdir}"
+  "$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
   
-  mount -o bind /proc "${clonetargetdir}"/proc
-  mount -o bind /sys "${clonetargetdir}"/sys
-  mount -o bind /dev "${clonetargetdir}"/dev
+  mount -o bind /proc "${clonedestdir}"/proc
+  mount -o bind /sys "${clonedestdir}"/sys
+  mount -o bind /dev "${clonedestdir}"/dev
  
   if [ "$cloneme_ui_mode" = "true" ];then
-    mount -o bind /tmp "${clonetargetdir}"/tmp
-    mount -o bind /run "${clonetargetdir}"/run
-    $installbootloader "${clonetargetdir}" "${graphic_interface_path}" "--createuser"
+    mount -o bind /tmp "${clonedestdir}"/tmp
+    mount -o bind /run "${clonedestdir}"/run
+    "$installbootloader" "${clonedestdir}" "${graphic_interface_path}" "--createuser"
   else
-    $installbootloader "${clonetargetdir}" "$config_new_sys"
+    "$installbootloader" "${clonedestdir}" "$config_new_sys"
   fi
   
   
-  umount "${clonetargetdir}"/{proc,sys,dev}
+  umount "${clonedestdir}"/{proc,sys,dev}
   if [ "$cloneme_ui_mode" = "true" ];then
-    umount "${clonetargetdir}"/{tmp,run}
+    umount "${clonedestdir}"/{tmp,run}
   fi
 }
 
 updater(){
-  if ! "$sharedir"/sh/rsyncci.sh update "${clonesourcedir}" "${clonetargetdir}"; then
+  if ! "$sharedir"/sh/rsyncci.sh update "${clonesourcedir}" "${clonedestdir}"; then
     exit 1
   fi
-  #"$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop "${clonetargetdir}"
+  #"$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
   copyuser
 }
 
