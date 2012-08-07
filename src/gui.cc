@@ -208,12 +208,14 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	//Filechooser
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
 	src->set_text("/");
+	#TODO: use unfocus instead
 	//src->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updatedsrc));
 	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
 	srcselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosesrc));
 	
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
 	dest->set_text("/dev/sdb1");
+	#TODO: use unfocus instead
 	//dest->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updateddest));
 	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
 	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
