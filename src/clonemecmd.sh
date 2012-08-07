@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 
 #
@@ -35,8 +35,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+
 #create absolut path name for this program
-myself="$(realpath -L "$0")"
+myself="$(realpath "$0")"
 #scriptdirectory (changed by installer)
 sharedir="./src/share" #--replacepattern--
 

@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 #usage: mountscript <mode> <device> [partition] <mountpoint> 
 #device can be a raw file (with use of partition!) or a blockdevice or something mount can mount
@@ -8,6 +8,7 @@
 #debug : return debug infos (but mounts real)
 
 #intern dependencies: umountscript.sh
+
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 

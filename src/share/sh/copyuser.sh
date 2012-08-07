@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 #copyuser.sh <srcsystem> <destsystem> <user> [action]
 #actions:
@@ -8,6 +8,7 @@
 # c: clean dest system from user
 
 #intern dependencies: cleanuser.sh
+
 
 srcsys="$(realpath "$1")"
 destsys="$(realpath "$2")"

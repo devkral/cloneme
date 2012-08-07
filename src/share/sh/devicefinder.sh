@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 #usage: devicefinder [options] <directory>
 
 #intern dependencies: -

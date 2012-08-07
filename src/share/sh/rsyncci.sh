@@ -1,7 +1,11 @@
-#! /bin/sh
+#! /bin/bash
 
 #usage: rsyncci.sh <mode> <src> <dest>
 #intern dependencies: -
+
+if [ ! -e /usr/bin/realpath ]; then
+  realpath="readlink -f"
+fi
 
 mode="$1"
 src="$(realpath "$2")"

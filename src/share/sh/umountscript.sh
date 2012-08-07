@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 #usage: umountscript.sh <mode> <mountpoint> 
 #modes:
@@ -7,6 +7,8 @@
 #uad: unmount underlying blockdevice from other mountpoints (can also be just the device)
 
 #intern dependencies: -
+
+
 
 mode="$1"
 mountpointt="$(realpath "$2")"

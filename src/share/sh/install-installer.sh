@@ -1,8 +1,10 @@
-#! /bin/sh
+#! /bin/bash
 
 #usage: install-installer.sh <programdir> [linkdir] <targetsystem>
 #dir where the cloneme files are located
 #intern dependencies: install-installer-compiler.sh clonemecmd.sh
+
+
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 

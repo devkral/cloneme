@@ -1,8 +1,9 @@
-#! /bin/sh
+#! /bin/bash
 
 #usage: prepsyncscript.sh <syncdir>
 
 #intern dependencies: umountscript.sh
+
 
 syncdir="$(realpath "$1")"
 

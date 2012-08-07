@@ -1,7 +1,8 @@
-#! /bin/sh
+#! /bin/bash
 
 #usage: addnewuser.sh
 #intern dependencies: groupexist.sh
+
 
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"

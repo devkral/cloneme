@@ -1,5 +1,6 @@
-#! /bin/sh
+#! /bin/bash
 
 #intern dependencies: -
+
 
 #stub

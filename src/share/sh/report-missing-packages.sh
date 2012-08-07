@@ -1,7 +1,8 @@
-#! /bin/sh
+#! /bin/bash
 
 #echo list of missing packages
 #intern dependencies: -
+
 
 does_not_exist=false
 

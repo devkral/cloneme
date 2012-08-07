@@ -1,8 +1,9 @@
-#! /bin/sh
+#! /bin/bash
 
 #usage: umountsyncscript.sh <syncdir>
 
 #intern dependencies: umountscript.sh
+
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 syncdir="$(realpath "$1")"
