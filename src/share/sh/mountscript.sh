@@ -72,13 +72,10 @@ if [ "$mode" = "mount" ] || [ "$mode" = "quiet" ]; then
   fi
   
   if [ -d "${thingtomount}" ];then
-    mkdir -p "${mountpath}" 2> /dev/null
     mount -o bind "${thingtomount}" "${mountpath}"
   elif [ -b "${thingtomount}" ];then
-    mkdir -p "${mountpath}" 2> /dev/null
     mount_blockdevice "${thingtomount}"
   elif [ -f "${thingtomount}" ];then
-    mkdir -p "${mountpath}" 2> /dev/null
     if ! losetup -a | grep "${thingtomount}" > /dev/null;then
       if ! losetup -f -P "${thingtomount}";then
         echo "Hint: have you restarted the kernel after last update?"
