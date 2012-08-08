@@ -59,6 +59,9 @@ clonesourceloop=""
 clonetargetloop=""
 clonetarget=""
 
+clonesourcedir="$syncdir"/src
+clonedestdir="$syncdir"/dest
+
 
 
 help(){
@@ -125,41 +128,17 @@ fi
 
 if [ "$cloneme_ui_mode" = "false" ];then
   "$sharedir"/sh/prepsyncscript.sh "${syncdir}"
-  if "$sharedir"/sh/mountscript.sh needpart "$clonesource"; then
-    echo "Please enter the partition number (beginning with p)"
-    read partitions
-    if ! clonesourcedir="$("$sharedir"/sh/mountscript.sh quiet "$clonesource" "$partitions" "$syncdir"/src)"; then
-      echo "$clonesourcedir"
-      exit 1
-    fi
-  else
-    if ! clonesourcedir="$("$sharedir"/sh/mountscript.sh quiet "$clonesource" "$syncdir"/src)"; then
-      echo "$clonesourcedir"
+
+  
+  if ! "$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src; then
       exit 1
     fi
   fi
  
-  if "$sharedir"/sh/mountscript.sh needpart "$clonetarget"; then
-    echo "Please enter the partition number (beginning with p)"
-    read partitiond
-    if ! clonedestdir="$("$sharedir"/sh/mountscript.sh quiet "$clonetarget" "$partitiond" "$syncdir"/dest)"; then
-      echo "$clonedestdir"
-      exit 1
-    fi
-
-  else
-    if ! clonedestdir="$("$sharedir"/sh/mountscript.sh quiet "$clonetarget" "$syncdir"/dest)"; then
-      echo "$clonedestdir"
+  if ! "$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest; then
       exit 1
     fi
   fi
-fi
-
-#loop shouldn't happen
-if [ "$clonesourcedir" = "$clonedestdir" ] || [ "$clonesourcedir" = "$clonedestdir/" ];then
-  echo "error: source = target"
-  echo "target: $clonedestdir"
-  exit 1
 fi
 
 

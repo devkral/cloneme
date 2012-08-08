@@ -74,11 +74,11 @@ if [ "$mode" = "mount" ] || [ "$mode" = "debug" ] || [ "$mode" = "quiet" ]; then
   fi
   
   if [ -d "${thingtomount}" ];then
-    mountdir="${thingtomount}"
+    mkdir -p "${mountpath}" 2> /dev/null
+    mount -o bind "${thingtomount}" "${mountpath}"
   elif [ -b "${thingtomount}" ];then
     mkdir -p "${mountpath}" 2> /dev/null
     mount_blockdevice "${thingtomount}"
-    mountdir="${mountpath}"
   elif [ -f "${thingtomount}" ];then
     mkdir -p "${mountpath}" 2> /dev/null
     if ! losetup -a | grep "${thingtomount}" > /dev/null;then
@@ -95,12 +95,10 @@ if [ "$mode" = "mount" ] || [ "$mode" = "debug" ] || [ "$mode" = "quiet" ]; then
       read partition
     fi
     mount_blockdevice "${loopmount}${partition}"
-    mountdir="${mountpath}"
   else
     echo "source not recognized"
     exit 1
   fi
-  echo "$mountdir"
   exit 0
 fi
 

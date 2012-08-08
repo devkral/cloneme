@@ -75,8 +75,10 @@ un_mount()
 umount_all()
 {
   if [ -b "$mountpointt" ];then
+    #same behaviour
     local umountdevice="$mountpointt"
   elif [ -f "$mountpointt" ];then
+    #same behaviour
     local umountdevice="$mountpointt"
   elif [ -d "$mountpointt" ];then
     local umountdevice="$(grep "$mountpointt " /proc/mounts | grep "^/" | sed -e "s/^\([^ ]\+\) [^ ]\+ .*/\1/g")"
