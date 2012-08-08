@@ -15,7 +15,8 @@ outputdir="$(dirname "$output")"
 
 if [ "$(uname -m)" != "$architecture" ];then
   cd "$sharedir/src"
-  compilefiles="$(ls ./)"
+  #safety guard: restrict to .cc .h
+  compilefiles="$(ls ./*.{cc,h})"
   if ! g++ -o "$output" `pkg-config --libs --cflags vte-2.90 gtkmm-3.0` -std=gnu++11 -Wall \
 	-DPACKAGE_DATA_DIR="\"${sharedir}\"" -DPACKAGE_BIN_DIR="\"$outputdir\"" -O2 $compilefiles; then
     exit 1
