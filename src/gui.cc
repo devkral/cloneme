@@ -90,13 +90,19 @@ void gui::opengparted()
 
 void gui::update()
 {
-	std::string sum=bindir()+"/clonemecmd.sh update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
+	std::string sum=""
+	sum+=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src\n";
+	sum+=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest\n";
+	sum+=bindir()+"/clonemecmd.sh update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
 void gui::install()
 {
-	std::string sum=bindir()+"/clonemecmd.sh install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
+	std::string sum=""
+	sum+=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src\n";
+	sum+=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest\n";
+	sum+=bindir()+"/clonemecmd.sh install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
@@ -108,7 +114,6 @@ void gui::choosesrc()
 	if (!temp.empty())
 	{
 		src->set_text(temp);
-		srcdestobject.src=temp;
 	}
 }
 
@@ -119,25 +124,40 @@ void gui::choosedest()
 	if (!temp.empty())
 	{
 		dest->set_text(temp);
-		srcdestobject.dest=temp;
 	}
 }
 
 void gui::updatedsrc()
 {
-	srcdestobject.src=src->get_text();
-	std::string sum=sharedir()+"/sh/mountscript.sh mount "+srcdestobject.src;+" "+syncdir()+"/src";
-	std::cerr << "test"; 
-	//system2(sum);
+	Glib::RefPtr<Gio::File> tempsrc = Gio::File::create_for_path (src->get_text());
+	if (tempsrc->query_file_type() ==   Gio::FILE_TYPE_DIRECTORY)
+	{
+		std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
+		std::cerr << system2(sum);
+	} else if (tempsrc->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempsrc->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+	{
+		
+		
+	}
+	
 }
 
 void gui::updateddest()
 {
-	srcdestobject.dest=dest->get_text();
-	std::string sum=sharedir()+"/sh/mountscript.sh mount "+srcdestobject.dest;+" "+syncdir()+"/dest";
-	//cerr << 
-	std::cerr << "test";
-	//system2(sum);
+	Glib::RefPtr<Gio::File> tempdest = Gio::File::create_for_path (dest->get_text());
+	if (tempdest->query_file_type() == Gio::FILE_TYPE_DIRECTORY)
+	{
+		std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
+		std::cerr << system2(sum);
+	} else if (tempdest->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempdest->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+	{
+		
+		
+	}
+	
+	
+	std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
+	std::cerr << system2(sum);
 }
 
 
@@ -224,6 +244,13 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	graphicaleditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::chooseeditor));
 	
 	main_win->show_all_children();
+	//initialize (temp solution)
+	std::string sum=""
+	sum+=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src\n";
+	sum+=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest\n";
+	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+
+	
 	if (main_win!=0)
 	{
 		kit.run(*main_win.operator->());

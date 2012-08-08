@@ -51,12 +51,12 @@
 #include <mutex>
 
 
-
+/**
 struct srcdest
 {
 	std::string src;
 	std::string dest;
-};
+};*/
 
 
 #ifndef _GUI_H_
@@ -92,7 +92,7 @@ private:
 	//src, dest
 	Glib::RefPtr<Gtk::Entry> src, dest;
 	void updatedsrc(), updateddest();
-	srcdest srcdestobject;
+	//srcdest srcdestobject;
 	Glib::RefPtr<Gtk::Button> srcselect, destselect;
 	void choosesrc ();
 	void choosedest ();
@@ -103,6 +103,10 @@ private:
 	//choose editor
 	Glib::RefPtr<Gtk::CheckButton> graphicaleditor;
 	void chooseeditor();
+	
+	//update disks
+	////void updatedisk()
+	////
 	
 
 };
