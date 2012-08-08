@@ -5,8 +5,8 @@ intern_help()
   echo "usage: umountscript.sh <mode> <mountpoint/mounteddevice>"
   echo "modes:"
   echo "rm: remove mountdir after unmount"
-  echo "n: just umount; if loop or blockdevice umount all depending mounts (and detach loop)"
-  echo "uma: unmount underlying blockdevice/loop/mountpoint from other mountpoints"
+  echo "n/normal/umount: just umount; if mounteddevice is loop or blockdevice umount all depending mounts (and detach loop)"
+  echo "related: unmount underlying blockdevice/loop/mountpoint from other mountpoints"
 }
 
 #intern dependencies: -
@@ -92,8 +92,10 @@ umount_all()
 
 case "$mode" in
   "n")un_mount "$mountpointt";;
+  "normal")un_mount "$mountpointt";;
+  "umount")un_mount "$mountpointt";;
   "rm")un_mount "$mountpointt"; rmdir "$mountpointt";;
-  "uma")umount_all;;
+  "related")umount_all;;
   *)intern_help  ;;
 esac
 
