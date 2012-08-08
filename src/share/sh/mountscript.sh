@@ -5,8 +5,6 @@
 #modes:
 #needpart: return 0 if partition doesn't need to be specified (needs just device)
 #mount: mount the device and partition
-#debug: return debug infos (but mounts real)
-#quiet: mount; don't ask in case of unclear partition
 
 #intern dependencies: umountscript.sh
 
@@ -58,7 +56,7 @@ if [ "$mode" = "needpart" ]; then
   fi
 fi
 
-if [ "$mode" = "mount" ] || [ "$mode" = "debug" ] || [ "$mode" = "quiet" ]; then
+if [ "$mode" = "mount" ] || [ "$mode" = "quiet" ]; then
 
   if [ ! -d "${thingtomount}" ];then
     #sorry other mountpoints but we must be sure that this is the only mountpoint;
@@ -86,11 +84,9 @@ if [ "$mode" = "mount" ] || [ "$mode" = "debug" ] || [ "$mode" = "quiet" ]; then
         echo "Hint: have you restarted the kernel after last update?"
         exit 1
       fi
-    elif [ "${mode}" = "debug" ];then
-      echo "raw file already loop mounted but this is no issue" 1>&2 
     fi
     loopmount="$(losetup -a | grep "${thingtomount}" | sed -e "s/:.*//" -e 's/^ \+//' -e 's/ \+$//')"
-    if [ "${partition}" = "" ] && [ "$mode" != "quiet" ]; then
+    if [ "${partition}" = "" ]; then
       echo "Please enter the partition number (beginning with p)"
       read partition
     fi
