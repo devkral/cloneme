@@ -90,18 +90,18 @@ void gui::opengparted()
 
 void gui::update()
 {
+	updatedsrc();
+	updateddest();
 	std::string sum="";
-	sum+=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src\n";
-	sum+=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest\n";
 	sum+=bindir()+"/clonemecmd.sh update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
 
 void gui::install()
 {
+	updatedsrc();
+	updateddest();
 	std::string sum="";
-	sum+=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src\n";
-	sum+=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest\n";
 	sum+=bindir()+"/clonemecmd.sh install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
 	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 }
@@ -244,11 +244,6 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	graphicaleditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::chooseeditor));
 	
 	main_win->show_all_children();
-	//initialize (temp solution)
-	std::string sum="";
-	sum+=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src\n";
-	sum+=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest\n";
-	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 
 	
 	if (main_win!=0)
