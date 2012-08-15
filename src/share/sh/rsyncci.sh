@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #usage: rsyncci.sh <mode> <src> <dest>
 #intern dependencies: -

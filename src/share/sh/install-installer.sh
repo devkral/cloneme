@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #usage: install-installer.sh <programdir> [linkdir] <targetsystem>
 #dir where the cloneme files are located

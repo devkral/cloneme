@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 
 #
@@ -240,5 +240,7 @@ esac
 if [ "$cloneme_ui_mode" = "false" ];then
   "$sharedir"/sh/umountsyncscript.sh "$syncdir"
 fi
+
+##trap "$sharedir/sh/umountsyncscript.sh $syncdir" SIGINT
 
 exit 0;

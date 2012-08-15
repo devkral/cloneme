@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #usage: groupexist.sh group1 group2 …
 #returns all existing groups (which are specified via args) commaseparated

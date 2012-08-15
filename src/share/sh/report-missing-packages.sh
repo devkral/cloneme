@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #echo list of missing packages
 #intern dependencies: -

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #usage: install-installer-compiler.sh <architecture> <output>
 #returns: 0 copy it yourself

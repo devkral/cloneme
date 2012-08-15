@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #usage: grub-installer_phase_2.sh [command for sysconfig like adding users] [ args ] (currently just one)
 #grub-probe can lead to a kill of an usb memory stick (some models?)

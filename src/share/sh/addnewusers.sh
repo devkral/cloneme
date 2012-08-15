@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #usage: addnewuser.sh
 #intern dependencies: groupexist.sh

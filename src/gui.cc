@@ -79,6 +79,69 @@ void gui::chooseeditor()
 	}
 
 }
+//is src and dest mounted
+bool gui::partready()
+{
+	Glib::RefPtr<Gio::File> tempsrc = Gio::File::create_for_path (src->get_text());
+	if (tempsrc->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempsrc->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+	{
+		if (partnumbsrc->get_text()=="")
+			return false;
+
+	}
+	Glib::RefPtr<Gio::File> tempdest = Gio::File::create_for_path (dest->get_text());
+	if (tempdest->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempdest->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+	{
+		if (partnumbdest->get_text()=="")
+			return false;
+	}
+	return true;
+}
+
+
+bool gui::lockoperation()
+{
+	if (operationlock==false)
+	{
+		operationlock=true;
+		installb->set_sensitive(false);
+		updateb->set_sensitive(false);
+		
+		src->set_sensitive(false);
+		dest->set_sensitive(false);
+		partnumbsrc->set_sensitive(false);
+		partnumbdest->set_sensitive(false);
+		srcselect->set_sensitive(false);
+		destselect->set_sensitive(false);
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool gui::unlockoperation()
+{
+	if (operationlock==true)
+	{
+		operationlock=false;
+
+		installb->set_sensitive(true);
+		updateb->set_sensitive(true);
+		src->set_sensitive(true);
+		dest->set_sensitive(true);
+		partnumbsrc->set_sensitive(true);
+		partnumbdest->set_sensitive(true);
+		srcselect->set_sensitive(true);
+		destselect->set_sensitive(true);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 
 void gui::opengparted()
 {
@@ -90,20 +153,30 @@ void gui::opengparted()
 
 void gui::update()
 {
-	updatedsrc();
-	updateddest();
-	std::string sum="";
-	sum+=bindir()+"/clonemecmd.sh update "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
-	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+	//handled by gui::gui
+	//updatedsrc();
+	//updateddest();
+	if (lockoperation()==true && partready()==true);
+	{
+		std::string sum="";
+		sum+=bindir()+"/clonemecmd.sh update "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+"installer_grub2"+"\n";
+		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+		unlockoperation();
+	}
 }
 
 void gui::install()
 {
-	updatedsrc();
-	updateddest();
-	std::string sum="";
-	sum+=bindir()+"/clonemecmd.sh install "+src->get_text()+" "+dest->get_text()+" "+home_path+" "+"installer_grub2"+"\n";
-	vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+	//handled by gui::gui
+	//updatedsrc();
+	//updateddest();
+	if (lockoperation()==true && partready()==true);
+	{
+		std::string sum="";
+		sum+=bindir()+"/clonemecmd.sh install "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+"installer_grub2"+"\n";
+		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+		unlockoperation();
+	}
 }
 
 void gui::choosesrc()
@@ -114,6 +187,7 @@ void gui::choosesrc()
 	if (!temp.empty())
 	{
 		src->set_text(temp);
+		updatedsrc(0);
 	}
 }
 
@@ -124,46 +198,78 @@ void gui::choosedest()
 	if (!temp.empty())
 	{
 		dest->set_text(temp);
+		//update 
+		updateddest(0);
 	}
 }
 
-void gui::updatedsrc()
+bool gui::updatedsrc(void*)
 {
-	Glib::RefPtr<Gio::File> tempsrc = Gio::File::create_for_path (src->get_text());
-	if (tempsrc->query_file_type() ==   Gio::FILE_TYPE_DIRECTORY)
+	if (operationlock==false)
 	{
-		std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
-		std::cerr << system2(sum);
-	} else if (tempsrc->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempsrc->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
-	{
+		Glib::RefPtr<Gio::File> tempsrc = Gio::File::create_for_path (src->get_text());
+		if (tempsrc->query_file_type() ==   Gio::FILE_TYPE_DIRECTORY)
+		{
+			sourcepart->hide();
+			std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
+			std::cerr << system2(sum);
+		} else if (tempsrc->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempsrc->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+		{
+			sourcepart->show();
+			partnumbsrc->set_text("");
 		
-		
+		}
 	}
-	
+	return false;
 }
 
-void gui::updateddest()
+bool gui::updatedsrcpart(void*)
 {
-	Glib::RefPtr<Gio::File> tempdest = Gio::File::create_for_path (dest->get_text());
-	if (tempdest->query_file_type() == Gio::FILE_TYPE_DIRECTORY)
+	if (operationlock==false)
 	{
-		std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
+		std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+partnumbsrc->get_text()+" "+syncdir()+"/src";
 		std::cerr << system2(sum);
-	} else if (tempdest->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempdest->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
-	{
-		
-		
 	}
-	
-	
-	std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
-	std::cerr << system2(sum);
+	return false;
 }
 
+bool gui::updateddest(void*)
+{
+	if (operationlock==false)
+	{
+		Glib::RefPtr<Gio::File> tempdest = Gio::File::create_for_path (dest->get_text());
+		if (tempdest->query_file_type() == Gio::FILE_TYPE_DIRECTORY)
+		{
+			destpart->hide();
+			std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
+			std::cerr << system2(sum);
+		} else if (tempdest->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempdest->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+		{
+			destpart->show();
+			partnumbdest->set_text("");
+		}
+	}
+	return false;
+}
+
+
+
+bool gui::updateddestpart(void*)
+{
+	if (operationlock==false)
+	{
+		std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+partnumbdest->get_text()+" "+syncdir()+"/dest";
+		std::cerr << system2(sum);
+	}
+	return false;
+}
 
 gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this),createdialog(this)
 {
+
 	//syncdir="";
+	//lock for preserving src and dest positions
+	operationlock=false;
 	home_path=argv[0];
 	builder = Gtk::Builder::create();
 	try
@@ -228,24 +334,33 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	//Filechooser
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
 	src->set_text("/");
-	//TODO: use unfocus instead
-	//src->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updatedsrc));
+	sourcepart=transform_to_rptr<Gtk::Grid>(builder->get_object("sourcepart"));
+	partnumbsrc=transform_to_rptr<Gtk::Entry>(builder->get_object("partnumbsrc"));
+
+	//use unfocus
+	src->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updatedsrc));
+	partnumbsrc->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updatedsrcpart));
 	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
 	srcselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosesrc));
 	
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
 	dest->set_text("/dev/sdb1");
-	//TODO: use unfocus instead
-	//dest->signal_changed( ).connect(sigc::mem_fun(*this,&gui::updateddest));
+	destpart=transform_to_rptr<Gtk::Grid>(builder->get_object("destpart"));
+	partnumbdest=transform_to_rptr<Gtk::Entry>(builder->get_object("partnumbdest"));
+
+	//use unfocus
+	dest->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updateddest));
+	partnumbdest->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updateddestpart));
 	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
 	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
 
 	graphicaleditor=transform_to_rptr<Gtk::CheckButton>(builder->get_object("graphicaleditor"));
 	graphicaleditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::chooseeditor));
+
+	updatedsrc(0);
+	updateddest(0);
 	
 	main_win->show_all_children();
-
-	
 	if (main_win!=0)
 	{
 		kit.run(*main_win.operator->());

@@ -90,12 +90,18 @@ private:
 	void update();
 	
 	//src, dest
-	Glib::RefPtr<Gtk::Entry> src, dest;
-	void updatedsrc(), updateddest();
+	Glib::RefPtr<Gtk::Entry> src, dest, partnumbsrc, partnumbdest;
+	Glib::RefPtr<Gtk::Grid> sourcepart, destpart;
+	bool updatedsrc(void*), updateddest(void*), updatedsrcpart(void*), updateddestpart(void*);
 	//srcdest srcdestobject;
 	Glib::RefPtr<Gtk::Button> srcselect, destselect;
 	void choosesrc ();
 	void choosedest ();
+
+	//safeguards
+	bool operationlock;
+	bool partready();
+	bool lockoperation(),unlockoperation(),;
 
 	//directs to program file
 	std::string home_path;

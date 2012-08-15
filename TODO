@@ -1,11 +1,7 @@
 
 +make EDITOR fetch from main system working (see gui.cc)
-+rename name (converter and copyuser)
 +add support for other bootloaders
 +offer some special options for ssds/USB-flashdrives
-+automount: split the mount functions off the skript and use them whenever a new directory/file is selected (in progress)
-+++automount: make safeguard so dir not changes while installing
-+somehow chroot on target system has no root rights (maybe ubutuntu specific)
 
 +make things running more stable
 
@@ -22,19 +18,13 @@ http://atrey.karlin.mff.cuni.cz/~pavel/nbd/nbd.html
 try qemu (relevant files):
 http://www.netzkompetenz.ch/ubuntu/qcow2-disk-image-mounten/
 
-qcow2 Disk Image mounten
-
-Kurzanleitung um eine gcow2 Disk-Image auf Ubuntu LTS 10.04 zu mounten:
-
-Als root, mit einem qcow2 image
-
 for partitions
 modprobe nbd max_part=8
 qemu-nbd --connect=/dev/nbd0 db1_old.qcow2
 # mount first partition
 mount /dev/nbd0p1 /mnt/
 
-wieder freigeben:
+release:
 
 umount /mnt/
 qemu-nbd --disconnect /dev/nbd0

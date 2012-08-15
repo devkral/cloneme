@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #usage: cleanuser.sh <user> <targetsystem>
 #intern dependencies: -

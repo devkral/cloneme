@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #usage: mountscript <mode> <device> [partition] <mountpoint> 
 #device can be a raw file (with use of partition!) or a blockdevice or something mount can mount

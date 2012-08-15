@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #copyuser.sh <srcsystem> <destsystem> <user> [action]
 #actions:
