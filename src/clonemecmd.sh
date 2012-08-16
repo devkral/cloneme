@@ -132,12 +132,10 @@ if [ "$cloneme_ui_mode" = "false" ];then
   
   if ! "$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src; then
       exit 1
-    fi
   fi
  
   if ! "$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest; then
       exit 1
-    fi
   fi
 fi
 

@@ -304,7 +304,7 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 			                           VTE_PTY_DEFAULT,
 			                           0,
 			                           startterm,
-			                           0, //Environment
+			                           0, //Environment // use environ instead?
 			                           (GSpawnFlags)(G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_SEARCH_PATH),  //Spawnflags
 			                           0,
 			                           0,
