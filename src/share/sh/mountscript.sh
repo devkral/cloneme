@@ -1,10 +1,13 @@
 #! /usr/bin/env bash
 
-#usage: mountscript <mode> <device> [partition] <mountpoint> 
-#device can be a raw file (with use of partition!) or a blockdevice or something mount can mount
-#modes:
-#needpart: return 0 if partition doesn't need to be specified (needs just device)
-#mount: mount the device and partition
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+echo "usage: mountscript <mode> <device> [partition] <mountpoint> "
+echo "device can be a raw file (with use of partition!) or a blockdevice or something mount can mount"
+echo "modes:"
+echo "needpart: return 0 if partition doesn't need to be specified (needs just device)"
+echo "mount: mount the device and partition"
+exit 1
+fi
 
 #intern dependencies: umountscript.sh
 

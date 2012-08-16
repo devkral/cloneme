@@ -1,7 +1,13 @@
 #! /usr/bin/env bash
 
-#usage: install-installer.sh <programdir> [linkdir] <targetsystem>
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+echo "usage: install-installer.sh <programdir> [linkdir] <targetsystem>"
+exit 1
+fi
+
 #dir where the cloneme files are located
+
+
 #intern dependencies: install-installer-compiler.sh clonemecmd.sh
 
 

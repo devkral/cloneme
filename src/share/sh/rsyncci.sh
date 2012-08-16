@@ -1,6 +1,10 @@
 #! /usr/bin/env bash
 
-#usage: rsyncci.sh <mode> <src> <dest>
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+echo "usage: rsyncci.sh <mode> <src> <dest>"
+exit 1
+fi
+
 #intern dependencies: -
 
 if [ ! -e /usr/bin/realpath ]; then

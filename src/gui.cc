@@ -213,11 +213,15 @@ bool gui::updatedsrc(void*)
 			sourcepart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
 			std::cerr << system2(sum);
-		} else if (tempsrc->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempsrc->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+		} else if (tempsrc->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK || tempsrc->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
 		{
 			sourcepart->show();
 			partnumbsrc->set_text("");
-		
+		}
+		else
+		{
+			sourcepart->hide();
+			std::cerr << "Error: " << src->get_text() << " doesn't exist\n";
 		}
 	}
 	return false;
@@ -243,10 +247,15 @@ bool gui::updateddest(void*)
 			destpart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
 			std::cerr << system2(sum);
-		} else if (tempdest->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempdest->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+		} else if (tempdest->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK || tempdest->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
 		{
 			destpart->show();
 			partnumbdest->set_text("");
+		}
+		else
+		{
+			destpart->hide();
+			std::cerr << "Error: " << dest->get_text() << " doesn't exist\n";
 		}
 	}
 	return false;
@@ -336,23 +345,24 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	src->set_text("/");
 	sourcepart=transform_to_rptr<Gtk::Grid>(builder->get_object("sourcepart"));
 	partnumbsrc=transform_to_rptr<Gtk::Entry>(builder->get_object("partnumbsrc"));
-
+	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
+	srcselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosesrc));
 	//use unfocus
 	src->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updatedsrc));
 	partnumbsrc->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updatedsrcpart));
-	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
-	srcselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosesrc));
+
 	
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
 	dest->set_text("/dev/sdb1");
+	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
+	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
 	destpart=transform_to_rptr<Gtk::Grid>(builder->get_object("destpart"));
 	partnumbdest=transform_to_rptr<Gtk::Entry>(builder->get_object("partnumbdest"));
-
 	//use unfocus
 	dest->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updateddest));
 	partnumbdest->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updateddestpart));
-	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
-	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
+	
+
 
 	graphicaleditor=transform_to_rptr<Gtk::CheckButton>(builder->get_object("graphicaleditor"));
 	graphicaleditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::chooseeditor));

@@ -1,6 +1,9 @@
 #! /usr/bin/env bash
 
-#usage: prepsyncscript.sh <syncdir>
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+echo "usage: prepsyncscript.sh <syncdir>"
+exit 1
+fi
 
 #intern dependencies: umountscript.sh
 

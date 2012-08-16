@@ -1,9 +1,5 @@
 #! /usr/bin/env bash
 
-#usage: devicefinder [options] <directory>
-
-#intern dependencies: -
-
 options=""
 
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
@@ -14,8 +10,10 @@ if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
   echo "mount: print mountpoint"
   echo "all: print <device> <mountpoint> <uuid>"
   #echo "options separated by ,"
-  exit 0
+  exit 1
 fi
+#intern dependencies: -
+
 case "$#" in
  1) dirtemp="$(realpath "${1}")";;
  2) options="$1"; dirtemp="$(realpath "${2}")" ;;

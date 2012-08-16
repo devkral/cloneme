@@ -1,9 +1,10 @@
 #! /usr/bin/env bash
 
-#usage: addnewuser.sh
+if [ "$1" = "help" ] || [ "$1" = "--help" ] ;then
+echo "usage: addnewuser.sh"
+exit 1
+fi
 #intern dependencies: groupexist.sh
-
-
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
