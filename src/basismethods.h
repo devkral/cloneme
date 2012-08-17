@@ -44,4 +44,11 @@ inline std::string syncdir()
 	//return system2(bindir()+"/clonemecmd.sh syncdir\n");
 }
 
+inline std::string mypidfile()
+{
+	return "/run/clonemegui.pid";
+}
+
+
+
 #endif // _BASISMETHODS_H_

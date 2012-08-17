@@ -39,7 +39,8 @@
 #include "gui.h"
 #include "myfilechooser.h"
 
-//#include <iostream>
+#include <fstream>
+#include <cstdio>
 //#include <unistd.h>
 
 #include <cstdlib>
@@ -50,7 +51,37 @@
 //#include <cerrno>
 
 
+bool setpidlock()
+{ 
+	if (access(mypidfile().c_str(),F_OK)==0)
+	{
+		//ifstream pidread(pidfile());
+		//char extract[256];
+		//pidread.getline(extract,256);
+		//if ()
+		//{
+		//	std::cerr << "Process already exists";
+		//	exit();
+		//}
+		//ofstream pidwrite(pidfile());
+		//std::string readstream=
+		std::cerr << "cloneme gui runs already. abort\n";
+		return false;
+	}
+	else
+	{
+		std::ofstream pidwritestream(mypidfile());
+		pidwritestream << getpid();
+		pidwritestream.close();
+		return true;
+	}
+}
 
+void unsetpidlock()
+{
+	if( remove( mypidfile().c_str() ) != 0 )
+		std::cerr << "debug: pidfile wasn't set";
+}
 
 
 void execparted(gui *refback)
@@ -275,7 +306,8 @@ bool gui::updateddestpart(void*)
 
 gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this),createdialog(this)
 {
-
+	if (setpidlock()==false)
+		exit(1);
 	//syncdir="";
 	//lock for preserving src and dest positions
 	operationlock=false;
@@ -381,4 +413,5 @@ gui::~gui()
 {
 	//cleanup
 	std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
+	unsetpidlock();
 }

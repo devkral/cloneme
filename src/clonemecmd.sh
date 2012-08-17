@@ -51,6 +51,8 @@ installbootloader="$sharedir/sh/grub-installer_phase_1.sh"
 clonesource="/"
 #folder where sync takes place
 syncdir="/run/syncdir"
+#pidfile
+pidfile="/run/clonemecmd.pid"
 #graphic interface
 #don't comment or change this
 graphic_interface_path=""
@@ -98,6 +100,17 @@ esac
 if [ "$choosemode" = "--help" ]; then
   help; exit 0;
 fi
+
+#just one instance can run simultanous
+if [ ! -e "$pidfile" ]; then
+  echo "$$" > "$pidfile"
+else
+  echo "an other instance is running, abort!"
+  exit 1;
+fi
+
+
+
 
 #check if runs with root permission
 if [ ! "$UID" = "0" ] && [ ! "$EUID" = "0" ]; then
@@ -235,10 +248,13 @@ case "$choosemode" in
   *)help;exit 1;;
 esac
 
+
+
 if [ "$cloneme_ui_mode" = "false" ];then
   "$sharedir"/sh/umountsyncscript.sh "$syncdir"
 fi
 
-##trap "$sharedir/sh/umountsyncscript.sh $syncdir" SIGINT
+rm "$pidfile"
+##trap "$sharedir/sh/umountsyncscript.sh \"$syncdir\";rm \"$pidfile\"" SIGINT
 
 exit 0;
