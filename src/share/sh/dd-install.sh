@@ -6,7 +6,7 @@ echo "src/dest can be a blockdevice or a raw file"
 echo "dest mustn't exist but the dir within it is written"
 exit 1
 fi
-
+#intern dependencies: -
 
 source="$1"
 dest="$2"
