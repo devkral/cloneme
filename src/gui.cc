@@ -55,32 +55,42 @@ bool setpidlock()
 { 
 	if (access(mypidfile().c_str(),F_OK)==0)
 	{
-		//ifstream pidread(pidfile());
-		//char extract[256];
-		//pidread.getline(extract,256);
-		//if ()
-		//{
-		//	std::cerr << "Process already exists";
-		//	exit();
-		//}
-		//ofstream pidwrite(pidfile());
-		//std::string readstream=
-		std::cerr << "cloneme gui runs already. abort\n";
-		return false;
+		std::ifstream pidread(mypidfile());
+		char extract[25];
+		pidread.getline(extract,25);
+		std::string tempof="/proc/";
+		tempof+=extract;
+		std::cerr << "Debug: " << tempof;
+		if (access(tempof.c_str(),F_OK)==0)
+		{
+			std::cerr << "cloneme gui runs already. abort\n";
+			return false;
+		}
 	}
-	else
-	{
-		std::ofstream pidwritestream(mypidfile());
-		pidwritestream << getpid();
-		pidwritestream.close();
-		return true;
-	}
+	//elsewise set pid and return true
+	std::ofstream pidwrite(mypidfile());
+	pidwrite << getpid();
+	pidwrite.close();
+	return true;
 }
 
 void unsetpidlock()
 {
-	if( remove( mypidfile().c_str() ) != 0 )
-		std::cerr << "debug: pidfile wasn't set";
+
+	if (access(mypidfile().c_str(),F_OK)==0)
+	{
+		std::ifstream pidread(mypidfile());
+		char extract[25];
+		pidread.getline(extract,25);
+
+		if ((int)getpid()==atoi(extract))
+		{
+			if(remove( mypidfile().c_str() ) != 0 )
+				std::cerr << "error: file couldn't be removed";
+		}
+	}
+	else
+		std::cerr << "debug: pidfile doesn't exist";
 }
 
 
