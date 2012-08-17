@@ -23,6 +23,10 @@ if [ ! -e "/usr/bin/realpath" ]; then
   does_not_exist=true
 fi
 
+#if [ ! -e "/usr/bin/dd" ] && [ ! -e "/bin/dd" ]; then
+#  echo "coreutils"
+#  does_not_exist=true
+#fi
 
 if [ ! -e "/sbin/losetup" ] && [ ! -e "/usr/bin/losetup" ]; then
   echo "losetup"

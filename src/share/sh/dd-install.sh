@@ -7,6 +7,8 @@ echo "dest mustn't exist but the dir within it is written"
 exit 1
 fi
 #intern dependencies: -
+#this script isn't in use yet maybe it will be an alternative option to rsync
+
 
 source="$1"
 dest="$2"
