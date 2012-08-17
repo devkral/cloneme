@@ -194,9 +194,6 @@ void gui::opengparted()
 
 void gui::update()
 {
-	//handled by gui::gui
-	//updatedsrc();
-	//updateddest();
 	if (lockoperation()==true && partready()==true);
 	{
 		std::string sum="";
@@ -208,9 +205,6 @@ void gui::update()
 
 void gui::install()
 {
-	//handled by gui::gui
-	//updatedsrc();
-	//updateddest();
 	if (lockoperation()==true && partready()==true);
 	{
 		std::string sum="";
@@ -228,6 +222,7 @@ void gui::choosesrc()
 	if (!temp.empty())
 	{
 		src->set_text(temp);
+		//mount
 		updatedsrc(0);
 	}
 }
@@ -239,7 +234,7 @@ void gui::choosedest()
 	if (!temp.empty())
 	{
 		dest->set_text(temp);
-		//update 
+		//mount
 		updateddest(0);
 	}
 }
