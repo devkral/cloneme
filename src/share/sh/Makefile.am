@@ -6,6 +6,7 @@ supportscripts_SCRIPTS = \
 	addnewusers.sh \
 	cleanuser.sh \
 	copyuser.sh \
+	dd-install.sh \
 	devicefinder.sh \
 	groupexist.sh \
 	grub-installer_phase_1.sh \
