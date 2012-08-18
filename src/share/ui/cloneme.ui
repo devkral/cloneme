@@ -150,7 +150,9 @@
                   <object class="GtkEntry" id="partnumbsrc">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">●</property>
+                    <property name="halign">start</property>
+                    <property name="valign">start</property>
+                    <property name="max_length">3</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -246,8 +248,9 @@
                   <object class="GtkEntry" id="partnumbdest">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">●</property>
-                    <property name="invisible_char_set">True</property>
+                    <property name="halign">start</property>
+                    <property name="valign">start</property>
+                    <property name="max_length">3</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
