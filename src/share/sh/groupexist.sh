@@ -1,10 +1,13 @@
 #! /usr/bin/env bash
 
+usage()
+  echo "usage: groupexist.sh group1 group2 …"
+  echo "returns all existing groups (which are specified via args) commaseparated"
+  echo "exit 2 if a group doesn't exist; exit 0 when every group exist"
+  exit 1
+}
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
-echo "usage: groupexist.sh group1 group2 …"
-echo "returns all existing groups (which are specified via args) commaseparated"
-echo "exit 2 if a group doesn't exist; exit 0 when every group exist"
-exit 1
+  usage
 fi
 #intern dependencies: -
 

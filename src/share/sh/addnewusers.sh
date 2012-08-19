@@ -6,6 +6,15 @@ exit 1
 fi
 #intern dependencies: groupexist.sh
 
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
+
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 #default groups of new users

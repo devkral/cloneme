@@ -64,9 +64,7 @@ clonetarget=""
 clonesourcedir="$syncdir"/src
 clonedestdir="$syncdir"/dest
 
-
-
-help(){
+usage(){
   echo "$0 <mode> [<source>] <target> [ graphic bootloader ]"
   echo "valid modes are:"
   echo "update: updates the target system to the level of the source"
@@ -76,7 +74,15 @@ help(){
   echo "<source> is the folder which is copied"
   echo "<target> is the partition on the device which is meant to contain the target system"
 }
-	
+
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi	
 
 # basic checks
 
@@ -94,11 +100,11 @@ case "$#" in
     ;;
   "3")clonesource="$(realpath "$2")"; clonetarget="$(realpath "$3")";;
   "2")clonetarget="$(realpath "$2")";;
-  *)help;exit 1;;
+  *)usage;exit 1;;
 esac
 
 if [ "$choosemode" = "--help" ]; then
-  help; exit 0;
+  usage; exit 1;
 fi
 
 #just one instance can run simultanous
@@ -245,7 +251,7 @@ updater(){
 case "$choosemode" in
   "update")updater;;
   "install")installer;;
-  *)help;exit 1;;
+  *)usage;exit 1;;
 esac
 
 

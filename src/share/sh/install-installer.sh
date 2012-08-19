@@ -1,16 +1,24 @@
 #! /usr/bin/env bash
 
+usage()
+{
+  echo "usage: install-installer.sh <programdir> [linkdir] <targetsystem>"
+  exit 1
+}
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
-echo "usage: install-installer.sh <programdir> [linkdir] <targetsystem>"
-exit 1
+  usage
 fi
-
-#dir where the cloneme files are located
-
 
 #intern dependencies: install-installer-compiler.sh clonemecmd.sh
 
-
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 

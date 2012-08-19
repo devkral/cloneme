@@ -2,7 +2,8 @@
 
 options=""
 
-if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+usage()
+{
   echo "usage: devicefinder [option] <directory>"
   echo "options:"
   echo "dev: print only block devices  (not e.g tmpfs) (checked by /dev)"
@@ -11,8 +12,20 @@ if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
   echo "all: print <device> <mountpoint> <uuid>"
   #echo "options separated by ,"
   exit 1
+}
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+  usage
 fi
 #intern dependencies: -
+
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
 
 case "$#" in
  1) dirtemp="$(realpath "${1}")";;

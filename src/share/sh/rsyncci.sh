@@ -1,14 +1,23 @@
 #! /usr/bin/env bash
 
+usage()
+{
+  echo "usage: rsyncci.sh <mode> <src> <dest>"
+  exit 1
+}
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
-echo "usage: rsyncci.sh <mode> <src> <dest>"
-exit 1
+  usage
 fi
 
 #intern dependencies: -
 
-if [ ! -e /usr/bin/realpath ]; then
-  realpath="readlink -f"
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
 fi
 
 mode="$1"

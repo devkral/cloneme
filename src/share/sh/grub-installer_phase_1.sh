@@ -4,7 +4,14 @@
 #dir where the cloneme files are located
 
 #intern dependencies: grub-installer_phase_2.sh
-
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
 
 share_dir="$(dirname "$(dirname "$(realpath "$0")")")"
 clonetargetdir="$(realpath "$1")"

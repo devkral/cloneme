@@ -1,16 +1,27 @@
 #! /usr/bin/env bash
 
+usage()
+{
+  echo "usage: mountscript <mode> <device> [partition] <mountpoint> "
+  echo "device can be a raw file (with use of partition!) or a blockdevice or something mount can mount"
+  echo "modes:"
+  echo "needpart: return 0 if partition doesn't need to be specified (needs just device)"
+  echo "mount: mount the device and partition"
+  exit 1
+}
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
-echo "usage: mountscript <mode> <device> [partition] <mountpoint> "
-echo "device can be a raw file (with use of partition!) or a blockdevice or something mount can mount"
-echo "modes:"
-echo "needpart: return 0 if partition doesn't need to be specified (needs just device)"
-echo "mount: mount the device and partition"
-exit 1
+  usage
 fi
-
 #intern dependencies: umountscript.sh
 
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
 
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 

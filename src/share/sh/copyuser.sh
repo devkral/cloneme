@@ -1,14 +1,28 @@
 #! /usr/bin/env bash
 
-#copyuser.sh <srcsystem> <destsystem> <user> [action]
-#actions:
-# s: syncronize/transfer home folder
-# e: Eradicate user files/Create empty user account (with the same password and permissions as the existing one).
-# i: breaks loop
-# c: clean dest system from user
-
+usage()
+{
+  echo "copyuser.sh <srcsystem> <destsystem> <user> [action]"
+  echo "actions:"
+  echo "s: syncronize/transfer home folder"
+  echo "e: Eradicate user files/Create empty user account (with the same password and permissions as the existing one)."
+  echo "i: breaks loop"
+  echo "c: clean dest system from user"
+  exit 1
+}
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+  usage
+fi
 #intern dependencies: cleanuser.sh
 
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
 
 srcsys="$(realpath "$1")"
 destsys="$(realpath "$2")"

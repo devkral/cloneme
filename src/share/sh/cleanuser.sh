@@ -5,7 +5,16 @@
 
 
 usertemp="$1"
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
 targetn="$(realpath "$2")"
+
 if [ "$targetn" = "" ];then
   echo "targetsystem empty; break: to high risk to clean the user from the false system"
   exit 1
