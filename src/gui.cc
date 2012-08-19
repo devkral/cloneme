@@ -241,15 +241,15 @@ void gui::choosedest()
 
 bool gui::updatedsrc(void*)
 {
-	if (operationlock==false)
+	if (operationlock==false && src->get_text()!="")
 	{
 		Glib::RefPtr<Gio::File> tempsrc = Gio::File::create_for_path (src->get_text());
-		if (tempsrc->query_file_type() ==   Gio::FILE_TYPE_DIRECTORY)
+		if (tempsrc->query_file_type()==Gio::FILE_TYPE_DIRECTORY ||  tempsrc->query_file_type()==Gio::FILE_TYPE_MOUNTABLE)
 		{
 			sourcepart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
 			std::cerr << system2(sum);
-		} else if (tempsrc->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK || tempsrc->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+		} else if (tempsrc->query_file_type()==Gio::FILE_TYPE_REGULAR)
 		{
 			sourcepart->show();
 			partnumbsrc->set_text("");
@@ -275,15 +275,15 @@ bool gui::updatedsrcpart(void*)
 
 bool gui::updateddest(void*)
 {
-	if (operationlock==false)
+	if (operationlock==false && dest->get_text()!="")
 	{
 		Glib::RefPtr<Gio::File> tempdest = Gio::File::create_for_path (dest->get_text());
-		if (tempdest->query_file_type() == Gio::FILE_TYPE_DIRECTORY)
+		if (tempdest->query_file_type() == Gio::FILE_TYPE_DIRECTORY || tempdest->query_file_type() == Gio::FILE_TYPE_MOUNTABLE)
 		{
 			destpart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
 			std::cerr << system2(sum);
-		} else if (tempdest->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK || tempdest->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
+		}else if (tempdest->query_file_type()==Gio::FILE_TYPE_REGULAR)
 		{
 			destpart->show();
 			partnumbdest->set_text("");

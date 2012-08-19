@@ -3,7 +3,7 @@
 usage()
   echo "usage: dd-install.sh <src> <dest>"
   echo "src/dest can be a blockdevice or a raw file"
-  echo "dest mustn't exist but the dir within it is written"
+  echo "dest mustn’t exist but the dir within it is written"
   exit 1
 }
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then

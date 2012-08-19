@@ -44,7 +44,7 @@ esac
 lastresult=""
 
 if [ ! -e "$dirtemp" ]; then
-  echo "$dirtemp doesn\'t exist"
+  echo "$dirtemp doesn’t exist"
   exit 2
 fi
 

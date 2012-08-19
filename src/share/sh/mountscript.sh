@@ -5,7 +5,7 @@ usage()
   echo "usage: mountscript <mode> <device> [partition] <mountpoint> "
   echo "device can be a raw file (with use of partition!) or a blockdevice or something mount can mount"
   echo "modes:"
-  echo "needpart: return 0 if partition doesn't need to be specified (needs just device)"
+  echo "needpart: return 0 if partition doesn’t need to be specified (needs just device)"
   echo "mount: mount the device and partition"
   exit 1
 }
@@ -40,7 +40,6 @@ case "$#" in
 2)
   mode="$1"
   thingtomount="$(realpath "$2")"
-  mountpath="" #for needpart only!!!!
   ;;
 esac
 
@@ -70,7 +69,7 @@ if [ "$mode" = "needpart" ]; then
   fi
 fi
 
-if [ "$mode" = "mount" ] || [ "$mode" = "quiet" ]; then
+if [ "$mode" = "mount" ] || [ -e "$mountpath" ]; then
 
   if [ ! -d "${thingtomount}" ];then
     #sorry other mountpoints but we must be sure that this is the only mountpoint;
