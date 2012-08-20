@@ -45,6 +45,7 @@ void myfilechooser::usefile()
 	myfilechoose->hide();
 	path=filechooserwidget1->get_preview_filename();
 	filekit.quit();
+	//waitfinish=false;
 	//filekit->remove_window (*myfilechoose.operator->());
 }
 
@@ -53,6 +54,7 @@ void myfilechooser::usefolder()
 	myfilechoose->hide();
 	path=filechooserwidget1->get_current_folder ();
 	filekit.quit();
+	//waitfinish=false;
 	//filekit->remove_window (*myfilechoose.operator->());
 }
 
@@ -61,6 +63,7 @@ void myfilechooser::cancelpath()
 	myfilechoose->hide();
 	path="";
 	filekit.quit();
+	//waitfinish=false;
 	//filekit->remove_window (*myfilechoose.operator->());
 }
 
@@ -69,11 +72,18 @@ std::string myfilechooser::run()
 	myfilechoose->show();
 	//filekit->add_window(*myfilechoose.operator->());
 	filekit.run(*myfilechoose.operator->());
+	//waitfinish.lock();
+	//waitfinish=true;
+	//while (waitfinish==true)
+	//{
+	//	sleep(10);
+	//}
+	//waitfinish.lock();
 	std::cerr << "released";
 	return path;
 }
 
-myfilechooser::myfilechooser(): filekit()
+myfilechooser::myfilechooser()//: filekit()
 {
 	//filekit=Gtk::Application::create("org.gtkmm.cloneme.filechooser");
 	//referenceback=referencebackt;

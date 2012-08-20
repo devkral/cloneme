@@ -52,6 +52,8 @@ protected:
 private:
 	//Glib::RefPtr<Gtk::Application> filekit;
 	Gtk::Main filekit;
+	//bool waitfinish=false;
+
 	//std::shared_ptr<gui> referenceback;
 	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> myfilechoose;

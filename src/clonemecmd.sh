@@ -218,7 +218,7 @@ installer(){
     exit 1
   fi
   copyuser
-  "$sharedir"/sh/install-installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
+  "$sharedir"/sh/install-installer.sh "$(dirname "$myself")" "$(dirname "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
   
   mount -o bind /proc "${clonedestdir}"/proc
   mount -o bind /sys "${clonedestdir}"/sys
@@ -243,7 +243,7 @@ updater(){
   if ! "$sharedir"/sh/rsyncci.sh update "${clonesourcedir}" "${clonedestdir}"; then
     exit 1
   fi
-  #"$sharedir"/sh/install_installer.sh "$(dir "$myself")" "$(dir "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
+  #"$sharedir"/sh/install_installer.sh "$(dirname "$myself")" "$(dirname "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
   copyuser
 }
 

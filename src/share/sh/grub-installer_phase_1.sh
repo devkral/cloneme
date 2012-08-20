@@ -13,7 +13,7 @@ if [ ! -e "/usr/bin/realpath" ];then
   }
 fi
 
-share_dir="$(dirname "$(dirname "$(realpath "$0")")")"
+sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 clonetargetdir="$(realpath "$1")"
 
 if [ -e "${clonetargetdir}"/boot/grub/device.map ];then
@@ -32,7 +32,7 @@ echo "finished"
 if [ $# > 1 ];then
   chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer_phase_2.sh
 else
-  chroot "${clonetargetdir}" "$sharedir"/sh//sh/grub-installer_phase_2 "$2" "$3"
+  chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer_phase_2 "$2" "$3"
 fi
 echo "back from chroot"
 tempsed=$(sed -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map)
