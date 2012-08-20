@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
 usage()
+{
   echo "usage: addnewuser.sh"
   exit 1
 }
