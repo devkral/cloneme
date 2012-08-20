@@ -30,7 +30,7 @@ fi
 #dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 #the command which configures the target system
-if [ "x$1" = "x" ]; then
+if [ "$1" = "" ]; then
   config_new_sys="${sharedir}/sh/addnewusers.sh"
 else
   config_new_sys="$1"
@@ -42,9 +42,9 @@ echo "Install grub…"
 if ! grub-install "${get_dev}";then
   echo "Error: ${get_dev} not found"
   echo "I failed please do it yourself or type \"exit\" and press <enter> to escape"
-  /bin/sh
+  /usr/bin/env bash
 fi
   
 grub-mkconfig -o /boot/grub/grub.cfg
-echo -e "grub installation finished.\nStart with the configuration of the new system"
+echo -e "\ngrub installation finished.\nStart with the configuration of the new system\n"
 "$config_new_sys" "$2"

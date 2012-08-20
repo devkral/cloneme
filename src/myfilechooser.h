@@ -37,7 +37,7 @@
 
 #include <gtkmm.h>
 #include <string>
-#include <mutex>
+//#include <mutex>
 
 #ifndef _MYFILECHOOSER_H_
 #define _MYFILECHOOSER_H_
@@ -47,6 +47,7 @@ class myfilechooser
 public:
 	myfilechooser ();
 	std::string run();
+	//void run2(Glib::RefPtr<Gtk::Entry> temp);
 protected:
 
 private:
@@ -56,6 +57,7 @@ private:
 
 	//std::shared_ptr<gui> referenceback;
 	Glib::RefPtr<Gtk::Builder> builder;
+	Glib::RefPtr<Gtk::Entry> changeentry;
 	Glib::RefPtr<Gtk::Window> myfilechoose;
 	Glib::RefPtr<Gtk::FileChooserWidget> filechooserwidget1;
 	Glib::RefPtr<Gtk::Button>selectfile,currentfold,canceldialog;

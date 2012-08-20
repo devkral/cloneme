@@ -45,7 +45,7 @@ tempsed=$(sed -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.
 echo "$tempsed" > "${clonetargetdir}"/boot/grub/device.map
 #sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdir}"/boot/grub/device.map
 echo "device.map cleaned"
-if [ "$cloneme_ui_mode" = "false" ];then
+if [[ $# = 1 ]];then
   echo "if you want to use device.map please type \"yes\" and edit it now"
   read shall_devicemap
   if [ "$shall_devicemap" = "yes" ]; then

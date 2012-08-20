@@ -218,6 +218,7 @@ void gui::choosesrc()
 {
 	
 	myfilechooser select;
+	//select.run2(src);
 	std::string temp=select.run();
 	if (!temp.empty())
 	{
@@ -230,6 +231,7 @@ void gui::choosesrc()
 void gui::choosedest()
 {
 	myfilechooser select;
+	//select.run2(dest);
 	std::string temp=select.run();
 	if (!temp.empty())
 	{

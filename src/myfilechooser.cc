@@ -39,12 +39,15 @@
 #include "basismethods.h"
 //#include <iostream> //not needed basismethods
 
-
+// TODO: find a way to block output but not interface without run()
 void myfilechooser::usefile()
 {
 	myfilechoose->hide();
 	path=filechooserwidget1->get_preview_filename();
 	filekit.quit();
+
+	//changeentry->set_text(path);
+
 	//waitfinish=false;
 	//filekit->remove_window (*myfilechoose.operator->());
 }
@@ -54,6 +57,8 @@ void myfilechooser::usefolder()
 	myfilechoose->hide();
 	path=filechooserwidget1->get_current_folder ();
 	filekit.quit();
+
+	//changeentry->set_text(path);
 	//waitfinish=false;
 	//filekit->remove_window (*myfilechoose.operator->());
 }
@@ -63,6 +68,8 @@ void myfilechooser::cancelpath()
 	myfilechoose->hide();
 	path="";
 	filekit.quit();
+
+	////!!!!!changeentry->set_text(path); don't set path!!!!
 	//waitfinish=false;
 	//filekit->remove_window (*myfilechoose.operator->());
 }
@@ -82,6 +89,13 @@ std::string myfilechooser::run()
 	std::cerr << "released";
 	return path;
 }
+
+/**
+void myfilechooser::run2(Glib::RefPtr<Gtk::Entry> temp)
+{
+	changeentry=temp;
+	myfilechoose->show();
+}*/
 
 myfilechooser::myfilechooser()//: filekit()
 {
