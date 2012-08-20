@@ -29,7 +29,7 @@ echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${clonetargetdir}"/boot/g
 echo "finished"
 
 # display can be opened with tmp and run
-if [ $# > 1 ];then
+if [ $# -gt 1 ];then
   chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer_phase_2.sh
 else
   chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer_phase_2 "$2" "$3"
