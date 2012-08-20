@@ -8,7 +8,7 @@ usage()
   echo "the used grub-probe can lead to a kill of an usb memory stick (some models?)"
   exit 1
 }
-if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+if [ "$1" = "help" ] || [ "$1" = "--help" ] ;then
   usage
 fi
 
