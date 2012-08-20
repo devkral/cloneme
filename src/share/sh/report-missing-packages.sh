@@ -1,6 +1,18 @@
 #! /usr/bin/env bash
 
-#echo list of missing packages
+usage()
+{
+  echo "usage: report-missing-packages.sh"
+  echo "echo list of missing packages"
+  echo "exit 2 if a package is missing"
+  echo "exit 1 if help is opened"
+  echo "exit 0 if no package is missing"
+  
+  exit 1
+}
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" != "0" ] ;then
+  usage
+fi
 #intern dependencies: -
 
 

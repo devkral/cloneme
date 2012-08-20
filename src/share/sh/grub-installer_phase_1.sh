@@ -1,7 +1,13 @@
 #! /usr/bin/env bash
 
-#usage: grub-installer_phase_1.sh <targetsystem> [command for sysconfig like adding users] [ args ] (currently just one)
-#dir where the cloneme files are located
+usage()
+{
+  echo "usage: grub-installer_phase_1.sh <targetsystem> [command for sysconfig like adding users] [ args ] (currently just one)"
+  exit 1
+}
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+  usage
+fi
 
 #intern dependencies: grub-installer_phase_2.sh
 #use readlink -f if realpath isn't available
