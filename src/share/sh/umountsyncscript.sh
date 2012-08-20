@@ -19,11 +19,12 @@ if [ ! -e "/usr/bin/realpath" ];then
   }
 fi
 
+#dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
+#dir where sync folder are located
 syncdir="$(realpath "$1")"
 
 "$sharedir"/sh/umountscript.sh rm "${syncdir}"/src
-
 "$sharedir"/sh/umountscript.sh rm "${syncdir}"/dest
 
 

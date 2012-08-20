@@ -5,13 +5,20 @@
 
 #intern dependencies: addnewusers.sh
 
-
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
 
 #dir where the cloneme files are located
-share_dir="$(dirname "$(dirname "$(realpath "$0")")")"
+sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 #the command which configures the target system
 if [ "x$1" = "x" ]; then
-  config_new_sys="${share_dir}/sh/addnewusers.sh"
+  config_new_sys="${sharedir}/sh/addnewusers.sh"
 else
   config_new_sys="$1"
 fi

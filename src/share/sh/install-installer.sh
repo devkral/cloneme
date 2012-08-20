@@ -19,7 +19,7 @@ if [ ! -e "/usr/bin/realpath" ];then
     exit 0;
   }
 fi
-
+#dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 programdir="$(realpath "$1")"

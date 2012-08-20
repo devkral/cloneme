@@ -19,6 +19,7 @@ if [ ! -e "/usr/bin/realpath" ];then
   }
 fi
 
+#dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 #default groups of new users

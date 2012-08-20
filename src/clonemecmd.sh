@@ -49,7 +49,7 @@ config_new_sys="$sharedir/sh/addnewusers.sh"
 installbootloader="$sharedir/sh/grub-installer_phase_1.sh"
 #folder which is copied
 clonesource="/"
-#folder where sync takes place
+#dir where sync folder are located
 syncdir="/run/syncdir"
 #pidfile
 pidfile="/run/clonemecmd.pid"

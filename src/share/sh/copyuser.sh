@@ -24,11 +24,13 @@ if [ ! -e "/usr/bin/realpath" ];then
   }
 fi
 
+#dir where the cloneme files are located
+sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 srcsys="$(realpath "$1")"
 destsys="$(realpath "$2")"
 curuser="$3"
 action="$4"
-sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
+
 
 
 for (( ; ; ))

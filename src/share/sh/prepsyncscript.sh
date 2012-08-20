@@ -8,17 +8,9 @@ usage()
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
   usage
 fi
-#intern dependencies: umountscript.sh
+#intern dependencies: -
 
-#use readlink -f if realpath isn't available
-if [ ! -e "/usr/bin/realpath" ];then
-  realpath()
-  {
-    echo "$(readlink -f "$1")"
-    exit 0;
-  }
-fi
-
+#dir where sync folder are located
 syncdir="$(realpath "$1")"
 
 mkdir -p "${syncdir}"/src
