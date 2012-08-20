@@ -197,7 +197,7 @@ void gui::update()
 	if (lockoperation()==true && partready()==true);
 	{
 		std::string sum="";
-		sum+=bindir()+"/clonemecmd.sh update "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+"installer_grub2"+"\n";
+		sum+=bindir()+"/clonemecmd.sh update "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+sharedir()+"/sh/grub-installer_phase_1.sh"+"\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}
@@ -208,7 +208,7 @@ void gui::install()
 	if (lockoperation()==true && partready()==true);
 	{
 		std::string sum="";
-		sum+=bindir()+"/clonemecmd.sh install "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+"installer_grub2"+"\n";
+		sum+=bindir()+"/clonemecmd.sh install "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+sharedir()+"/sh/grub-installer_phase_1.sh"+"\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}
@@ -243,21 +243,16 @@ bool gui::updatedsrc(void*)
 {
 	if (operationlock==false && src->get_text()!="")
 	{
-		Glib::RefPtr<Gio::File> tempsrc = Gio::File::create_for_path (src->get_text());
-		if (tempsrc->query_file_type()==Gio::FILE_TYPE_DIRECTORY ||  tempsrc->query_file_type()==Gio::FILE_TYPE_MOUNTABLE)
+
+		if (system2(sharedir()+"/sh/mountscript.sh needpart "+src->get_text())=="false")
 		{
 			sourcepart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
 			std::cerr << system2(sum);
-		} else if (tempsrc->query_file_type()==Gio::FILE_TYPE_REGULAR)
+		} else
 		{
 			sourcepart->show();
 			partnumbsrc->set_text("");
-		}
-		else
-		{
-			sourcepart->hide();
-			std::cerr << "Error: " << src->get_text() << " doesn't exist\n";
 		}
 	}
 	return false;
@@ -277,21 +272,15 @@ bool gui::updateddest(void*)
 {
 	if (operationlock==false && dest->get_text()!="")
 	{
-		Glib::RefPtr<Gio::File> tempdest = Gio::File::create_for_path (dest->get_text());
-		if (tempdest->query_file_type() == Gio::FILE_TYPE_DIRECTORY || tempdest->query_file_type() == Gio::FILE_TYPE_MOUNTABLE)
+		if (system2(sharedir()+"/sh/mountscript.sh needpart "+dest->get_text())=="false")
 		{
 			destpart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
 			std::cerr << system2(sum);
-		}else if (tempdest->query_file_type()==Gio::FILE_TYPE_REGULAR)
+		}else
 		{
 			destpart->show();
 			partnumbdest->set_text("");
-		}
-		else
-		{
-			destpart->hide();
-			std::cerr << "Error: " << dest->get_text() << " doesn't exist\n";
 		}
 	}
 	return false;
@@ -309,10 +298,12 @@ bool gui::updateddestpart(void*)
 	return false;
 }
 
-gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this),createdialog(this)
+gui::gui(int argc, char** argv): kitdeprecated(argc,argv),gpartthread()//,copydialog(this),createdialog(this)
 {
 	if (setpidlock()==false)
 		exit(1);
+	//kit=Gtk::Application::create(argc, argv,"org.gtkmm.cloneme.main");
+	
 	//syncdir="";
 	//lock for preserving src and dest positions
 	operationlock=false;
@@ -379,7 +370,7 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	
 	//Filechooser
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
-	src->set_text("/");
+	//src->set_text("/");
 	sourcepart=transform_to_rptr<Gtk::Grid>(builder->get_object("sourcepart"));
 	partnumbsrc=transform_to_rptr<Gtk::Entry>(builder->get_object("partnumbsrc"));
 	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
@@ -390,7 +381,7 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 
 	
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
-	dest->set_text("/dev/sdb1");
+	//dest->set_text("/dev/sdb1");
 	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
 	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
 	destpart=transform_to_rptr<Gtk::Grid>(builder->get_object("destpart"));
@@ -404,13 +395,14 @@ gui::gui(int argc, char** argv): kit(argc, argv),gpartthread()//,copydialog(this
 	graphicaleditor=transform_to_rptr<Gtk::CheckButton>(builder->get_object("graphicaleditor"));
 	graphicaleditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::chooseeditor));
 
-	updatedsrc(0);
-	updateddest(0);
+	//updatedsrc(0);
+	//updateddest(0);
 	
 	main_win->show_all_children();
 	if (main_win!=0)
 	{
-		kit.run(*main_win.operator->());
+		kitdeprecated.run(*main_win.operator->());
+		//kit->run(*main_win.operator->(), argc, argv);
 	}
 }
 

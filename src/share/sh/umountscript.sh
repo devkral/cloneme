@@ -43,7 +43,7 @@ un_mount()
   if [ -d "${umountpoint}" ]; then
     if mountpoint "${umountpoint}" > /dev/null; then
       if ! umount "${umountpoint}"; then
-        echo "umountscript: cannot unmount the mount directory"
+        echo "umountscript: cannot unmount mountpoint"
         echo "could mean that an other service depending on this directory is still running"
         echo "abort!"
         exit 1

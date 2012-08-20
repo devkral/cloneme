@@ -1,9 +1,13 @@
 #! /usr/bin/env bash
 
-if [ "$1" = "help" ] || [ "$1" = "--help" ] ;then
-echo "usage: addnewuser.sh"
-exit 1
+usage()
+  echo "usage: addnewuser.sh"
+  exit 1
+}
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+  usage
 fi
+
 #intern dependencies: groupexist.sh
 
 #use readlink -f if realpath isn't available

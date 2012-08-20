@@ -63,8 +63,10 @@ mount_blockdevice()
 
 if [ "$mode" = "needpart" ]; then
   if [ -f "${thingtomount}" ]; then
+    echo "true"
     exit 0
   else
+    echo "false"
     exit 1
   fi
 fi

@@ -68,11 +68,14 @@ public:
 	gui(int argc, char** argv);
 	~gui();
 	std::mutex gpartmut;
+
+	
 protected:
 
 private:
 	//base
-	Gtk::Main kit;
+	//Glib::RefPtr<Gtk::Application> kit;
+	Gtk::Main kitdeprecated;
 	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> main_win;
 	
@@ -90,7 +93,8 @@ private:
 	void update();
 	
 	//src, dest
-	Glib::RefPtr<Gtk::Entry> src, dest, partnumbsrc, partnumbdest;
+	Glib::RefPtr<Gtk::Entry> src, dest;
+	Glib::RefPtr<Gtk::Entry> partnumbsrc, partnumbdest;
 	Glib::RefPtr<Gtk::Grid> sourcepart, destpart;
 	bool updatedsrc(void*), updateddest(void*), updatedsrcpart(void*), updateddestpart(void*);
 	//srcdest srcdestobject;
@@ -110,11 +114,6 @@ private:
 	Glib::RefPtr<Gtk::CheckButton> graphicaleditor;
 	void chooseeditor();
 	
-	//update disks
-	////void updatedisk()
-	////
-	
-
 };
 
 #endif // _GUI_H_

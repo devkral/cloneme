@@ -1,6 +1,14 @@
 #! /usr/bin/env bash
 
-#usage: cleanuser.sh <user> <targetsystem>
+usage()
+{
+  echo "usage: cleanuser.sh <user> <targetsystem>"
+  exit 1
+}
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+  usage
+fi
+
 #intern dependencies: -
 
 

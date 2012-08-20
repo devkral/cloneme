@@ -50,7 +50,9 @@ public:
 protected:
 
 private:
-	Gtk::Main kit;
+	//Glib::RefPtr<Gtk::Application> filekit;
+	Gtk::Main filekit;
+	//std::shared_ptr<gui> referenceback;
 	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> myfilechoose;
 	Glib::RefPtr<Gtk::FileChooserWidget> filechooserwidget1;
