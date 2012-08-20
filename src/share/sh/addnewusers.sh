@@ -5,7 +5,7 @@ usage()
   echo "usage: addnewuser.sh"
   exit 1
 }
-if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" != "0" ] ;then
   usage
 fi
 
