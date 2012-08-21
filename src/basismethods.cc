@@ -1,6 +1,5 @@
 #include "basismethods.h"
 #include <cstdio>
-#include <iostream>
 
 std::string system2(std::string _tcommand)
 {

@@ -49,9 +49,9 @@
 #include <iostream>
 //#include <cstdio>
 
-#ifdef ENABLE_NLS
-#  include <libintl.h>
-#endif
+//#ifdef ENABLE_NLS
+//#  include <libintl.h>
+//#endif
 
 
 bool comparechar(char *r1, char *r2)
@@ -70,27 +70,15 @@ bool comparechar(char *r1, char *r2)
 
 std::string becomeroot()
 {
-//what did I want to prevent here?
-//	bool preserving=false;
-//	if ( access(PACKAGE_DATA_DIR"/ui/",F_OK)==0)
-//		preserving=true;
 	
 	if ( access("/usr/bin/gksudo",F_OK)==0)
-//		if (preserving)
 			return (std::string)"gksudo -k ";
-//		else
-//			return (std::string)"gksudo ";
+			
 	if ( access("/usr/bin/gksu",F_OK)==0)
-//		if (preserving)
 			return (std::string)"gksu -S -k ";
-//		else
-//			return (std::string)"gksu -S ";
-	
+
 	if ( access("/usr/bin/sudo",F_OK)==0)
-//		if (preserving)
 			return (std::string)"sudo -E ";
-//		else
-//			return (std::string)"sudo ";
 	
 	return (std::string)"su -c";
 };

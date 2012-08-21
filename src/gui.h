@@ -47,9 +47,9 @@
 
 #include <gtkmm.h>
 #include <string>
-#include <thread>
-#include <mutex>
-
+//#include <thread>
+//#include <mutex>
+#include "myfilechooser.h"
 
 /**
 struct srcdest
@@ -67,25 +67,28 @@ class gui
 public:
 	gui(int argc, char** argv);
 	~gui();
-	std::mutex gpartmut;
-
+	//std::mutex gpartmut;
+	Glib::Threads::Mutex gparted_mutex;
 	
 protected:
 
 private:
 	//base
-	//Glib::RefPtr<Gtk::Application> kit;
 	Gtk::Main kitdeprecated;
 	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> main_win;
+
+
 	
 	//Terminal
 	GtkWidget* vteterm;
 	Glib::RefPtr<Gtk::Alignment> terminal;	
 
 	//gparted
-	std::thread gpartthread;
+	Glib::Threads::Thread *gpartthread;
+	//std::thread gpartthread;
 	Glib::RefPtr<Gtk::Button> gparted;
+	void execparted();
 	void opengparted();
 	//install update
 	Glib::RefPtr<Gtk::Button> installb,updateb;
@@ -99,9 +102,21 @@ private:
 	bool updatedsrc(void*), updateddest(void*), updatedsrcpart(void*), updateddestpart(void*);
 	//srcdest srcdestobject;
 	Glib::RefPtr<Gtk::Button> srcselect, destselect;
-	void choosesrc ();
-	void choosedest ();
+	void choosesrc(), choosesrc2();
+	void choosedest(), choosedest2();
 
+	//src, dest safeguards,threads,elements
+	Glib::Threads::Thread *threadsrc;
+	Glib::Threads::Mutex srclock;
+	myfilechooser filechoosesrc;
+
+	Glib::Threads::Thread *threaddest;
+	Glib::Threads::Mutex destlock;
+	myfilechooser filechoosedest;
+	
+	//mounted, unmounted source and dest
+	bool is_mounteds,is_mountedd;
+	
 	//safeguards
 	bool operationlock;
 	bool partready();

@@ -37,7 +37,6 @@
 
 #include <gtkmm.h>
 #include <string>
-//#include <mutex>
 
 #ifndef _MYFILECHOOSER_H_
 #define _MYFILECHOOSER_H_
@@ -46,26 +45,32 @@ class myfilechooser
 {
 public:
 	myfilechooser ();
+	//shows window
+	void show();
+	//blocks and returns path (be careful: don't block mainloop, use threads)
 	std::string run();
-	//void run2(Glib::RefPtr<Gtk::Entry> temp);
+	//usage:
+	//myfilechooser show()
+	//thread with run()
 protected:
 
 private:
-	//Glib::RefPtr<Gtk::Application> filekit;
-	Gtk::Main filekit;
-	//bool waitfinish=false;
-
-	//std::shared_ptr<gui> referenceback;
-	Glib::RefPtr<Gtk::Builder> builder;
-	Glib::RefPtr<Gtk::Entry> changeentry;
-	Glib::RefPtr<Gtk::Window> myfilechoose;
-	Glib::RefPtr<Gtk::FileChooserWidget> filechooserwidget1;
-	Glib::RefPtr<Gtk::Button>selectfile,currentfold,canceldialog;
+	//build window
+	Glib::RefPtr<Gtk::Builder> builder2;
+	//used for the wait method
+	Glib::Threads::Mutex waitfinish;
+	//Window
+	Glib::RefPtr<Gtk::Window> fcdialog;
+	//intern predefined widget for filechoosing
+	Glib::RefPtr<Gtk::FileChooserWidget> fcwidget;
+	//added special buttons
+	Glib::RefPtr<Gtk::Button>selectedfile,currentfolder,cancelchoose;
 	std::string path;
 
-	void usefile();
-	void usefolder();
-	void cancelpath();
+	//
+	void selectedfilef();
+	void currentfolderf();
+	void cancelchoosef();
 	
 	
 	

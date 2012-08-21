@@ -37,16 +37,18 @@
 
 #include "basismethods.h"
 #include "gui.h"
-#include "myfilechooser.h"
+//#include "myfilechooser.h"
 
 #include <fstream>
 #include <cstdio>
 //#include <unistd.h>
 
 #include <cstdlib>
-#include <cassert>
-#include <thread>
+//#include <cassert>
+//#include <thread>
 #include <vte/vte.h>
+
+//#include <memory>
 
 //#include <cerrno>
 
@@ -55,12 +57,12 @@ bool setpidlock()
 { 
 	if (access(mypidfile().c_str(),F_OK)==0)
 	{
-		std::ifstream pidread(mypidfile());
+		std::ifstream pidread(mypidfile().c_str());
 		char extract[25];
 		pidread.getline(extract,25);
 		std::string tempof="/proc/";
 		tempof+=extract;
-		std::cerr << "Debug: " << tempof;
+		std::cerr << "Debug: " << tempof << std::endl;
 		if (access(tempof.c_str(),F_OK)==0)
 		{
 			std::cerr << "cloneme gui runs already. abort\n";
@@ -68,7 +70,7 @@ bool setpidlock()
 		}
 	}
 	//elsewise set pid and return true
-	std::ofstream pidwrite(mypidfile());
+	std::ofstream pidwrite(mypidfile().c_str());
 	pidwrite << getpid();
 	pidwrite.close();
 	return true;
@@ -79,7 +81,7 @@ void unsetpidlock()
 
 	if (access(mypidfile().c_str(),F_OK)==0)
 	{
-		std::ifstream pidread(mypidfile());
+		std::ifstream pidread(mypidfile().c_str());
 		char extract[25];
 		pidread.getline(extract,25);
 
@@ -94,11 +96,7 @@ void unsetpidlock()
 }
 
 
-void execparted(gui *refback)
-{
-	std::system("gparted");
-	refback->gpartmut.unlock();
-}
+
 
 void gui::chooseeditor()
 {
@@ -120,24 +118,7 @@ void gui::chooseeditor()
 	}
 
 }
-//is src and dest mounted
-bool gui::partready()
-{
-	Glib::RefPtr<Gio::File> tempsrc = Gio::File::create_for_path (src->get_text());
-	if (tempsrc->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempsrc->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
-	{
-		if (partnumbsrc->get_text()=="")
-			return false;
 
-	}
-	Glib::RefPtr<Gio::File> tempdest = Gio::File::create_for_path (dest->get_text());
-	if (tempdest->query_file_type()  == Gio::FILE_TYPE_SYMBOLIC_LINK | tempdest->query_file_type() ==   Gio::FILE_TYPE_REGULAR)
-	{
-		if (partnumbdest->get_text()=="")
-			return false;
-	}
-	return true;
-}
 
 
 bool gui::lockoperation()
@@ -184,11 +165,20 @@ bool gui::unlockoperation()
 }
 
 
+//void execparted(gui *refback)
+void gui::execparted()
+{
+	std::system("gparted");
+	//refback->gpartmut.unlock();
+	gparted_mutex.unlock();
+}
+
 void gui::opengparted()
 {
-	if (gpartmut.try_lock())
+	if (gparted_mutex.trylock())
 	{
-		gpartthread=std::thread(execparted,this);
+		//gpartthread=std::thread(execparted,this);
+		gpartthread=Glib::Threads::Thread::create(sigc::mem_fun(*this,&gui::execparted));
 	}
 }
 
@@ -217,46 +207,80 @@ void gui::install()
 void gui::choosesrc()
 {
 	
-	myfilechooser select;
-	//select.run2(src);
-	std::string temp=select.run();
+	if (srclock.trylock()==true)
+	{
+		filechoosesrc.show();
+		//threadsrc=std::thread(sigc::mem_fun(*this, &gui::choosesrc2));
+		threadsrc=Glib::Threads::Thread::create(sigc::mem_fun(*this, &gui::choosesrc2));
+	}
+		
+}
+	
+void gui::choosesrc2()
+{
+	std::string temp=filechoosesrc.run();
 	if (!temp.empty())
 	{
 		src->set_text(temp);
 		//mount
 		updatedsrc(0);
 	}
+	srclock.unlock();
 }
 
 void gui::choosedest()
 {
-	myfilechooser select;
-	//select.run2(dest);
-	std::string temp=select.run();
+	if (destlock.trylock()==true)
+	{
+		filechoosedest.show();
+		threaddest=Glib::Threads::Thread::create(sigc::mem_fun(*this, &gui::choosedest2));
+	}
+		
+}
+
+void gui::choosedest2()
+{
+	std::string temp=filechoosedest.run();
 	if (!temp.empty())
 	{
 		dest->set_text(temp);
 		//mount
 		updateddest(0);
 	}
+	destlock.unlock();
+}
+
+//is src and dest mounted
+bool gui::partready()
+{
+	if (is_mounteds==false || is_mountedd==false)
+		return false;
+	return true;
 }
 
 bool gui::updatedsrc(void*)
 {
 	if (operationlock==false && src->get_text()!="")
 	{
-
 		if (system2(sharedir()+"/sh/mountscript.sh needpart "+src->get_text())=="false")
 		{
 			sourcepart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
 			std::cerr << system2(sum);
+			is_mounteds=true;
 		} else
 		{
 			sourcepart->show();
 			partnumbsrc->set_text("");
+			is_mounteds=false;
 		}
 	}
+	else
+	{
+		sourcepart->hide();
+		is_mounteds=false;
+	}
+	
 	return false;
 }
 
@@ -266,6 +290,7 @@ bool gui::updatedsrcpart(void*)
 	{
 		std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" p"+partnumbsrc->get_text()+" "+syncdir()+"/src";
 		std::cerr << system2(sum);
+		is_mounteds=true;
 	}
 	return false;
 }
@@ -279,11 +304,18 @@ bool gui::updateddest(void*)
 			destpart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
 			std::cerr << system2(sum);
+			is_mountedd=true;
 		}else
 		{
 			destpart->show();
 			partnumbdest->set_text("");
+			is_mountedd=false;
 		}
+	}
+	else
+	{
+		destpart->hide();
+		is_mountedd=false;
 	}
 	return false;
 }
@@ -296,6 +328,7 @@ bool gui::updateddestpart(void*)
 	{
 		std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" p"+partnumbdest->get_text()+" "+syncdir()+"/dest";
 		std::cerr << system2(sum);
+		is_mountedd=true;
 	}
 	return false;
 }
@@ -304,9 +337,10 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),gpartthread()//,copydi
 {
 	if (setpidlock()==false)
 		exit(1);
+	is_mountedd=false;
+	is_mounteds=false;
 	//kit=Gtk::Application::create(argc, argv,"org.gtkmm.cloneme.main");
 	
-	//syncdir="";
 	//lock for preserving src and dest positions
 	operationlock=false;
 	home_path=argv[0];
@@ -413,4 +447,6 @@ gui::~gui()
 	//cleanup
 	std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
 	unsetpidlock();
+
+
 }

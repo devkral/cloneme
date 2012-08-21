@@ -16,9 +16,6 @@ AM_CFLAGS =\
 	 -Wall\
 	 -g
 
-#not ready yet
-# AM_CXXFLAGS = -std=c++11 
-AM_CXXFLAGS = -std=c++0x
 
 bin_PROGRAMS = cloneme
 

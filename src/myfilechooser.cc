@@ -39,74 +39,53 @@
 #include "basismethods.h"
 //#include <iostream> //not needed basismethods
 
-// TODO: find a way to block output but not interface without run()
-void myfilechooser::usefile()
+//privat:
+
+void myfilechooser::selectedfilef()
 {
-	myfilechoose->hide();
-	path=filechooserwidget1->get_preview_filename();
-	filekit.quit();
-
-	//changeentry->set_text(path);
-
-	//waitfinish=false;
-	//filekit->remove_window (*myfilechoose.operator->());
+	fcdialog->hide();
+	path=fcwidget->get_preview_filename();
+	waitfinish.unlock();
 }
 
-void myfilechooser::usefolder()
+void myfilechooser::currentfolderf()
 {
-	myfilechoose->hide();
-	path=filechooserwidget1->get_current_folder ();
-	filekit.quit();
-
-	//changeentry->set_text(path);
-	//waitfinish=false;
-	//filekit->remove_window (*myfilechoose.operator->());
+	fcdialog->hide();
+	path=fcwidget->get_current_folder ();
+	waitfinish.unlock();
 }
 
-void myfilechooser::cancelpath()
+void myfilechooser::cancelchoosef()
 {
-	myfilechoose->hide();
+	fcdialog->hide();
 	path="";
-	filekit.quit();
-
-	////!!!!!changeentry->set_text(path); don't set path!!!!
-	//waitfinish=false;
-	//filekit->remove_window (*myfilechoose.operator->());
+	waitfinish.unlock();
 }
+
+
+//public:
+
+void myfilechooser::show()
+{
+	fcdialog->show();
+}
+
 
 std::string myfilechooser::run()
 {
-	myfilechoose->show();
-	//filekit->add_window(*myfilechoose.operator->());
-	filekit.run(*myfilechoose.operator->());
-	//waitfinish.lock();
-	//waitfinish=true;
-	//while (waitfinish==true)
-	//{
-	//	sleep(10);
-	//}
-	//waitfinish.lock();
-	std::cerr << "released";
+	waitfinish.lock();
+	waitfinish.lock();
+	std::cerr << "Debug: released";
 	return path;
 }
 
-/**
-void myfilechooser::run2(Glib::RefPtr<Gtk::Entry> temp)
+myfilechooser::myfilechooser()
 {
-	changeentry=temp;
-	myfilechoose->show();
-}*/
-
-myfilechooser::myfilechooser()//: filekit()
-{
-	//filekit=Gtk::Application::create("org.gtkmm.cloneme.filechooser");
-	//referenceback=referencebackt;
-	//filekit=temp;
 	path="";
-	builder = Gtk::Builder::create();
+	builder2 = Gtk::Builder::create();
 	try
 	{
-		builder->add_from_file(sharedir()+"/ui/myfiledialog.ui");
+		builder2->add_from_file(sharedir()+"/ui/myfiledialog.ui");
 	}
 	catch(const Glib::FileError& ex)
 	{
@@ -123,14 +102,15 @@ myfilechooser::myfilechooser()//: filekit()
 		std::cerr << "BuilderError: " << ex.what() << std::endl;
 		throw(ex);
 	}
-	myfilechoose=transform_to_rptr<Gtk::Window>(builder->get_object("myfilechoose"));
-	filechooserwidget1=transform_to_rptr<Gtk::FileChooserWidget>(builder->get_object("filechooserwidget1"));
-	selectfile=transform_to_rptr<Gtk::Button>(builder->get_object("selectfile"));
-	selectfile->signal_clicked ().connect(sigc::mem_fun(*this,&myfilechooser::usefile));
-	currentfold=transform_to_rptr<Gtk::Button>(builder->get_object("currentfold"));
-	currentfold->signal_clicked ().connect(sigc::mem_fun(*this,&myfilechooser::usefolder));
-	canceldialog=transform_to_rptr<Gtk::Button>(builder->get_object("canceldialog"));
-	canceldialog->signal_clicked ().connect(sigc::mem_fun(*this,&myfilechooser::cancelpath));
+	fcdialog=transform_to_rptr<Gtk::Window>(builder2->get_object("fcdialog"));
+	fcwidget=transform_to_rptr<Gtk::FileChooserWidget>(builder2->get_object("fcwidget"));
+	selectedfile=transform_to_rptr<Gtk::Button>(builder2->get_object("selectedfile"));
+	selectedfile->signal_clicked ().connect(sigc::mem_fun(*this,&myfilechooser::selectedfilef));
+	currentfolder=transform_to_rptr<Gtk::Button>(builder2->get_object("currentfolder"));
+	currentfolder->signal_clicked ().connect(sigc::mem_fun(*this,&myfilechooser::currentfolderf));
+	cancelchoose=transform_to_rptr<Gtk::Button>(builder2->get_object("cancelchoose"));
+	cancelchoose->signal_clicked ().connect(sigc::mem_fun(*this,&myfilechooser::cancelchoosef));
+
 };
 
 
