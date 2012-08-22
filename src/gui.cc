@@ -55,7 +55,7 @@
 
 bool setpidlock()
 { 
-	if (access(mypidfile().c_str(),F_OK)==0)
+	if (access((syncdir()+"/cloneme.pid").c_str(),F_OK)==0)
 	{
 		std::ifstream pidread((syncdir()+"/cloneme.pid").c_str());
 		char extract[25];
@@ -79,7 +79,7 @@ bool setpidlock()
 bool unsetpidlock()
 {
 
-	if (access(mypidfile().c_str(),F_OK)==0)
+	if (access((syncdir()+"/cloneme.pid").c_str(),F_OK)==0)
 	{
 		std::ifstream pidread((syncdir()+"/cloneme.pid").c_str());
 		char extract[25];
@@ -87,19 +87,19 @@ bool unsetpidlock()
 
 		if ((int)getpid()==atoi(extract))
 		{
-			if(remove( mypidfile().c_str() ) != 0 )
+			if(remove((syncdir()+"/cloneme.pid").c_str()) != 0 )
 				std::cerr << "error: error while removing file";
 			else
 				return true;
 		}
 		else
 		{
-			std::cerr << "Error: an other cloneme service is running. Don't unmount!"
+			std::cerr << "Error: an other cloneme service is running. Don't unmount!\n";
 		}
 	}
 	else
 		std::cerr << "debug: pidfile doesn't exist";
-	return false
+	return false;
 }
 
 

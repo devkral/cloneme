@@ -97,8 +97,6 @@ bootloadertarget="$sharedir/sh/grub-installer_phase_1.sh"
 clonesource="/"
 #dir where sync folder are located
 syncdir="/run/syncdir"
-#pidfile
-pidfile="$syncdir/cloneme.pid"
 #command to copy users
 copyusertarget="${sharedir}"/sh/copyuser.sh
 #command to install the installer
@@ -173,11 +171,15 @@ fi
 ### basic checks:
 
 #just one instance can run simultanous
-if [ ! -e "$pidfile" ]; then
-  echo "$$" > "$pidfile"
+if [ ! -e "$syncdir/cloneme.pid" ]; then
+  echo "$$" > "$syncdir/cloneme.pid"
 else
-  echo "an other instance is running, abort!"
-  exit 1;
+  if [ -d "/proc/$(cat "$syncdir/cloneme.pid")" ]; then
+    echo "an other instance is running, abort!"
+    exit 1;
+  else
+    echo "$$" > "$syncdir/cloneme.pid"
+  fi
 fi
 
 #check if runs with root permission
@@ -227,7 +229,7 @@ updater(){
 }
 
 
-case "$choosemode" in
+case "$mode" in
   "update")updater;;
   "install")installer;;
   "cleandest")rm -r "$syncdir"/dest/*;;
