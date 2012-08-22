@@ -3,7 +3,7 @@
 usage()
 {
   echo "don't use directly!!!"
-  echo "usage: grub-installer_phase_2.sh [command for sysconfig like adding users] [ args ] (currently just one)"
+  echo "usage: grub-installer_phase_2.sh [command for sysconfig like adding users] [ args ]"
   echo ""
   echo "the used grub-probe can lead to a kill of an usb memory stick (some models?)"
   exit 1
@@ -47,4 +47,4 @@ fi
   
 grub-mkconfig -o /boot/grub/grub.cfg
 echo -e "\ngrub installation finished.\nStart with the configuration of the new system\n"
-"$config_new_sys" "$2"
+eval "$@"

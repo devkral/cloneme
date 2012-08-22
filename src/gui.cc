@@ -48,7 +48,7 @@
 //#include <thread>
 #include <vte/vte.h>
 
-//#include <memory>
+#include <memory>
 
 //#include <cerrno>
 
@@ -57,7 +57,7 @@ bool setpidlock()
 { 
 	if (access(mypidfile().c_str(),F_OK)==0)
 	{
-		std::ifstream pidread(mypidfile().c_str());
+		std::ifstream pidread((syncdir()+"/cloneme.pid").c_str());
 		char extract[25];
 		pidread.getline(extract,25);
 		std::string tempof="/proc/";
@@ -70,29 +70,36 @@ bool setpidlock()
 		}
 	}
 	//elsewise set pid and return true
-	std::ofstream pidwrite(mypidfile().c_str());
+	std::ofstream pidwrite((syncdir()+"/cloneme.pid").c_str());
 	pidwrite << getpid();
 	pidwrite.close();
 	return true;
 }
 
-void unsetpidlock()
+bool unsetpidlock()
 {
 
 	if (access(mypidfile().c_str(),F_OK)==0)
 	{
-		std::ifstream pidread(mypidfile().c_str());
+		std::ifstream pidread((syncdir()+"/cloneme.pid").c_str());
 		char extract[25];
 		pidread.getline(extract,25);
 
 		if ((int)getpid()==atoi(extract))
 		{
 			if(remove( mypidfile().c_str() ) != 0 )
-				std::cerr << "error: file couldn't be removed";
+				std::cerr << "error: error while removing file";
+			else
+				return true;
+		}
+		else
+		{
+			std::cerr << "Error: an other cloneme service is running. Don't unmount!"
 		}
 	}
 	else
 		std::cerr << "debug: pidfile doesn't exist";
+	return false
 }
 
 
@@ -198,7 +205,15 @@ void gui::install()
 	if (lockoperation()==true && partready()==true);
 	{
 		std::string sum="";
-		sum+=bindir()+"/clonemecmd.sh install "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+sharedir()+"/sh/grub-installer_phase_1.sh"+"\n";
+		// --copyuser
+		//sum+=bindir()+"/clonemecmd.sh install "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+sharedir()+"/sh/grub-installer_phase_1.sh"+"\n";
+
+		sum+=sharedir()+"/sh/rsyncci.sh ";
+		sum+="--mode install ";
+		sum+="--src "+syncdir()+"/src ";
+		sum+="--dest "+syncdir()+"/dest ";
+		sum+="--bootloader "+sharedir()+"/sh/grub-installer_phase_1.sh ";
+		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/cloneme.desktop "+syncdir()+"/dest\"\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}
@@ -445,8 +460,6 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),gpartthread()//,copydi
 gui::~gui()
 {
 	//cleanup
-	std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
-	unsetpidlock();
-
-
+	if (unsetpidlock())
+		std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
 }

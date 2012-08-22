@@ -2,7 +2,7 @@
 
 usage()
 {
-  echo "usage: install-installer.sh <programdir> [linkdir] <targetsystem>"
+  echo "usage: install-installer.sh <programdir/programfile> [linkdir] <targetsystem>"
   exit 1
 }
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
@@ -23,6 +23,10 @@ fi
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 programdir="$(realpath "$1")"
+if [ ! -d $programdir ]; then
+  programdir="$(dirname "$programdir")"
+fi
+
 
 if [[ $# > 2 ]];then
   linkdir="$(realpath "$2")"
