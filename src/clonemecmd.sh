@@ -1,6 +1,5 @@
 #! /usr/bin/env bash
 
-
 #
 # Created by alex devkral@web.de
 #
@@ -34,7 +33,54 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+usage()
+{
+  echo "usage: clonemecmd.sh <args…>"
+  echo "opt arg"
+  echo "  --src <where is copied from> (default: /) !!!"
+  echo "needed args:"
+  echo "  --dest <where is copied to> can be blockdevice, raw file (virt) or directory"
+  echo "  --mode <mode which should be used> see mode section"
+  echo ""
+  echo "mode:"
+  echo "  update: just sync and ask for each user which files should be copied"
+  echo "  install: like update+fstab update and other things; see install section"
+  echo "  cleandest: place --dest points to will be cleaned via rm -r *"
+  echo ""
+  echo "install:"
+  echo "  --bootloader <target>: optional (default: grub2):"
+  echo "      specify prog to install bootloader"
+  # be careful: default bootloader needs installinstaller
+  echo ""
+  echo "  --editfstab <editor>: optional (default: skip):"
+  echo "      edit fstab with editor"
+  echo ""
+  echo "general options:"
+  echo "  --copyuser <target>: optional (default: copyuser.sh):"
+  echo "    - specify program to copy users"
+  echo "    - syntax of target program:"
+  echo "        <target> --src <src> --dest <dest> --user <name>"
+  echo ""
+  echo "  --installinstaller <target> optional (default: install-installer):"
+  echo "      use target prog to install installer"
+  echo ""
+  echo "The syntax is nearly the same as the one of rsyncci.sh. The reason:"
+  echo "Most args are transmitted to rsyncci.sh but clonemecmd.sh adds useful things like mount of blockdevices/raw files and sane defaults"
 
+  exit 1
+}
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+  usage
+fi
+
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi	
 
 #create absolut path name for this program
 myself="$(realpath "$0")"
@@ -46,50 +92,85 @@ sharedir="./src/share" #--replacepattern--
 #the command which configures the target system
 config_new_sys="$sharedir/sh/addnewusers.sh"
 #the command to install the bootloader
-installbootloader="$sharedir/sh/grub-installer_phase_1.sh"
+bootloadertarget="$sharedir/sh/grub-installer_phase_1.sh"
 #folder which is copied by default
 clonesource="/"
 #dir where sync folder are located
 syncdir="/run/syncdir"
 #pidfile
 pidfile="$syncdir/cloneme.pid"
-#graphic interface
+#command to copy users
+copyusertarget="${sharedir}"/sh/copyuser.sh
+#command to install the installer
+installinstallertarget="--installinstaller $sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/cloneme.desktop ${clonedestdir}"
 #don't comment or change this
 clonetarget=""
+mode=""
+editfstabtarget=""
+# temps
+installinstallertarget2=""
+bootloadertarget2=""
+editfstabtarget2=""
 
-usage(){
-  echo "$0 <mode> [<source>] <target> [ graphic bootloader ]"
-  echo "valid modes are:"
-  echo "update: updates the target system to the level of the source"
-  echo "install: clone running system with respect for privacy of users"
-  echo ""
-  echo "Explaination"
-  echo "<source> is the folder which is copied"
-  echo "<target> is the partition on the device which is meant to contain the target system"
-}
+# for updater (ne=nonempty means: nonempty if as arg specified)
+bootloadertargetne=""
+installinstallertargetne=""
 
-#use readlink -f if realpath isn't available
-if [ ! -e "/usr/bin/realpath" ];then
-  realpath()
-  {
-    echo "$(readlink -f "$1")"
-    exit 0;
-  }
-fi	
+while [ $# -gt 0 ]
+do
+  case "$1" in
+    "--mode")mode="$2";shift;;
+    "--src")clonesource="$(realpath "$2")"; shift;;
+    "--dest")clonetarget="$(realpath "$2")"; shift;;
+    "--copyuser")copyusertarget="$(realpath "$2")"; shift;;
+    "--editfstab")editfstabtarget2="$(realpath "$2")"; shift;;
+    "--installinstaller")installinstallertarget2="$(realpath "$2")"; shift;;
+    "--bootloader")bootloadertarget2="$(realpath "$2")"; shift;;
+  esac
+  shift
+done
 
-# basic checks
+if [ installinstallertarget2 != "" ]; then
+  installinstallertarget="--installinstaller $installinstallertarget2"
+  installinstallertargetne="--installinstaller $installinstallertarget2"
+fi 
 
-# translate into more informative names and check arguments
-choosemode="$1"
-case "$#" in
-  "3")clonesource="$(realpath "$2")"; clonetarget="$(realpath "$3")";;
-  "2")clonetarget="$(realpath "$2")";;
-  *)usage;exit 1;;
-esac
-
-if [ "$choosemode" = "--help" ]; then
-  usage; exit 1;
+if [ bootloadertarget2 != "" ]; then
+  bootloadertarget="--bootloader $bootloadertarget2"
+  bootloadertargetne="--bootloader $bootloadertarget2"
 fi
+
+if [ editfstabtarget2 != "" ]; then
+  editfstabtarget="--editfstab $editfstabtarget2"
+fi 
+
+if [ "$clonetarget" = "" ] || [ ! -e "$clonetarget" ]; then
+  echo "Error: no destination system specified";
+  shall_exit=true;
+fi
+
+if [ "$mode" = "" ]; then
+  echo "Error: no mode is specified";
+  shall_exit=true;
+fi
+
+
+# exit if a needed arg wasn't specified elsewise echo choosen options
+if [ $shall_exit = true ]; then
+  exit 1
+else
+  echo "choosed options"
+  echo "$mode"
+  echo "$srcsys"
+  echo "$destsys"
+  echo ""
+  echo "$copyusertarget"
+  echo "$editfstabtarget"
+  echo "$installinstallertarget"
+  echo "$bootloadertarget"
+fi
+
+### basic checks:
 
 #just one instance can run simultanous
 if [ ! -e "$pidfile" ]; then
@@ -99,34 +180,17 @@ else
   exit 1;
 fi
 
-
-
-
 #check if runs with root permission
 if [ ! "$UID" = "0" ] && [ ! "$EUID" = "0" ]; then
   echo "error: needs root permissions"
   exit 1;
 fi
 
-
 #check syncdir; it mustn't end with /"
-tempp="$(echo "$syncdir" | sed "s/\/$//")"
-syncdir="$tempp"
+tempp="$(realpath "$syncdir")"
 
-if ! "$sharedir"/sh/report-missing-packages.sh; then
+if [ "$("$sharedir"/sh/report-missing-packages.sh)" = "" ]; then
   exit 1
-fi
-
-
-if [ ! -e "/usr/bin/$EDITOR" ] && [ ! -e "/bin/$EDITOR" ] && [ ! -e "$EDITOR" ]; then
-  echo "error: no default editor found"
-  echo "please enter your favourite editor"
-  read EDITOR
-  echo "Shall I set this editor as default editor? [yes] (writes into ~/bashrc)"
-  read write_bashrc
-  if [ "$write_bashrc" = "yes" ]; then
-    echo "EDITOR=\"$EDITOR\"" >> ~/.bashrc
-  fi
 fi
 
 "$sharedir"/sh/prepsyncscript.sh "${syncdir}"
@@ -138,53 +202,14 @@ if ! "$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest; then
   exit 1
 fi
 
-
-
-
 installer(){
-#  rsyncing="true"
-
-
-#    if [ "$(ls -A "${clonedestdir}")" != "" ];then
-#      echo "The target partition is not empty. Shall I clean it? Type \"yes\""
-#      read shall_clean
-#      if [ "${shall_clean}" = "yes" ];then
-#        rm -r "${clonedestdir}"/*
-#      fi
-#      echo "Skip rsync? Type \"yes\""
-#      read rsyncing_quest
-#      if [ "${rsyncing_quest}" = "yes" ];then
-#        rsyncing="false"
-#      fi
-#    fi
-
-  
-#  if [ "$rsyncing" = "true" ];then
-#     if ! "$sharedir"/sh/rsyncci.sh install "${clonesourcedir}" "${clonedestdir}";then
-#       exit 1;
-#     fi
-#  fi
-  
-#    echo "root in fstab updated"
-#    if [ "$cloneme_ui_mode" = false ];then
-#      echo "If you use more partitions (e.g.swap) please type \"yes\" to update the rest"
-#      read shall_fstab
-#      if [ "$shall_fstab" = "yes" ]; then
-#        if ! ${EDITOR} "${clonedestdir}"/etc/fstab; then
-#          echo "Fall back to vi"
-#          vi "${clonedestdir}"/etc/fstab
-#        fi
-#      fi
-#    fi
-
-#  copyuser
-#  "$sharedir"/sh/install-installer.sh "$(dirname "$myself")" "$(dirname "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
   if ! "$sharedir"/sh/rsyncci.sh \
 --mode install \
 --src "$syncdir"/src \
 --dest "$syncdir"/dest \
---bootloader "${sharedir}/sh/grub-installer_phase_1.sh $config_new_sys" \
---installinstaller "$sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/cloneme.desktop ${clonedestdir}";then
+"$editfstabtarget" \
+"$bootloadertarget" \
+"$installinstallertarget";then
     exit 1;
   fi 
 }
@@ -193,24 +218,25 @@ updater(){
    if ! "$sharedir"/sh/rsyncci.sh \
 --mode update \
 --src "${clonesourcedir}" \
---dest "${clonedestdir}"; then
+--dest "${clonedestdir}" \
+"$editfstabtarget" \
+"$bootloadertargetne" \
+"$installinstallertargetne";then
     exit 1;
   fi 
-# \
-# --bootloader "${sharedir}/sh/grub-installer_phase_1.sh $config_new_sys" \
-# --installinstaller "$sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/cloneme.desktop ${clonedestdir}";then
 }
 
 
 case "$choosemode" in
   "update")updater;;
   "install")installer;;
+  "cleandest")rm -r "$syncdir"/dest/*;;
   *)usage;exit 1;;
 esac
 
 
 "$sharedir"/sh/umountsyncscript.sh "$syncdir"
 rm "$pidfile"
-##trap "$sharedir/sh/umountsyncscript.sh \"$syncdir\";rm \"$pidfile\"" SIGINT
+trap "$sharedir/sh/umountsyncscript.sh \"$syncdir\";rm \"$pidfile\"" SIGINT
 
 exit 0;
