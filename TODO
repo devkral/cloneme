@@ -1,12 +1,11 @@
 
-+make EDITOR fetch from main system working (see gui.cc)
-+add support for other bootloaders
-+offer some special options for ssds/USB-flashdrives
-
-+make things running more stable
++make grub-install script working
 
 less important:
-+rework system2 output
++make EDITOR fetch from main system working (see gui.cc)
++++run less parts as root (less important)
++add support for other bootloaders
++offer some special options for ssds/USB-flashdrives
 
 not very important:
 loop other things than raw
