@@ -213,7 +213,7 @@ void gui::install()
 		sum+="--src "+syncdir()+"/src ";
 		sum+="--dest "+syncdir()+"/dest ";
 		sum+="--bootloader "+sharedir()+"/sh/grub-installer_phase_1.sh ";
-		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/cloneme.desktop "+syncdir()+"/dest\"\n";
+		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\"\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}

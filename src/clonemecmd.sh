@@ -100,7 +100,7 @@ syncdir="/run/syncdir"
 #command to copy users
 copyusertarget="${sharedir}"/sh/copyuser.sh
 #command to install the installer
-installinstallertarget="--installinstaller $sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/cloneme.desktop ${clonedestdir}"
+installinstallertarget="--installinstaller $sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/ ${clonedestdir}"
 #don't comment or change this
 clonetarget=""
 mode=""

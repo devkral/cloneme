@@ -63,6 +63,9 @@ fi
 
 if [[ $# > 2 ]];then
   linkdir="$(realpath "$2")"
+  if [ ! -d "$linkdir" ]; then
+    linkdir="$(dirname "$linkdir")"
+  fi
   targetdir="$(realpath "$3")"
 else
   targetdir="$(realpath "$2")"
@@ -83,6 +86,7 @@ if ! cp -r "$sharedir"/* "$targetdir$sharedir";then
 fi
 
 if [ "$linkdir" != "" ];then
+
   mkdir -p "$targetdir$linkdir" 2> /dev/null
   cp "$linkdir"/cloneme.desktop "$targetdir$linkdir"
 fi
