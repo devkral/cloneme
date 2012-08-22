@@ -85,7 +85,7 @@ mount -o bind /dev "${clonedestdir}"/dev
 mount -o bind /tmp "${clonedestdir}"/tmp
 mount -o bind /run "${clonedestdir}"/run
 shift # currently just one arg which must vanish
-chroot "${clonetargetdir}" "$sharedir"/sh/grub-installer_phase_2.sh "$@"
+chroot "${clonetargetdir}" "$sharedir/sh/grub-installer_phase_2.sh" "$@"
 echo "back from chroot"
 umount "${clonedestdir}"/{tmp,run,proc,sys,dev}
 echo "mounts cleaned up"

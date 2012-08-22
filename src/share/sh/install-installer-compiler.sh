@@ -37,15 +37,14 @@
 usage()
 {
   echo "usage: install-installer-compiler.sh <architecture> <output>"
-  echo "returns: 0 copy it yourself"
-  echo "         2 compiled"
+  echo "warning: cloneme specific"
   exit 1
 }
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
   usage
 fi
-
 #intern dependencies: src dir
+#cloneme specific; doesn't work
 
 #use readlink -f if realpath isn't available
 if [ ! -e "/usr/bin/realpath" ];then
@@ -60,18 +59,22 @@ sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
 architecture="$1"
 output="$(realpath "$2")"
+if [ -d "$output" ]; then
+  output="$output/cloneme"
+fi
 outputdir="$(dirname "$output")"
 
+echo "check architecture…"
 if [ "$(uname -m)" != "$architecture" ];then
+  echo "false architecture. compile"
   cd "$sharedir/src"
   #safety guard: restrict to .cc .h
   compilefiles="$(ls ./*.{cc,h})"
   if ! g++ -o "$output" `pkg-config --libs --cflags vte-2.90 gtkmm-3.0` -std=c++11 -Wall \
 	-DPACKAGE_DATA_DIR="\"${sharedir}\"" -DPACKAGE_BIN_DIR="\"$outputdir\"" -O2 $compilefiles; then
+    echo "error"
     exit 1
   fi
-  
-  exit 2
 fi
 
 exit 0

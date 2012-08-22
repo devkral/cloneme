@@ -36,13 +36,14 @@
 usage()
 {
   echo "usage: install-installer.sh <programdir/programfile> [linkdir] <targetsystem>"
+  echo "warning: cloneme specific"
   exit 1
 }
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
   usage
 fi
-
 #intern dependencies: install-installer-compiler.sh clonemecmd.sh
+#cloneme specific
 
 #use readlink -f if realpath isn't available
 if [ ! -e "/usr/bin/realpath" ];then
@@ -76,8 +77,12 @@ mkdir -p "${targetdir}${sharedir}" 2> /dev/null
 cp "$programdir"/clonemecmd.sh "${targetdir}${programdir}"
 sed -i -e "s|.* #--replacepattern--|sharedir=\"${sharedir}\" #--replacepattern--|" "$targetdir$programdir"/clonemecmd.sh
 
-if [ -e "$programdir"/cloneme ] && "${sharedir}"/sh/install-installer-compiler.sh "$(uname -m)" "$targetdir$programdir"/cloneme;then
+if [ -e "$programdir"/cloneme ]; then
   cp "$programdir"/cloneme "$targetdir$programdir"
+ #doesn't work; uname detects processor arch
+ # echo "Enter chroot"
+ # chroot "$targetdir" "${sharedir}"/sh/install-installer-compiler.sh "$(uname -m)" "$targetdir$programdir"/cloneme
+ # echo "Leave chroot"
 fi
 
 mkdir -p "$targetdir$share_dir" 2> /dev/null

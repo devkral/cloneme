@@ -45,21 +45,24 @@ void myfilechooser::selectedfilef()
 {
 	fcdialog->hide();
 	path=fcwidget->get_preview_filename();
-	waitfinish.unlock();
+	//waitfinish.unlock();
+	waitfinish=false;
 }
 
 void myfilechooser::currentfolderf()
 {
 	fcdialog->hide();
 	path=fcwidget->get_current_folder ();
-	waitfinish.unlock();
+	//waitfinish.unlock();
+	waitfinish=false;
 }
 
 void myfilechooser::cancelchoosef()
 {
 	fcdialog->hide();
 	path="";
-	waitfinish.unlock();
+	//waitfinish.unlock();
+	waitfinish=false;
 }
 
 
@@ -69,12 +72,22 @@ void myfilechooser::show()
 {
 	fcdialog->show();
 }
+void myfilechooser::unlock2()
+{
+	//waitfinish.unlock();
+	waitfinish=false;
 
+}
 
 std::string myfilechooser::run()
 {
-	waitfinish.lock();
-	waitfinish.lock();
+	//waitfinish.lock();
+	//waitfinish.lock();
+	//freaky but works TODO: find a solution to sleep and to wake via SIGALRM
+	waitfinish=true;//.trylock();
+	while (!waitfinish)//.trylock()){}
+		sleep(1);
+	
 	std::cerr << "Debug: released";
 	return path;
 }

@@ -49,6 +49,7 @@ public:
 	void show();
 	//blocks and returns path (be careful: don't block mainloop, use threads)
 	std::string run();
+	void unlock2();
 	//usage:
 	//myfilechooser show()
 	//thread with run()
@@ -58,7 +59,8 @@ private:
 	//build window
 	Glib::RefPtr<Gtk::Builder> builder2;
 	//used for the wait method
-	Glib::Threads::Mutex waitfinish;
+	//Glib::Threads::Mutex waitfinish;
+	bool waitfinish;
 	//Window
 	Glib::RefPtr<Gtk::Window> fcdialog;
 	//intern predefined widget for filechoosing

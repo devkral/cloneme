@@ -182,9 +182,11 @@ void gui::execparted()
 
 void gui::opengparted()
 {
+	
 	if (gparted_mutex.trylock())
 	{
 		//gpartthread=std::thread(execparted,this);
+		//gpartthread->join( );
 		gpartthread=Glib::Threads::Thread::create(sigc::mem_fun(*this,&gui::execparted));
 	}
 }
@@ -224,6 +226,7 @@ void gui::choosesrc()
 	
 	if (srclock.trylock()==true)
 	{
+//threadsrc->join( );
 		filechoosesrc.show();
 		//threadsrc=std::thread(sigc::mem_fun(*this, &gui::choosesrc2));
 		threadsrc=Glib::Threads::Thread::create(sigc::mem_fun(*this, &gui::choosesrc2));
@@ -247,6 +250,7 @@ void gui::choosedest()
 {
 	if (destlock.trylock()==true)
 	{
+		//threaddest->join( );
 		filechoosedest.show();
 		threaddest=Glib::Threads::Thread::create(sigc::mem_fun(*this, &gui::choosedest2));
 	}
@@ -262,6 +266,7 @@ void gui::choosedest2()
 		//mount
 		updateddest(0);
 	}
+	//filechoosedest.unlock2();
 	destlock.unlock();
 }
 
@@ -348,7 +353,7 @@ bool gui::updateddestpart(void*)
 	return false;
 }
 
-gui::gui(int argc, char** argv): kitdeprecated(argc,argv),gpartthread()//,copydialog(this),createdialog(this)
+gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filechoosedest()//gpartthread()//,copydialog(this),createdialog(this)
 {
 	if (setpidlock()==false)
 		exit(1);
