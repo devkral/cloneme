@@ -88,7 +88,7 @@ bool unsetpidlock()
 		if ((int)getpid()==atoi(extract))
 		{
 			if(remove((syncdir()+"/cloneme.pid").c_str()) != 0 )
-				std::cerr << "error: error while removing file";
+				std::cerr << "error: error while removing file\n";
 			else
 				return true;
 		}
@@ -98,7 +98,7 @@ bool unsetpidlock()
 		}
 	}
 	else
-		std::cerr << "debug: pidfile doesn't exist";
+		std::cerr << "debug: pidfile doesn't exist\n";
 	return false;
 }
 
