@@ -168,8 +168,9 @@ else
   echo "$bootloadertarget"
 fi
 
-### basic checks:
-
+# pidlocking
+pidcreate()
+{
 #just one instance can run simultanous
 if [ ! -e "$syncdir/cloneme.pid" ]; then
   echo "$$" > "$syncdir/cloneme.pid"
@@ -181,6 +182,27 @@ else
     echo "$$" > "$syncdir/cloneme.pid"
   fi
 fi
+}
+
+pidremove()
+{
+if [ ! -e "$syncdir/cloneme.pid" ]; then
+  echo "error: missing pidfile"
+elif [ ! -f "$syncdir/cloneme.pid" ]; then
+  echo -e "error: \"$syncdir/cloneme.pid\" is not a file\n"
+else
+  if [ "/proc/$(cat "$syncdir/cloneme.pid")" != "$$" ]; then
+    echo "an other instance is running, abort!"
+    exit 1;
+  else
+    rm "$syncdir/cloneme.pid"
+  fi
+fi
+}
+
+### basic checks:
+
+pidcreate
 
 #check if runs with root permission
 if [ ! "$UID" = "0" ] && [ ! "$EUID" = "0" ]; then
@@ -238,7 +260,8 @@ esac
 
 
 "$sharedir"/sh/umountsyncscript.sh "$syncdir"
-rm "$pidfile"
-trap "$sharedir/sh/umountsyncscript.sh \"$syncdir\";rm \"$pidfile\"" SIGINT
+pidremove
+
+trap "$sharedir/sh/umountsyncscript.sh \"$syncdir\";pidremove" SIGINT
 
 exit 0;
