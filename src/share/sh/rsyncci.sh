@@ -138,6 +138,13 @@ else
   echo "$bootloadertarget"
 fi
 
+for check_if_mounted in tmp run proc sys dev
+do
+  if mountpoint -q "$destsys"/"$check_if_mounted"; then
+    echo "$check_if_mounted is mounted! abort!"
+    exit 1;
+  fi
+done
 
 copyuser()
 {
@@ -147,16 +154,9 @@ copyuser()
     eval "$copyuserpath --src ${srcsys} --dest ${destsys} --user ${usertemp}"
   done
 }
-
-if mountpoint "$destsys"/{tmp,run,proc,sys,dev}; then
-  echo "tmp, run, proc, sys or dev are mounted! abort!"
-  exit 1;
-fi
  
 updater()
 {
-  
- 
   if ! rsync -a -A --progress --delete --exclude "${srcsys}/run/*" --exclude "${srcsys}/"boot/grub/grub.cfg --exclude "${srcsys}"/boot/grub/device.map --exclude "${srcsys}"/etc/fstab --exclude "${dest}" --exclude "${srcsys}/home/*" --exclude "${srcsys}/sys/*" --exclude "${srcsys}/dev/*" --exclude "${srcsys}/proc/*" --exclude "${srcsys}/var/log/*" --exclude "${srcsys}/tmp/*" --exclude "${srcsys}/run/*" --exclude "${srcsys}/var/run/*" --exclude "${srcsys}/var/tmp/*" "${srcsys}"/* "${srcsys}" ; then
     echo "error: rsync could not sync"
     exit 1
