@@ -99,10 +99,10 @@ do
     "--mode")mode="$2";shift;;
     "--src")srcsys="$(realpath "$2")"; shift;;
     "--dest")destsys="$(realpath "$2")"; shift;;
-    "--copyuser")copyusertarget="$(realpath "$2")"; shift;;
-    "--editfstab")editfstabtarget="$(realpath "$2")"; shift;;
-    "--installinstaller")installinstallertarget="$(realpath "$2")"; shift;;
-    "--bootloader")bootloadertarget="$(realpath "$2")"; shift;;
+    "--copyuser")copyusertarget="$2"; shift;;
+    "--editfstab")editfstabtarget="$2"; shift;;
+    "--installinstaller")installinstallertarget="$2"; shift;;
+    "--bootloader")bootloadertarget="$2"; shift;;
   esac
   shift
 done
