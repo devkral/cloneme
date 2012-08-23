@@ -214,8 +214,8 @@ void gui::install()
 		sum+="--mode install ";
 		sum+="--src "+syncdir()+"/src ";
 		sum+="--dest "+syncdir()+"/dest ";
-		sum+="--bootloader "+sharedir()+"/sh/grub-installer_phase_1.sh ";
 		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\"\n";
+		sum+="--bootloader "+sharedir()+"/sh/grub-installer_phase_1.sh ";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}
