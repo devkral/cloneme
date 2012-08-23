@@ -175,7 +175,7 @@ bool gui::unlockoperation()
 //void execparted(gui *refback)
 void gui::execparted()
 {
-	std::cerr << std::system2("gpartedbin");
+	std::cerr << system2("gpartedbin");
 	//refback->gpartmut.unlock();
 	gparted_mutex.unlock();
 }
