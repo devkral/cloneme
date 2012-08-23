@@ -344,8 +344,6 @@ bool gui::updateddest(void*)
 
 bool gui::updateddestpart(void*)
 {
-	//initialize syncdir
-	std::cerr << system2(sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n");
 	if (operationlock==false)
 	{
 		std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" p"+partnumbdest->get_text()+" "+syncdir()+"/dest";
@@ -357,8 +355,8 @@ bool gui::updateddestpart(void*)
 
 gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filechoosedest()//
 {
-	
-	
+	//initialize syncdir
+	std::cerr << system2(sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n");
 	if (setpidlock()==false)
 		exit(1);
 	is_mountedd=false;

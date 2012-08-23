@@ -44,7 +44,12 @@ fi
 #intern dependencies: -
 
 #dir where sync folder are located
-syncdir="$(realpath "$1")"
+if [ "$1" != "" ]; then
+  syncdir="$(realpath "$1")"
+else
+  echo "error: no mountpoint specified"
+  exit 1
+fi
 
 mkdir -p "${syncdir}"/src
 
