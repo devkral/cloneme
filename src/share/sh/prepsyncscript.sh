@@ -52,7 +52,6 @@ else
 fi
 
 mkdir -p "${syncdir}"/src
-
 mkdir -p "${syncdir}"/dest
 
 

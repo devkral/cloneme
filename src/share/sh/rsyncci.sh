@@ -138,8 +138,6 @@ else
   echo "$bootloadertarget"
 fi
 
-#src end slash less
-srcsl="$(echo "$srcsys" | sed "s|/$||")"
 
 copyuser()
 {
@@ -150,9 +148,16 @@ copyuser()
   done
 }
 
+if mountpoint "$destsys"/{tmp,run,proc,sys,dev}; then
+  echo "tmp, run, proc, sys or dev are mounted! abort!"
+  exit 1;
+fi
+ 
 updater()
 {
-  if ! rsync -a -A --progress --delete --exclude "${srcsl}/run/*" --exclude "${srcsl}/"boot/grub/grub.cfg --exclude "${srcsl}"/boot/grub/device.map --exclude "${srcsl}"/etc/fstab --exclude "${dest}" --exclude "${srcsl}/home/*" --exclude "${srcsl}/sys/*" --exclude "${srcsl}/dev/*" --exclude "${srcsl}/proc/*" --exclude "${srcsl}/var/log/*" --exclude "${srcsl}/tmp/*" --exclude "${srcsl}/run/*" --exclude "${srcsl}/var/run/*" --exclude "${srcsl}/var/tmp/*" "${srcsl}"/* "${destsys}" ; then
+  
+ 
+  if ! rsync -a -A --progress --delete --exclude "${srcsys}/run/*" --exclude "${srcsys}/"boot/grub/grub.cfg --exclude "${srcsys}"/boot/grub/device.map --exclude "${srcsys}"/etc/fstab --exclude "${dest}" --exclude "${srcsys}/home/*" --exclude "${srcsys}/sys/*" --exclude "${srcsys}/dev/*" --exclude "${srcsys}/proc/*" --exclude "${srcsys}/var/log/*" --exclude "${srcsys}/tmp/*" --exclude "${srcsys}/run/*" --exclude "${srcsys}/var/run/*" --exclude "${srcsys}/var/tmp/*" "${srcsys}"/* "${srcsys}" ; then
     echo "error: rsync could not sync"
     exit 1
   fi
@@ -167,7 +172,7 @@ updater()
 
 installer()
 {
-  if ! rsync -a -A --progress --delete --exclude "${srcsl}/run/*" --exclude "${srcsl}/"boot/grub/grub.cfg --exclude "${srcsl}/"boot/grub/device.map --exclude "${dest}" --exclude "${srcsl}/home/*" --exclude "${srcsl}/sys/*" --exclude "${srcsl}/dev/*" --exclude "${srcsl}/proc/*" --exclude "${srcsl}/var/log/*" --exclude "${srcsl}/tmp/*" --exclude "${srcsl}/run/*" --exclude "${srcsl}/var/run/*" --exclude "${srcsl}/var/tmp/*" "${srcsl}"/* "${destsys}" ;then
+  if ! rsync -a -A --progress --delete --exclude "${srcsys}/run/*" --exclude "${srcsys}/"boot/grub/grub.cfg --exclude "${srcsys}/"boot/grub/device.map --exclude "${dest}" --exclude "${srcsys}/home/*" --exclude "${srcsys}/sys/*" --exclude "${srcsys}/dev/*" --exclude "${srcsys}/proc/*" --exclude "${srcsys}/var/log/*" --exclude "${srcsys}/tmp/*" --exclude "${srcsys}/run/*" --exclude "${srcsys}/var/run/*" --exclude "${srcsys}/var/tmp/*" "${srcsys}"/* "${destsys}" ;then
     echo "error: rsync could not sync"
     exit 1
   fi

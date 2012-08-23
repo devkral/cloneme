@@ -64,6 +64,7 @@ case "$#" in
   thingtomount="$(realpath "$2")"
   partition="$3"
   mountpath="$(realpath "$4")"
+    
   ;;
 3)
   mode="$1"

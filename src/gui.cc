@@ -196,7 +196,10 @@ void gui::update()
 	if (lockoperation()==true && partready()==true);
 	{
 		std::string sum="";
-		sum+=bindir()+"/clonemecmd.sh update "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+sharedir()+"/sh/grub-installer_phase_1.sh"+"\n";
+		sum+=sharedir()+"/sh/rsyncci.sh ";
+		sum+="--mode update ";
+		sum+="--src "+syncdir()+"/src ";
+		sum+="--dest "+syncdir()+"/dest\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}
@@ -214,8 +217,8 @@ void gui::install()
 		sum+="--mode install ";
 		sum+="--src "+syncdir()+"/src ";
 		sum+="--dest "+syncdir()+"/dest ";
-		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\"\n";
-		sum+="--bootloader "+sharedir()+"/sh/grub-installer_phase_1.sh ";
+		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
+		sum+="--bootloader "+sharedir()+"/sh/grub-installer_phase_1.sh\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}
