@@ -68,7 +68,7 @@ fi
 echo "Install grub…"
   #/ is clonetargetdir
   get_dev="$(grub-probe -t device "/" | sed  -e "s|[0-9]*$||")"
-if ! grub-install "${get_dev}";then
+if ! grub-bios-setup "${get_dev}";then
   echo "Error: ${get_dev} not found"
   echo "I failed please do it yourself or type \"exit\" and press <enter> to escape"
   /usr/bin/env bash
