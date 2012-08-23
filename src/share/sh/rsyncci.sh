@@ -151,7 +151,7 @@ copyuser()
   local usertemp
   for usertemp in $(ls "${srcsys}"/home)
   do
-    eval "$copyuserpath --src ${srcsys} --dest ${destsys} --user ${usertemp}"
+    eval "$copyusertarget --src ${srcsys} --dest ${destsys} --user ${usertemp}"
   done
 }
  
