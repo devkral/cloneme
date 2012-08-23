@@ -53,7 +53,7 @@ if [ ! -e "/usr/bin/realpath" ];then
 fi
 #dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
-clonetargetdir="$(realpath "$1")"
+targetdir="$(realpath "$1")"
 
 
 if [ ! -f "$sharedir/sh/grub-installer_phase_2.sh" ]; then
@@ -63,34 +63,34 @@ if [ ! -f "$sharedir/sh/grub-installer_phase_2.sh" ]; then
   exit 1
 fi
 
-if [ -e "${clonetargetdir}"/boot/grub/device.map ];then
-  tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${clonetargetdir}"/boot/grub/device.map)"
-  echo "$tempdev" > "${clonetargetdir}"/boot/grub/device.map
-  sed -i -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map
+if [ -e "${targetdir}"/boot/grub/device.map ];then
+  tempdev="$(sed -e "s/\((hd0)\)/# \1/" "${targetdir}"/boot/grub/device.map)"
+  echo "$tempdev" > "${targetdir}"/boot/grub/device.map
+  sed -i -e "/#--specialclone-me--/d" "${targetdir}"/boot/grub/device.map
 fi
 
-echo "some temporary adjustments to ${clonetargetdir}/boot/grub/device.map"
-mkdir -p "${clonetargetdir}"/boot/grub/
-tempprobegrub="$("$sharedir"/sh/devicefinder.sh dev "${clonetargetdir}" | sed -e "s|[0-9]*$||")"
-echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${clonetargetdir}"/boot/grub/device.map
+echo "some temporary adjustments to ${targetdir}/boot/grub/device.map"
+mkdir -p "${targetdir}"/boot/grub/
+tempprobegrub="$("$sharedir"/sh/devicefinder.sh dev "${targetdir}" | sed -e "s|[0-9]*$||")"
+echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${targetdir}"/boot/grub/device.map
 echo "finished"
 
 
 
-mount -o bind /proc "${clonedestdir}"/proc
-mount -o bind /sys "${clonedestdir}"/sys
-mount -o bind /dev "${clonedestdir}"/dev
+mount -o bind /proc "${targetdir}"/proc
+mount -o bind /sys "${targetdir}"/sys
+mount -o bind /dev "${targetdir}"/dev
 
 # display can be opened with tmp and run
-mount -o bind /tmp "${clonedestdir}"/tmp
-mount -o bind /run "${clonedestdir}"/run
+mount -o bind /tmp "${targetdir}"/tmp
+mount -o bind /run "${targetdir}"/run
 shift # currently just one arg which must vanish
-chroot "${clonetargetdir}" "$sharedir/sh/grub-installer_phase_2.sh" "$@"
+chroot "${targetdir}" "$sharedir/sh/grub-installer_phase_2.sh" "$@"
 echo "back from chroot"
-umount "${clonedestdir}"/{tmp,run,proc,sys,dev}
+umount "${clonetargetdir}"/{tmp,run,proc,sys,dev}
 echo "mounts cleaned up"
 
-tempsed=$(sed -e "/#--specialclone-me--/d" "${clonetargetdir}"/boot/grub/device.map)
-echo "$tempsed" > "${clonetargetdir}"/boot/grub/device.map
-#sed -i -e "s/# (hd0)/(hd0)/" "${clonetargetdir}"/boot/grub/device.map
+tempsed=$(sed -e "/#--specialclone-me--/d" "${targetdir}"/boot/grub/device.map)
+echo "$tempsed" > "${targetdir}"/boot/grub/device.map
+#sed -i -e "s/# (hd0)/(hd0)/" "${targetdir}"/boot/grub/device.map
 echo "device.map cleaned"

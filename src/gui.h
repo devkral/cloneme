@@ -85,7 +85,7 @@ private:
 	Glib::RefPtr<Gtk::Alignment> terminal;	
 
 	//gparted
-	Glib::Threads::Thread *gpartthread;
+	Glib::Threads::Thread *threadpart;
 	//std::thread gpartthread;
 	Glib::RefPtr<Gtk::Button> gparted;
 	void execparted();

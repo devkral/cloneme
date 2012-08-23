@@ -175,7 +175,7 @@ bool gui::unlockoperation()
 //void execparted(gui *refback)
 void gui::execparted()
 {
-	std::system("gparted");
+	std::cerr << std::system2("gpartedbin");
 	//refback->gpartmut.unlock();
 	gparted_mutex.unlock();
 }
@@ -185,9 +185,9 @@ void gui::opengparted()
 	
 	if (gparted_mutex.trylock())
 	{
-		//gpartthread=std::thread(execparted,this);
-		//gpartthread->join( );
-		gpartthread=Glib::Threads::Thread::create(sigc::mem_fun(*this,&gui::execparted));
+		//threadpart=std::thread(execparted,this);
+		//threadpart->join( );
+		threadpart=Glib::Threads::Thread::create(sigc::mem_fun(*this,&gui::execparted));
 	}
 }
 
@@ -353,7 +353,7 @@ bool gui::updateddestpart(void*)
 	return false;
 }
 
-gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filechoosedest()//gpartthread()//,copydialog(this),createdialog(this)
+gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filechoosedest()//
 {
 	if (setpidlock()==false)
 		exit(1);
@@ -467,4 +467,10 @@ gui::~gui()
 	//cleanup
 	if (unsetpidlock())
 		std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
+	if (threadsrc!=0)
+		threadsrc->join();
+	if (threaddest!=0)
+		threaddest->join();
+	if (threadpart!=0)
+		threadpart->join();
 }
