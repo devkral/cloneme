@@ -78,7 +78,7 @@ case "$#" in
 esac
 
 
-#new:  "$mountpath" <dest>
+# mountpath <device>
 mount_blockdevice()
 {
   local device="$1"
@@ -113,7 +113,7 @@ if [ "$mode" = "mount" ] || [ -e "$mountpath" ]; then
     "$sharedir"/sh/umountscript.sh n "$thingtomount"
   fi
   
-  if mountpoint "${mountpath}" &> /dev/null; then
+  if mountpoint -q "${mountpath}"; then
   #sorry predecessor but we must be sure that is mounted as ROOT
     if ! "$sharedir"/sh/umountscript.sh n "${mountpath}"; then
       exit 1

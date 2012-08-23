@@ -309,7 +309,7 @@ bool gui::updatedsrc(void*)
 
 bool gui::updatedsrcpart(void*)
 {
-	if (operationlock==false)
+	if (operationlock==false && srcpart->get_text()!="")
 	{
 		std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" p"+partnumbsrc->get_text()+" "+syncdir()+"/src";
 		std::cerr << system2(sum);
@@ -347,7 +347,7 @@ bool gui::updateddest(void*)
 
 bool gui::updateddestpart(void*)
 {
-	if (operationlock==false)
+	if (operationlock==false && destpart->get_text()!="")
 	{
 		std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" p"+partnumbdest->get_text()+" "+syncdir()+"/dest";
 		std::cerr << system2(sum);
