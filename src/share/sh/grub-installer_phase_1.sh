@@ -87,7 +87,7 @@ mount -o bind /run "${targetdir}"/run
 shift # currently just one arg which must vanish
 chroot "${targetdir}" "$sharedir/sh/grub-installer_phase_2.sh" "$@"
 echo "back from chroot"
-umount "${clonetargetdir}"/{tmp,run,proc,sys,dev}
+umount "${targetdir}"/{tmp,run,proc,sys,dev}
 echo "mounts cleaned up"
 
 tempsed=$(sed -e "/#--specialclone-me--/d" "${targetdir}"/boot/grub/device.map)
