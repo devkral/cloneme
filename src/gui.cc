@@ -117,8 +117,8 @@ void gui::chooseeditor()
 //TODO:
 //buggy;can't fetch the editor from the main system
 //most probably because of missing environment variables
-		Glib::ustring sum="EDITOR="+system2("echo \"$EDITOR\"")+"\n";
-		std::cout << sum;
+		Glib::ustring sum="";//EDITOR="+system2("echo \"$EDITOR\"")+"\n";
+		//std::cout << sum;
 //so use my favourite
 		sum="EDITOR=nano\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
@@ -285,7 +285,7 @@ bool gui::updateddest(void*)
 {
 	if (operationlock==false && dest->get_text()!="")
 	{
-		if (system((sharedir()+"/sh/mountscript.sh needpart "+dest->get_text()).c_str()==1)
+		if (system((sharedir()+"/sh/mountscript.sh needpart "+dest->get_text()).c_str())==1)
 		{
 			destpart->hide();
 			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
@@ -322,8 +322,8 @@ bool gui::updateddestpart(void*)
 gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filechoosedest()//
 {
 	//initialize syncdir
-	if (system(sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n")!=0)
-		exit(1)
+	if (system((sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n").c_str())!=0)
+		exit(1);
 	if (setpidlock()==false)
 		exit(1);
 	is_mountedd=false;
@@ -433,7 +433,7 @@ gui::~gui()
 {
 	//cleanup
 	if (unsetpidlock())
-		system(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
+		system((sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n").c_str());
 	if (threadpart!=0)
 		threadpart->join();
 }
