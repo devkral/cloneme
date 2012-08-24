@@ -84,17 +84,22 @@
           <object class="GtkGrid" id="sourcepanel">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_right">5</property>
+            <property name="hexpand">True</property>
             <child>
               <object class="GtkEntry" id="src">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="hexpand">True</property>
                 <property name="invisible_char">●</property>
                 <property name="invisible_char_set">True</property>
+                <property name="secondary_icon_stock">gtk-open</property>
+                <property name="primary_icon_activatable">False</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
                 <property name="top_attach">1</property>
-                <property name="width">1</property>
+                <property name="width">2</property>
                 <property name="height">1</property>
               </packing>
             </child>
@@ -110,23 +115,6 @@
                 <property name="left_attach">0</property>
                 <property name="top_attach">0</property>
                 <property name="width">2</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="srcselect">
-                <property name="label">gtk-open</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
-                <property name="width">1</property>
                 <property name="height">1</property>
               </packing>
             </child>
@@ -148,12 +136,29 @@
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkLabel" id="label4">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkEntry" id="partnumbsrc">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="halign">start</property>
                     <property name="valign">start</property>
                     <property name="max_length">3</property>
+                    <property name="invisible_char">●</property>
+                    <property name="width_chars">2</property>
+                    <property name="invisible_char_set">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -166,9 +171,12 @@
               <packing>
                 <property name="left_attach">0</property>
                 <property name="top_attach">2</property>
-                <property name="width">2</property>
+                <property name="width">1</property>
                 <property name="height">1</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
           <packing>
@@ -182,17 +190,21 @@
           <object class="GtkGrid" id="destpanel">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">5</property>
+            <property name="hexpand">True</property>
             <child>
               <object class="GtkEntry" id="dest">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="hexpand">True</property>
                 <property name="invisible_char">●</property>
                 <property name="invisible_char_set">True</property>
+                <property name="secondary_icon_stock">gtk-open</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
                 <property name="top_attach">1</property>
-                <property name="width">1</property>
+                <property name="width">2</property>
                 <property name="height">1</property>
               </packing>
             </child>
@@ -208,23 +220,6 @@
                 <property name="left_attach">0</property>
                 <property name="top_attach">0</property>
                 <property name="width">2</property>
-                <property name="height">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="destselect">
-                <property name="label">gtk-open</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
-                <property name="width">1</property>
                 <property name="height">1</property>
               </packing>
             </child>
@@ -252,6 +247,7 @@
                     <property name="halign">start</property>
                     <property name="valign">start</property>
                     <property name="max_length">3</property>
+                    <property name="width_chars">2</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -264,9 +260,12 @@
               <packing>
                 <property name="left_attach">0</property>
                 <property name="top_attach">2</property>
-                <property name="width">2</property>
+                <property name="width">1</property>
                 <property name="height">1</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
           <packing>

@@ -128,8 +128,6 @@ bool gui::lockoperation()
 		dest->set_sensitive(false);
 		partnumbsrc->set_sensitive(false);
 		partnumbdest->set_sensitive(false);
-		srcselect->set_sensitive(false);
-		destselect->set_sensitive(false);
 	}
 	else
 	{
@@ -149,8 +147,6 @@ bool gui::unlockoperation()
 		dest->set_sensitive(true);
 		partnumbsrc->set_sensitive(true);
 		partnumbdest->set_sensitive(true);
-		srcselect->set_sensitive(true);
-		destselect->set_sensitive(true);
 		return true;
 	}
 	else
@@ -215,14 +211,14 @@ void gui::install()
 	}
 }
 
-void gui::choosesrc()
+void gui::choosesrc(Gtk::EntryIconPosition pos, const GdkEventButton* event)
 {
 	filechoosesrc.run(src);
 	updatedsrc(0);
 }
 
 
-void gui::choosedest()
+void gui::choosedest(Gtk::EntryIconPosition pos, const GdkEventButton* event)
 {
 	filechoosedest.run(dest);
 	updateddest(0);		
@@ -384,33 +380,32 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 	updateb->signal_clicked ().connect(sigc::mem_fun(*this,&gui::update));
 	
 	//Filechooser
+	//src:
 	src=transform_to_rptr<Gtk::Entry>(builder->get_object("src"));
 	//src->set_text("/");
-	sourcepart=transform_to_rptr<Gtk::Grid>(builder->get_object("sourcepart"));
 	partnumbsrc=transform_to_rptr<Gtk::Entry>(builder->get_object("partnumbsrc"));
-	srcselect=transform_to_rptr<Gtk::Button>(builder->get_object("srcselect"));
-	srcselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosesrc));
-	//use unfocus
+	sourcepart=transform_to_rptr<Gtk::Grid>(builder->get_object("sourcepart"));
+	//use icon release for opening filechooser dialog
+	src->signal_icon_release().connect(sigc::mem_fun(*this,&gui::choosesrc));
+	//use unfocus for mount
 	src->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updatedsrc));
 	partnumbsrc->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updatedsrcpart));
-
 	
+	//dest:
 	dest=transform_to_rptr<Gtk::Entry>(builder->get_object("dest"));
 	//dest->set_text("/dev/sdb1");
-	destselect=transform_to_rptr<Gtk::Button>(builder->get_object("destselect"));
-	destselect->signal_clicked ().connect(sigc::mem_fun(*this,&gui::choosedest));
 	destpart=transform_to_rptr<Gtk::Grid>(builder->get_object("destpart"));
 	partnumbdest=transform_to_rptr<Gtk::Entry>(builder->get_object("partnumbdest"));
-	//use unfocus
+	//use icon release for opening filechooser dialog
+	dest->signal_icon_release().connect(sigc::mem_fun(*this,&gui::choosedest));
+	//use unfocus for mount
 	dest->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updateddest));
 	partnumbdest->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updateddestpart));
 	
 	//editor
 	useeditor=transform_to_rptr<Gtk::CheckButton>(builder->get_object("useeditor"));
 	useeditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::useeditorf));
-	
 	editortouse=transform_to_rptr<Gtk::Entry>(builder->get_object("editortouse"));
-	editortouse->signal_focus_out_event ().connect(sigc::mem_fun(*this,&gui::editortousef));
 
 	//updatedsrc(0);
 	//updateddest(0);

@@ -100,10 +100,9 @@ private:
 	Glib::RefPtr<Gtk::Entry> partnumbsrc, partnumbdest;
 	Glib::RefPtr<Gtk::Grid> sourcepart, destpart;
 	bool updatedsrc(void*), updateddest(void*), updatedsrcpart(void*), updateddestpart(void*);
-	//srcdest srcdestobject;
-	Glib::RefPtr<Gtk::Button> srcselect, destselect;
-	void choosesrc();
-	void choosedest();
+	//filechooser
+	void choosesrc(Gtk::EntryIconPosition pos, const GdkEventButton* event);
+	void choosedest(Gtk::EntryIconPosition pos, const GdkEventButton* event);
 
 	//src, dest safeguards,threads,elements
 	//Glib::Threads::Thread *threadsrc;
