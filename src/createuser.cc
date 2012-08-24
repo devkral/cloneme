@@ -56,10 +56,8 @@ int createuser::makeuser()
 		+sharedir()+\
 		"/sh/groupexist.sh"+supplement_groups+")\n";
 	sum+="passwd -e \""+username->get_text()+"\"\n";
-	Glib::ustring log=system2(sum);
-	username->set_text("");
-	// cout returned messages
-	std::cout << "Debug: " << log << "\n";
+	if (system(sum.c_str())==0)
+		username->set_text("");
 	return 0;
 	
 }

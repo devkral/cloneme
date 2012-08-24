@@ -175,7 +175,8 @@ bool gui::unlockoperation()
 //void execparted(gui *refback)
 void gui::execparted()
 {
-	std::cerr << system2("gpartedbin");
+	if (system("gpartedbin")!=0)
+		std::cerr << "An error happened\n";
 	//refback->gpartmut.unlock();
 	gparted_mutex.unlock();
 }
@@ -247,7 +248,7 @@ bool gui::updatedsrc(void*)
 {
 	if (operationlock==false && src->get_text()!="")
 	{
-		if (system2(sharedir()+"/sh/mountscript.sh needpart "+src->get_text())=="false")
+		if (system((sharedir()+"/sh/mountscript.sh needpart "+src->get_text()).c_str())==1)
 		{
 			sourcepart->hide();
 			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
@@ -284,7 +285,7 @@ bool gui::updateddest(void*)
 {
 	if (operationlock==false && dest->get_text()!="")
 	{
-		if (system2(sharedir()+"/sh/mountscript.sh needpart "+dest->get_text())=="false")
+		if (system((sharedir()+"/sh/mountscript.sh needpart "+dest->get_text()).c_str()==1)
 		{
 			destpart->hide();
 			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
@@ -321,7 +322,8 @@ bool gui::updateddestpart(void*)
 gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filechoosedest()//
 {
 	//initialize syncdir
-	std::cerr << system2(sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n");
+	if (system(sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n")!=0)
+		exit(1)
 	if (setpidlock()==false)
 		exit(1);
 	is_mountedd=false;
@@ -431,7 +433,7 @@ gui::~gui()
 {
 	//cleanup
 	if (unsetpidlock())
-		std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
+		system(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
 	if (threadpart!=0)
 		threadpart->join();
 }
