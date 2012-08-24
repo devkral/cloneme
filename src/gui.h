@@ -102,16 +102,16 @@ private:
 	bool updatedsrc(void*), updateddest(void*), updatedsrcpart(void*), updateddestpart(void*);
 	//srcdest srcdestobject;
 	Glib::RefPtr<Gtk::Button> srcselect, destselect;
-	void choosesrc(), choosesrc2();
-	void choosedest(), choosedest2();
+	void choosesrc();
+	void choosedest();
 
 	//src, dest safeguards,threads,elements
-	Glib::Threads::Thread *threadsrc;
-	Glib::Threads::Mutex srclock;
+	//Glib::Threads::Thread *threadsrc;
+	//Glib::Threads::Mutex srclock;
 	myfilechooser filechoosesrc;
 
-	Glib::Threads::Thread *threaddest;
-	Glib::Threads::Mutex destlock;
+	//Glib::Threads::Thread *threaddest;
+	//Glib::Threads::Mutex destlock;
 	myfilechooser filechoosedest;
 	
 	//mounted, unmounted source and dest

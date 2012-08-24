@@ -37,59 +37,37 @@
 
 #include "myfilechooser.h"
 #include "basismethods.h"
-//#include <iostream> //not needed basismethods
-
 //privat:
 
 void myfilechooser::selectedfilef()
 {
 	fcdialog->hide();
 	path=fcwidget->get_preview_filename();
-	//waitfinish.unlock();
-	waitfinish=false;
+	if (adopedentry==true)
+		adopedentry->set_text(path);
 }
 
 void myfilechooser::currentfolderf()
 {
 	fcdialog->hide();
 	path=fcwidget->get_current_folder ();
-	//waitfinish.unlock();
-	waitfinish=false;
+	if (adopedentry==true)
+		adopedentry->set_text(path);
 }
 
 void myfilechooser::cancelchoosef()
 {
 	fcdialog->hide();
 	path="";
-	//waitfinish.unlock();
-	waitfinish=false;
 }
 
 
 //public:
 
-void myfilechooser::show()
+void myfilechooser::run(Glib::RefPtr<Gtk::Entry> &temp)
 {
+	adopedentry=temp;
 	fcdialog->show();
-}
-void myfilechooser::unlock2()
-{
-	//waitfinish.unlock();
-	waitfinish=false;
-
-}
-
-std::string myfilechooser::run()
-{
-	//waitfinish.lock();
-	//waitfinish.lock();
-	//freaky but works TODO: find a solution to sleep and to wake via SIGALRM
-	waitfinish=true;//.trylock();
-	while (!waitfinish)//.trylock()){}
-		sleep(1);
-	
-	std::cerr << "Debug: released";
-	return path;
 }
 
 myfilechooser::myfilechooser()
@@ -125,6 +103,3 @@ myfilechooser::myfilechooser()
 	cancelchoose->signal_clicked ().connect(sigc::mem_fun(*this,&myfilechooser::cancelchoosef));
 
 };
-
-
-

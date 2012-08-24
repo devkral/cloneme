@@ -210,9 +210,6 @@ void gui::install()
 	if (lockoperation()==true && partready()==true);
 	{
 		std::string sum="";
-		// --copyuser
-		//sum+=bindir()+"/clonemecmd.sh install "+syncdir()+"/src "+syncdir()+"/dest "+home_path+" "+sharedir()+"/sh/grub-installer_phase_1.sh"+"\n";
-
 		sum+=sharedir()+"/sh/rsyncci.sh ";
 		sum+="--mode install ";
 		sum+="--src "+syncdir()+"/src ";
@@ -227,51 +224,16 @@ void gui::install()
 
 void gui::choosesrc()
 {
-	
-	if (srclock.trylock()==true)
-	{
-//threadsrc->join( );
-		filechoosesrc.show();
-		//threadsrc=std::thread(sigc::mem_fun(*this, &gui::choosesrc2));
-		threadsrc=Glib::Threads::Thread::create(sigc::mem_fun(*this, &gui::choosesrc2));
-	}
+	filechoosesrc.run(src);
+	updatedsrc(0);
 		
 }
-	
-void gui::choosesrc2()
-{
-	std::string temp=filechoosesrc.run();
-	if (!temp.empty())
-	{
-		src->set_text(temp);
-		//mount
-		updatedsrc(0);
-	}
-	srclock.unlock();
-}
+
 
 void gui::choosedest()
 {
-	if (destlock.trylock()==true)
-	{
-		//threaddest->join( );
-		filechoosedest.show();
-		threaddest=Glib::Threads::Thread::create(sigc::mem_fun(*this, &gui::choosedest2));
-	}
-		
-}
-
-void gui::choosedest2()
-{
-	std::string temp=filechoosedest.run();
-	if (!temp.empty())
-	{
-		dest->set_text(temp);
-		//mount
-		updateddest(0);
-	}
-	//filechoosedest.unlock2();
-	destlock.unlock();
+	filechoosedest.run(dest);
+	updateddest(0);		
 }
 
 //is src and dest mounted
@@ -471,10 +433,6 @@ gui::~gui()
 	//cleanup
 	if (unsetpidlock())
 		std::cerr << system2(sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n");
-	if (threadsrc!=0)
-		threadsrc->join();
-	if (threaddest!=0)
-		threaddest->join();
 	if (threadpart!=0)
 		threadpart->join();
 }

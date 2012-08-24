@@ -45,14 +45,11 @@ class myfilechooser
 {
 public:
 	myfilechooser ();
+	//myfilechooser (Glib::RefPtr<Gtk::Entry> &temp);
+	//~myfilechooser ();
 	//shows window
-	void show();
-	//blocks and returns path (be careful: don't block mainloop, use threads)
-	std::string run();
-	void unlock2();
+	void run(Glib::RefPtr<Gtk::Entry> &temp);
 	//usage:
-	//myfilechooser show()
-	//thread with run()
 protected:
 
 private:
@@ -69,6 +66,8 @@ private:
 	Glib::RefPtr<Gtk::Button>selectedfile,currentfolder,cancelchoose;
 	std::string path;
 
+	//adopted entry
+	Glib::RefPtr<Gtk::Entry> adopedentry;
 	//
 	void selectedfilef();
 	void currentfolderf();
