@@ -189,6 +189,8 @@ installer()
     echo "no fstab found"
     exit 1
   fi
+  #optional add bootflag to partition target dir is on (thinkpad boot) This should be done in the bootloader script.
+  
   copyuser
   if [ "$installinstallertarget" != "" ]; then
     eval "$installinstallertarget"

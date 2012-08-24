@@ -1,15 +1,12 @@
 
-+make grub-install script working
-
 less important:
-+make EDITOR fetch from main system working (see gui.cc)
 +++run less parts as root (less important)
 +add support for other bootloaders
 +offer some special options for ssds/USB-flashdrives
 
-not very important:
+future:
 loop other things than raw
-maybe detect via grub-probe or parted if nbd is mounted
+maybe detect via parted if nbd is mounted
 
 nbd stuff
 http://atrey.karlin.mff.cuni.cz/~pavel/nbd/nbd.html

@@ -126,9 +126,9 @@ private:
 	Glib::ustring home_path;
 
 	//choose editor
-	Glib::RefPtr<Gtk::CheckButton> graphicaleditor;
-	void chooseeditor();
-	
+	Glib::RefPtr<Gtk::CheckButton> useeditor;
+	Glib::RefPtr<Gtk::Entry> editortouse;
+	void useeditorf();	
 };
 
 #endif // _GUI_H_

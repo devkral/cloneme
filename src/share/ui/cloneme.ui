@@ -313,16 +313,42 @@
               </packing>
             </child>
             <child>
-              <object class="GtkCheckButton" id="graphicaleditor">
-                <property name="label" translatable="yes">Use graphical editor?</property>
-                <property name="use_action_appearance">False</property>
+              <object class="GtkGrid" id="grid2">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="xalign">0</property>
-                <property name="active">True</property>
-                <property name="draw_indicator">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkCheckButton" id="useeditor">
+                    <property name="label" translatable="yes">Use a editor to tweak config?</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="xalign">0</property>
+                    <property name="draw_indicator">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="editortouse">
+                    <property name="can_focus">True</property>
+                    <property name="no_show_all">True</property>
+                    <property name="invisible_char">●</property>
+                    <property name="text" translatable="yes">nano</property>
+                    <property name="overwrite_mode">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="left_attach">0</property>

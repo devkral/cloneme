@@ -103,30 +103,18 @@ bool unsetpidlock()
 }
 
 
-
-
-void gui::chooseeditor()
+void gui::useeditorf()
 {
-	if (graphicaleditor->get_active ())
+	if (useeditor->get_active ())
 	{
-		Glib::ustring sum="EDITOR=gedit\n";
-		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+		editortouse->show();
 	}
 	else
 	{
-//TODO:
-//buggy;can't fetch the editor from the main system
-//most probably because of missing environment variables
-		Glib::ustring sum="";//EDITOR="+system2("echo \"$EDITOR\"")+"\n";
-		//std::cout << sum;
-//so use my favourite
-		sum="EDITOR=nano\n";
-		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+		editortouse->hide();
 	}
 
 }
-
-
 
 bool gui::lockoperation()
 {
@@ -201,6 +189,8 @@ void gui::update()
 		sum+="--mode update ";
 		sum+="--src "+syncdir()+"/src ";
 		sum+="--dest "+syncdir()+"/dest\n";
+		if (useeditor->get_active ())
+			sum+="--editfstab \""+editortouse->get_text()+"\" ";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}
@@ -216,6 +206,8 @@ void gui::install()
 		sum+="--src "+syncdir()+"/src ";
 		sum+="--dest "+syncdir()+"/dest ";
 		sum+="--copyuser \""+bindir()+"/cloneme --copyuser\"\n";
+		if (useeditor->get_active ())
+			sum+="--editfstab \""+editortouse->get_text()+"\" ";
 		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
 		sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+bindir()+"/cloneme --createuser\"\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
@@ -413,10 +405,12 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 	dest->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updateddest));
 	partnumbdest->signal_focus_out_event( ).connect(sigc::mem_fun(*this,&gui::updateddestpart));
 	
-
-
-	graphicaleditor=transform_to_rptr<Gtk::CheckButton>(builder->get_object("graphicaleditor"));
-	graphicaleditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::chooseeditor));
+	//editor
+	useeditor=transform_to_rptr<Gtk::CheckButton>(builder->get_object("useeditor"));
+	useeditor->signal_toggled ().connect(sigc::mem_fun(*this,&gui::useeditorf));
+	
+	editortouse=transform_to_rptr<Gtk::Entry>(builder->get_object("editortouse"));
+	editortouse->signal_focus_out_event ().connect(sigc::mem_fun(*this,&gui::editortousef));
 
 	//updatedsrc(0);
 	//updateddest(0);

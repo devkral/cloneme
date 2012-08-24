@@ -54,7 +54,8 @@ fi
 #dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 targetdir="$(realpath "$1")"
-
+getdevice="$("$sharedir"/sh/devicefinder.sh dev "${targetdir}" | sed -e "s|[0-9]*$||")"
+getpartition="$("$sharedir"/sh/devicefinder.sh dev "${targetdir}" | sed -e "s|^[^0-9]*||")"
 
 if [ ! -f "$sharedir/sh/grub-installer_phase_2.sh" ]; then
   echo "In target sys grub-installer_phase_2.sh isn't available"
@@ -71,10 +72,14 @@ fi
 
 echo "some temporary adjustments to ${targetdir}/boot/grub/device.map"
 mkdir -p "${targetdir}"/boot/grub/
-tempprobegrub="$("$sharedir"/sh/devicefinder.sh dev "${targetdir}" | sed -e "s|[0-9]*$||")"
-echo "(hd0) ${tempprobegrub} #--specialclone-me--" >> "${targetdir}"/boot/grub/device.map
+
+echo "(hd0) ${getdevice} #--specialclone-me--" >> "${targetdir}"/boot/grub/device.map
 echo "finished"
 
+#add bootflag
+echo "Now add bootflag to the partition (needed to boot with some mainboards e.g. thinkpad)"
+parted -s "${getdevice}" set $getpartition boot on
+#
 
 
 mount -o bind /proc "${targetdir}"/proc

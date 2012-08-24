@@ -44,7 +44,10 @@ void myfilechooser::selectedfilef()
 	fcdialog->hide();
 	path=fcwidget->get_preview_filename();
 	if (adopedentry==true)
+	{
 		adopedentry->set_text(path);
+		adopedentry->grab_focus ();
+	}
 }
 
 void myfilechooser::currentfolderf()
@@ -52,7 +55,10 @@ void myfilechooser::currentfolderf()
 	fcdialog->hide();
 	path=fcwidget->get_current_folder ();
 	if (adopedentry==true)
+	{
 		adopedentry->set_text(path);
+		adopedentry->grab_focus ();
+	}
 }
 
 void myfilechooser::cancelchoosef()
