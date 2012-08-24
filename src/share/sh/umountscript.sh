@@ -112,10 +112,13 @@ un_mount()
         un_mount "$(echo "$itemtoumount" | sed -e 's/\\040/\ /g')"
       done
     fi
+  else
+    echo "error: can't unmount, $umountpoint wasn't recognized"
+    exit 1
   fi
 }
 
-#umount_all <blockdevice>
+#umount_all
 umount_all()
 {
   if [ -b "$mountpointt" ];then

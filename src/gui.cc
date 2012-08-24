@@ -290,8 +290,8 @@ bool gui::updatedsrc(void*)
 		{
 			sourcepart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
-			std::cerr << system2(sum);
-			is_mounteds=true;
+			if ( system(sum.c_str())==0)
+				is_mounteds=true;
 		} else
 		{
 			sourcepart->show();
@@ -313,8 +313,8 @@ bool gui::updatedsrcpart(void*)
 	if (operationlock==false && partnumbsrc->get_text()!="")
 	{
 		std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" p"+partnumbsrc->get_text()+" "+syncdir()+"/src";
-		std::cerr << system2(sum);
-		is_mounteds=true;
+		if ( system(sum.c_str())==0)
+			is_mounteds=true;
 	}
 	return false;
 }
@@ -327,8 +327,8 @@ bool gui::updateddest(void*)
 		{
 			destpart->hide();
 			std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
-			std::cerr << system2(sum);
-			is_mountedd=true;
+			if ( system(sum.c_str())==0)
+				is_mountedd=true;
 		}else
 		{
 			destpart->show();
@@ -351,8 +351,8 @@ bool gui::updateddestpart(void*)
 	if (operationlock==false && partnumbdest->get_text()!="")
 	{
 		std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" p"+partnumbdest->get_text()+" "+syncdir()+"/dest";
-		std::cerr << system2(sum);
-		is_mountedd=true;
+		if ( system(sum.c_str())==0)
+			is_mountedd=true;
 	}
 	return false;
 }
