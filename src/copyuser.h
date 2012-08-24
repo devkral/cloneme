@@ -78,8 +78,8 @@ private:
 	void createemptyf();
 	void explainf();
 	
-	std::string src, dest;
-	std::string name;
+	Glib::ustring src, dest;
+	Glib::ustring name;
 
 };
 

@@ -41,12 +41,9 @@
 #include "gui.h"
 #include "copyuser.h"
 #include "createuser.h"
+#include "basismethods.h"
 
 #include <getopt.h>
-#include <unistd.h>
-#include <cstdlib>
-#include <string>
-#include <iostream>
 //#include <cstdio>
 
 //#ifdef ENABLE_NLS
@@ -68,7 +65,7 @@ bool comparechar(char *r1, char *r2)
 
 
 
-std::string becomeroot()
+Glib::ustring becomeroot()
 {
 	
 	if ( access("/usr/bin/gksudo",F_OK)==0)
@@ -80,7 +77,7 @@ std::string becomeroot()
 	if ( access("/usr/bin/sudo",F_OK)==0)
 			return (std::string)"sudo -E ";
 	
-	return (std::string)"su -c";
+	return (Glib::ustring)"su -c";
 };
 
 void startgui(int argc, char* argv[])
@@ -91,7 +88,7 @@ void startgui(int argc, char* argv[])
 	}
 	if (getuid()!=0)
 	{
-		std::string summary=becomeroot();
+		Glib::ustring summary=becomeroot();
 		summary+=argv[0];
 		for (int count=1; count<argc; count++)
 			summary+=argv[count];

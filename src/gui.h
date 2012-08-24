@@ -54,8 +54,8 @@
 /**
 struct srcdest
 {
-	std::string src;
-	std::string dest;
+	Glib::ustring src;
+	Glib::ustring dest;
 };*/
 
 
@@ -123,7 +123,7 @@ private:
 	bool lockoperation(),unlockoperation(),;
 
 	//directs to program file
-	std::string home_path;
+	Glib::ustring home_path;
 
 	//choose editor
 	Glib::RefPtr<Gtk::CheckButton> graphicaleditor;

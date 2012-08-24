@@ -55,8 +55,6 @@ protected:
 private:
 	//build window
 	Glib::RefPtr<Gtk::Builder> builder2;
-	//used for the wait method
-	//Glib::Threads::Mutex waitfinish;
 	bool waitfinish;
 	//Window
 	Glib::RefPtr<Gtk::Window> fcdialog;
@@ -64,7 +62,7 @@ private:
 	Glib::RefPtr<Gtk::FileChooserWidget> fcwidget;
 	//added special buttons
 	Glib::RefPtr<Gtk::Button>selectedfile,currentfolder,cancelchoose;
-	std::string path;
+	Glib::ustring path;
 
 	//adopted entry
 	Glib::RefPtr<Gtk::Entry> adopedentry;

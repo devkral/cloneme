@@ -47,14 +47,14 @@
 
 void copyuser::cleanuser()
 {
-	std::string sum=sharedir()+"/sh/cleanuser.sh "+name+" "+dest+"\n";
+	Glib::ustring sum=sharedir()+"/sh/cleanuser.sh "+name+" "+dest+"\n";
 	system2(sum);
 }
 
 
 void copyuser::copysynchf()
 {
-	std::string sum=sharedir()+"/sh/copyuser.sh "+src+" "+dest+" "+name+" s\n";
+	Glib::ustring sum=sharedir()+"/sh/copyuser.sh "+src+" "+dest+" "+name+" s\n";
 	std::cerr << system2(sum);
 	kitcopy.quit();
 }
@@ -69,7 +69,7 @@ void copyuser::ignoref()
 
 void copyuser::emptyf()
 {
-	std::string sum=sharedir()+"/sh/copyuser.sh "+src+" "+dest+" "+name+" e\n";
+	Glib::ustring sum=sharedir()+"/sh/copyuser.sh "+src+" "+dest+" "+name+" e\n";
 	system2(sum);
 	kitcopy.quit();
 }
@@ -189,7 +189,7 @@ copyuser::copyuser(int argc, char* argv[]): kitcopy(argc, argv)
 	explain->signal_clicked ().connect(sigc::mem_fun(*this,&copyuser::explainf));
 	
 	
-	if ( access(((std::string)"/home/"+name).c_str(),F_OK)==0)
+	if ( access(((Glib::ustring)"/home/"+name).c_str(),F_OK)==0)
 	{
 		setactionspace(*((Gtk::Widget *)userexist.operator->()));
 		user_exist=true;

@@ -1,5 +1,4 @@
 
-#include <string>
 #include <gtkmm.h>
 #include <iostream>
 #include <unistd.h>
@@ -16,9 +15,9 @@ transform_to_rptr(const Glib::RefPtr< Glib::Object >& p)
 	return Glib::RefPtr<T_CppObject>::cast_dynamic(p);
 }
 
-std::string system2(std::string _tcommand);
+Glib::ustring system2(Glib::ustring _tcommand);
 
-inline std::string sharedir()
+inline Glib::ustring sharedir()
 {
 	if (access(PACKAGE_DATA_DIR,F_OK)==0)
 	{
@@ -28,23 +27,23 @@ inline std::string sharedir()
 		return tempt;
 	}
 	else
-		return (std::string)"./src/share";
+		return (Glib::ustring)"./src/share";
 }
-inline std::string bindir()
+inline Glib::ustring bindir()
 {
 	if (access(PACKAGE_BIN_DIR,F_OK)==0)
-		return (std::string)PACKAGE_BIN_DIR;
+		return (Glib::ustring)PACKAGE_BIN_DIR;
 	else
-		return (std::string)"./src";
+		return (Glib::ustring)"./src";
 }
 
-inline std::string syncdir()
+inline Glib::ustring syncdir()
 {
 	return "/run/syncdir";
 	//return system2(bindir()+"/clonemecmd.sh syncdir\n");
 }
 /**
-inline std::string mypidfile()
+inline Glib::ustring mypidfile()
 {
 	return syncdir()+"/cloneme.pid";
 }*/

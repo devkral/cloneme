@@ -46,17 +46,17 @@ int createuser::makeuser()
 {
 	if (username->get_text_length () ==0)
 		return 2;
-	std::string sum="";
-	std::string supplement_groups="video audio optical power";
+	Glib::ustring sum="";
+	Glib::ustring supplement_groups="video audio optical power";
 	if (admswitch->get_state()==true)
 	{
 		supplement_groups+=" wheel adm admin";
 	}
-	sum+="useradd -m -U \""+(std::string)username->get_text()+"\" -p \"\" -G $("\
+	sum+="useradd -m -U \""+(Glib::ustring)username->get_text()+"\" -p \"\" -G $("\
 		+sharedir()+\
 		"/sh/groupexist.sh"+supplement_groups+")\n";
 	sum+="passwd -e \""+username->get_text()+"\"\n";
-	std::string log=system2(sum);
+	Glib::ustring log=system2(sum);
 	username->set_text("");
 	// cout returned messages
 	std::cout << "Debug: " << log << "\n";

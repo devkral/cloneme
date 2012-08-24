@@ -60,7 +60,7 @@ bool setpidlock()
 		std::ifstream pidread((syncdir()+"/cloneme.pid").c_str());
 		char extract[25];
 		pidread.getline(extract,25);
-		std::string tempof="/proc/";
+		Glib::ustring tempof="/proc/";
 		tempof+=extract;
 		std::cerr << "Debug: " << tempof << std::endl;
 		if (access(tempof.c_str(),F_OK)==0)
@@ -109,7 +109,7 @@ void gui::chooseeditor()
 {
 	if (graphicaleditor->get_active ())
 	{
-		std::string sum="EDITOR=gedit\n";
+		Glib::ustring sum="EDITOR=gedit\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 	}
 	else
@@ -117,7 +117,7 @@ void gui::chooseeditor()
 //TODO:
 //buggy;can't fetch the editor from the main system
 //most probably because of missing environment variables
-		std::string sum="EDITOR="+system2("echo \"$EDITOR\"")+"\n";
+		Glib::ustring sum="EDITOR="+system2("echo \"$EDITOR\"")+"\n";
 		std::cout << sum;
 //so use my favourite
 		sum="EDITOR=nano\n";
@@ -195,7 +195,7 @@ void gui::update()
 {
 	if (lockoperation()==true && partready()==true);
 	{
-		std::string sum="";
+		Glib::ustring sum="";
 		sum+=sharedir()+"/sh/rsyncci.sh ";
 		sum+="--mode update ";
 		sum+="--src "+syncdir()+"/src ";
@@ -209,7 +209,7 @@ void gui::install()
 {
 	if (lockoperation()==true && partready()==true);
 	{
-		std::string sum="";
+		Glib::ustring sum="";
 		sum+=sharedir()+"/sh/rsyncci.sh ";
 		sum+="--mode install ";
 		sum+="--src "+syncdir()+"/src ";
@@ -226,7 +226,6 @@ void gui::choosesrc()
 {
 	filechoosesrc.run(src);
 	updatedsrc(0);
-		
 }
 
 
@@ -251,7 +250,7 @@ bool gui::updatedsrc(void*)
 		if (system2(sharedir()+"/sh/mountscript.sh needpart "+src->get_text())=="false")
 		{
 			sourcepart->hide();
-			std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
+			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
 			if ( system(sum.c_str())==0)
 				is_mounteds=true;
 		} else
@@ -274,7 +273,7 @@ bool gui::updatedsrcpart(void*)
 {
 	if (operationlock==false && partnumbsrc->get_text()!="")
 	{
-		std::string sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" p"+partnumbsrc->get_text()+" "+syncdir()+"/src";
+		Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" p"+partnumbsrc->get_text()+" "+syncdir()+"/src";
 		if ( system(sum.c_str())==0)
 			is_mounteds=true;
 	}
@@ -288,7 +287,7 @@ bool gui::updateddest(void*)
 		if (system2(sharedir()+"/sh/mountscript.sh needpart "+dest->get_text())=="false")
 		{
 			destpart->hide();
-			std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
+			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
 			if ( system(sum.c_str())==0)
 				is_mountedd=true;
 		}else
@@ -312,7 +311,7 @@ bool gui::updateddestpart(void*)
 {
 	if (operationlock==false && partnumbdest->get_text()!="")
 	{
-		std::string sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" p"+partnumbdest->get_text()+" "+syncdir()+"/dest";
+		Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" p"+partnumbdest->get_text()+" "+syncdir()+"/dest";
 		if ( system(sum.c_str())==0)
 			is_mountedd=true;
 	}

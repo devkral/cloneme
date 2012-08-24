@@ -1,7 +1,7 @@
 #include "basismethods.h"
 #include <cstdio>
 
-std::string system2(std::string _tcommand)
+Glib::ustring system2(Glib::ustring _tcommand)
 {
    FILE * proc;
    std::string temp="";
