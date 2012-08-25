@@ -196,8 +196,9 @@ void gui::update()
 			sum+="--src "+syncdir()+"/src ";
 			sum+="--dest "+syncdir()+"/dest ";
 			sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
-			if (useeditor->get_active ())
-				sum+="--editfstab \""+editortouse->get_text()+"\" ";
+//doesn't work
+//			if (useeditor->get_active ())
+//				sum+="--editfstab \""+editortouse->get_text()+"\" ";
 			sum+="\n";
 			sum+="rm "+syncdir()+"/guilock\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
@@ -216,11 +217,12 @@ void gui::install()
 			sum+="--mode install ";
 			sum+="--src "+syncdir()+"/src ";
 			sum+="--dest "+syncdir()+"/dest ";
+			sum+="--adduser \""+bindir()+"/cloneme --createuser\" ";
 			sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
 			if (useeditor->get_active ())
 				sum+="--editfstab \""+editortouse->get_text()+"\" ";
-			sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
-			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest \\\"if ! "+bindir()+"/cloneme --createuser; then "+sharedir()+"/sh/addnewusers.sh; fi\\\"\"\n";
+			sum+="--exec \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
+			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest\"\n";
 			sum+="rm "+syncdir()+"/guilock\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		}
@@ -331,9 +333,9 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 {
 	//initialize syncdir
 	if (system((sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n").c_str())!=0)
-		exit(1);
+		throw (-1);
 	if (setpidlock()==false)
-		exit(1);
+		throw (-1);
 	is_mountedd=false;
 	is_mounteds=false;
 	//kit=Gtk::Application::create(argc, argv,"org.gtkmm.cloneme.main");

@@ -37,6 +37,7 @@
 
 #include "createuser.h"
 #include "base.h"
+#include <getopt.h>
 
 int createuser::makeuser()
 {
@@ -48,9 +49,9 @@ int createuser::makeuser()
 	{
 		supplement_groups+=" wheel adm admin";
 	}
-	sum+="useradd -m -U \""+(Glib::ustring)username->get_text()+"\" -p \"\" -G $("\
+	sum+="useradd -m -R "+dest+" -U \""+(Glib::ustring)username->get_text()+"\" -p \"\" -G $("\
 		+sharedir()+\
-		"/sh/groupexist.sh"+supplement_groups+")\n";
+		"/sh/groupexist.sh "+supplement_groups+")\n";
 	sum+="passwd -e \""+username->get_text()+"\"\n";
 	if (system(sum.c_str())==0)
 		username->set_text("");
@@ -89,6 +90,31 @@ void createuser::adduserquit()
 
 createuser::createuser(int argc, char* argv[]): kitcreate(argc, argv)
 {
+	
+	int ch=0;
+	int index=0;
+	// options descriptor 
+	static struct option longopts[] = {
+		{ "dest", required_argument, &ch, 1 },
+		{0,0,0,0}
+	};
+	
+	while (getopt_long(argc, argv, "", longopts, &index) != -1)
+	{
+		switch(ch)
+		{
+			case 1: dest=optarg;
+				break;
+			default: ;
+				break;
+		};
+    }
+	if (dest.empty())
+	{
+		std::cerr << "Error: dest wasn't specified\n";
+		throw (-1);
+	}
+	
 	builder = Gtk::Builder::create();
 	try
 	{

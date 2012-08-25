@@ -48,21 +48,26 @@ usage()
   echo "  cleandest: place --dest points to will be cleaned via rm -r *"
   echo ""
   echo "install:"
+  echo "  --installinstaller <target> optional (default: install-installer, if specified also useable by update):"
+  echo "      use target prog to install installer"
   echo "  --bootloader <target>: optional (default: grub2):"
   echo "      specify prog to install bootloader"
   # be careful: default bootloader needs installinstaller
   echo ""
   echo "  --editfstab <editor>: optional (default: skip):"
   echo "      edit fstab with editor"
+  echo "  --adduser <target>: optional (default: addnewusers.sh):"
+  echo "    - specify program to add new users"
+  echo "    - syntax of target program:"
+  echo "        <target> --dest <dest>"
   echo ""
   echo "general options:"
   echo "  --copyuser <target>: optional (default: copyuser.sh):"
   echo "    - specify program to copy users"
   echo "    - syntax of target program:"
   echo "        <target> --src <src> --dest <dest> --user <name>"
-  echo ""
-  echo "  --installinstaller <target> optional (default: install-installer):"
-  echo "      use target prog to install installer"
+  echo "" #\\\"$sharedir\\\"/sh/addnewusers.sh\"
+
   echo ""
   echo "The syntax is nearly the same as the one of rsyncci.sh. The reason:"
   echo "Most args are transmitted to rsyncci.sh but clonemecmd.sh adds useful things like mount of blockdevices/raw files and sane defaults"
@@ -89,29 +94,25 @@ sharedir="./src/share" #--replacepattern--
 
 
 #defaults
-#the command which configures the target system
-config_new_sys="$sharedir/sh/addnewusers.sh"
 #the command to install the bootloader
-bootloadertarget="$sharedir/sh/grub-installer_phase_1.sh $syncdir/dest $config_new_sys"
+bootloadertarget="$sharedir/sh/grub-installer_phase_1.sh $syncdir/dest"
 #folder which is copied by default
 clonesource="/"
 #dir where sync folder are located
 syncdir="/run/syncdir"
 #command to copy users
 copyusertarget="${sharedir}"/sh/copyuser.sh
+#command to add new users
+addusertarget="${sharedir}"/sh/addnewusers.sh
 #command to install the installer
-installinstallertarget="--installinstaller $sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/ ${clonedestdir}"
+installinstallertarget="\"$sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/ ${clonedestdir};"
 #don't comment or change this
 clonetarget=""
 mode=""
 editfstabtarget=""
 # temps
-installinstallertarget2=""
-bootloadertarget2=""
-editfstabtarget2=""
 
 # for updater (ne=nonempty means: nonempty if as arg specified)
-bootloadertargetne=""
 installinstallertargetne=""
 
 
@@ -123,29 +124,19 @@ do
     "--src")clonesource="$(realpath "$2")"; shift;;
     "--dest")clonetarget="$(realpath "$2")"; shift;;
     "--copyuser")copyusertarget="$2"; shift;;
-    "--editfstab")editfstabtarget2="$2"; shift;;
+    "--adduser")addusertarget="$2"; shift;;
+    "--editfstab")editfstabtarget="$2"; shift;;
     "--installinstaller")installinstallertarget2="$2"; shift;;
-    "--bootloader")bootloadertarget2="$2"; shift;;
+    "--bootloader")bootloadertarget="$2"; shift;;
   esac
   shift
 done
 
-if [ installinstallertarget2 != "" ]; then
-  installinstallertarget="--installinstaller $installinstallertarget2"
-  installinstallertargetne="--installinstaller $installinstallertarget2"
+if [ ! -n $installinstallertarget2 ]; then
+  installinstallertarget="--exec $installinstallertarget2"
+  installinstallertargetne="--exec $installinstallertarget2"
 else
-  installinstallertarget="--installinstaller $installinstallertarget"
-fi 
-
-if [ bootloadertarget2 != "" ]; then
-  bootloadertarget="--bootloader $bootloadertarget2"
-  bootloadertargetne="--bootloader $bootloadertarget2"
-else
-  bootloadertarget="--bootloader $bootloadertarget"
-fi
-
-if [ editfstabtarget2 != "" ]; then
-  editfstabtarget="--editfstab $editfstabtarget2"
+  installinstallertarget="--exec $installinstallertarget"
 fi 
 
 if [ "$clonetarget" = "" ] || [ ! -e "$clonetarget" ]; then
@@ -163,9 +154,6 @@ if [ "$UID" != "0" ] || [ "$EUID" != "0" ]; then
   exit 1
 fi
 
-
-
-
 # exit if a needed arg wasn't specified elsewise echo selected options
 if [ $shall_exit = true ]; then
   exit 1
@@ -176,10 +164,17 @@ else
   echo "$clonetarget"
   echo ""
   echo "$copyusertarget"
+  echo "$addusertarget"
   echo "$editfstabtarget"
   echo "$installinstallertarget"
   echo "$bootloadertarget"
 fi
+
+#make editfstab ready for rsyncci
+if [ ! -n $editfstabtarget ]; then
+  editfstabtarget="--editfstab $editfstabtarget"
+fi 
+
 
 # pidlocking
 pidcreate()
@@ -247,6 +242,9 @@ installer(){
 --mode install \
 --src "$syncdir"/src \
 --dest "$syncdir"/dest \
+--dest "$syncdir"/dest \
+--adduser "$addusertarget" \
+--copyuser "$copyusertarget" \
 "$editfstabtarget" \
 "$bootloadertarget" \
 "$installinstallertarget";then
@@ -260,8 +258,6 @@ echo "Begin update"
 --mode update \
 --src "${syncdir}/src" \
 --dest "${syncdir}/dest" \
-"$editfstabtarget" \
-"$bootloadertargetne" \
 "$installinstallertargetne";then
     exit 1;
   else
@@ -269,15 +265,12 @@ echo "Begin update"
   fi 
 }
 
-
 case "$mode" in
   "update")updater;;
   "install")installer;;
   "cleandest")rm -r "$syncdir"/dest/*;;
   *)usage;;
 esac
-
-
 
 pidremove
 

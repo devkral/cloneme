@@ -141,7 +141,10 @@ do
     if ! rsync -a -A --progress --delete --exclude "${destsys}" "${srcsys}"/home/"${curuser}" "${destsys}"/home/ ;then
       echo "error: rsync could not sync"
       exit 1
-    fi  
+    fi
+    if [ -f "${srcsys}"/var/spool/mail/"${curuser}" ]; then
+      rsync -a -A "${srcsys}"/var/spool/mail/"${curuser}" "${destsys}"/var/spool/mail/
+    fi
     break
   fi
   if [ "$answer_useracc" = "e" ]; then

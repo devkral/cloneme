@@ -35,10 +35,10 @@
 
 usage()
 {
-  echo "usage: addnewuser.sh"
+  echo "usage: addnewuser.sh <destsys>"
   exit 1
 }
-if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" != "0" ] ;then
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" != "1" ] ;then
   usage
 fi
 
@@ -52,6 +52,8 @@ if [ ! -e "/usr/bin/realpath" ];then
     exit 0;
   }
 fi
+
+destsys="$(realpath "$1")"
 
 #dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
@@ -80,8 +82,8 @@ do
     if [ "$admin_perm" = "yes" ];then
       usergroupargs+="$usergroupargs,$("${sharedir}"/sh/groupexist.sh $admingroup)"
     fi
-    useradd -m -U "$user_name" -p "" -G "$usergroupargs"
-    passwd -e "$user_name"
+    useradd -m -U "$user_name" -p "" -R "$destsys" -G "$usergroupargs"
+    passwd -e "$user_name" -R "$destsys"
   fi
   if [ "$n_user" = "no" ];then
     break

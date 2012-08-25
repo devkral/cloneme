@@ -40,6 +40,10 @@ usage()
   echo "  --src <system copied from>"
   echo "  --dest <folder copied to>"
   echo "  --mode <mode which should be used> see mode section"
+  echo "  --copyuser <target>:"
+  echo "    - specify program to copy users"
+  echo "    - syntax of target program:"
+  echo "        <target> --src <src> --dest <dest> --user <name>"
   echo ""
   echo "mode:"
   echo "  update: just sync and ask for each user which files should be copied"
@@ -53,16 +57,13 @@ usage()
   echo ""
   echo "  --editfstab <editor>: optional (default: skip):"
   echo "      edit fstab with editor"
-  echo ""
-  echo "general options:"
-  echo "  --copyuser <target>: optional (default: copyuser.sh):"
-  echo "    - specify program to copy users"
+  echo "  --adduser <target>: optional (default: skip:"
+  echo "    - specify program to add new users"
   echo "    - syntax of target program:"
-  echo "        <target> --src <src> --dest <dest> --user <name>"
-  echo ""
+  echo "        <target> --dest <dest>"
+  echo "general options:"
   echo "  --installinstaller <target> optional (default: skip):"
   echo "      use target prog to install installer"
-  echo ""
 
   exit 1
 }
@@ -82,19 +83,17 @@ if [ ! -e "/usr/bin/realpath" ];then
 fi
 
 
-mode=""
-srcsys=""
-destsys=""
 
 #dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
-copyusertarget="${sharedir}"/sh/copyuser.sh
-editfstabtarget=""
-installinstallertarget=""
 #"$sharedir"/sh/install-installer.sh "$(dirname "$0")" "$(dirname "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
-bootloadertarget=""
 
 shall_exit=false
+installinstallertarget=""
+addusertarget=""
+editfstab=""
+installinstaller=""
+bootloadertarget=""
 
 while [ $# -gt 0 ]
 do
@@ -103,6 +102,7 @@ do
     "--src")srcsys="$(realpath "$2")"; shift;;
     "--dest")destsys="$(realpath "$2")"; shift;;
     "--copyuser")copyusertarget="$2"; shift;;
+    "--adduser")addusertarget="$2"; shift;;
     "--editfstab")editfstabtarget="$2"; shift;;
     "--installinstaller")installinstallertarget="$2"; shift;;
     "--bootloader")bootloadertarget="$2"; shift;;
@@ -110,21 +110,25 @@ do
   shift
 done
 
-if [ "$srcsys" = "" ] || [ ! -e "$srcsys" ]; then
+if [ -n $srcsys ] || [ ! -e "$srcsys" ]; then
   echo "Error: no source system specified";
   shall_exit=true;
 fi
 
-if [ "$destsys" = "" ] || [ ! -e "$destsys" ]; then
+if [ -n $destsys ] || [ ! -e "$destsys" ]; then
   echo "Error: no destination system specified";
   shall_exit=true;
 fi
 
-if [ "$mode" = "" ]; then
+if [ -n $mode ]; then
   echo "Error: no mode is specified";
   shall_exit=true;
 fi
 
+if [ -n $copyusertarget ]; then
+  echo "Error: command for copying userfiles specified";
+  shall_exit=true;
+fi
 
 # exit if a needed arg wasn't specified elsewise echo choosen options
 if [ $shall_exit = true ]; then
@@ -136,6 +140,7 @@ else
   echo "$destsys"
   echo ""
   echo "$copyusertarget"
+  echo "$addusertarget"
   echo "$editfstabtarget"
   echo "$installinstallertarget"
   echo "$bootloadertarget"
@@ -160,29 +165,31 @@ copyuser()
   do
     eval "$copyusertarget --src ${srcsys} --dest ${destsys} --user ${usertemp}"
   done
+  if [ "$addusertarget" != "" ]; then
+    eval "$addusertarget --dest ${destsys}"
+  fi
+  
 }
  
 updater()
 {
-  if ! rsync -a -A --progress --delete --exclude "/run/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "/etc/fstab" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys}"/* "${destsys}" ; then
+  if ! rsync -a -A --progress --delete --exclude "/etc/fstab" --exclude "/run/*" --exclude "/var/spool/mail/*" --exclude "/etc/passwd" --exclude "/etc/passwd?"  --exclude "/etc/group" --exclude "/etc/group?" --exclude "/etc/shadow" --exclude "/etc/shadow?" --exclude "/etc/gshadow" --exclude "/etc/gshadow?" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys}"/* "${destsys}" ; then
     echo "error: rsync could not sync"
     exit 1
   fi
   copyuser
-  if [ -n "$installinstallertarget" ]; then
+  if [ "$installinstallertarget" != "" ]; then
     eval "$installinstallertarget"
-  fi
-  if [ -n "$bootloadertarget" ]; then
-    eval "$bootloadertarget"
   fi
 }
 
 installer()
 {
-  if ! rsync -a -A --progress --delete --exclude "/run/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys}"/* "${destsys}" ;then
+  if ! rsync -a -A --progress --delete --exclude "/run/*" --exclude "/var/spool/mail/*" --exclude "/etc/passwd" --exclude "/etc/passwd?"  --exclude "/etc/group" --exclude "/etc/group?" --exclude "/etc/shadow" --exclude "/etc/shadow?" --exclude "/etc/gshadow" --exclude "/etc/gshadow?" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys}"/* "${destsys}" ;then
     echo "error: rsync could not sync"
     exit 1
   fi
+  "$sharedir"/sh/update-users.sh
   if [ -f "${dest}"/etc/fstab ];then
     local tempprobefstab="$("$sharedir"/sh/devicefinder.sh uuid "${destsys}")"
     local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobe}\1/" "${destsys}"/etc/fstab)"
@@ -197,7 +204,6 @@ installer()
     exit 1
   fi
   #optional add bootflag to partition target dir is on (thinkpad boot) This should be done in the bootloader script.
-  
   copyuser
   if [ "$installinstallertarget" != "" ]; then
     eval "$installinstallertarget"
