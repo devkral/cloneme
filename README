@@ -1,5 +1,4 @@
-this bash script can clone the whole system it's running on
-be careful: alpha quality
+this bash script can clone a system to an usbstick or whatever (am existing partition is required and just one partition can be copied)
+It can also update an existing system via rsync. 
 
-
-cloneme commandline version is in src/sh
+cloneme commandline version is in src

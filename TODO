@@ -2,12 +2,15 @@
 Limitation: graphic addnewusers just works on systems with the same architecture
 
 less important:
-+++run less parts as root (less important)
+
++++run less parts as root
 +add support for other bootloaders
 +offer some special options for ssds/USB-flashdrives
 
+
 future:
-loop other things than raw
++copy more than one partition (maybe read fstab of src)
++loop other things than raw
 maybe detect via parted if nbd is mounted
 
 nbd stuff
