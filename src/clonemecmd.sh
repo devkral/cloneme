@@ -156,8 +156,15 @@ if [ "$mode" = "" ]; then
   shall_exit=true;
 fi
 
+if [ "$UID" != "0" ] || [ "$EUID" != "0" ]; then
+  echo "must run with root rights"
+  exit 1
+fi
 
-# exit if a needed arg wasn't specified elsewise echo choosen options
+
+
+
+# exit if a needed arg wasn't specified elsewise echo selected options
 if [ $shall_exit = true ]; then
   exit 1
 else
