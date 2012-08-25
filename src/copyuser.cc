@@ -52,7 +52,7 @@ void copyuser::cleanuser()
 
 void copyuser::copysynchf()
 {
-	Glib::ustring sum=sharedir()+"/sh/copyuser.sh --src "+src+" --dest "+dest+" --user "+name+" s\n";
+	Glib::ustring sum=sharedir()+"/sh/copyuser.sh --src "+src+" --dest "+dest+" --user "+name+" --action s\n";
 	if (system(sum.c_str())==0)
 		kitcopy.quit();
 }
@@ -67,7 +67,7 @@ void copyuser::ignoref()
 
 void copyuser::emptyf()
 {
-	Glib::ustring sum=sharedir()+"/sh/copyuser.sh --src "+src+" --dest "+dest+" --user "+name+" e\n";
+	Glib::ustring sum=sharedir()+"/sh/copyuser.sh --src "+src+" --dest "+dest+" --user "+name+" --action e\n";
 	if (system(sum.c_str())==0)
 		kitcopy.quit();
 }
