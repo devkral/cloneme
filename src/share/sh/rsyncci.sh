@@ -157,7 +157,7 @@ copyuser()
  
 updater()
 {
-  if ! rsync -a -A --progress --delete --exclude "${srcsys}/run/*" --exclude "${srcsys}/"boot/grub/grub.cfg --exclude "${srcsys}"/boot/grub/device.map --exclude "${srcsys}"/etc/fstab --exclude "${dest}" --exclude "${srcsys}/home/*" --exclude "${srcsys}/sys/*" --exclude "${srcsys}/dev/*" --exclude "${srcsys}/proc/*" --exclude "${srcsys}/var/log/*" --exclude "${srcsys}/tmp/*" --exclude "${srcsys}/run/*" --exclude "${srcsys}/var/run/*" --exclude "${srcsys}/var/tmp/*" "${srcsys}"/* "${srcsys}" ; then
+  if ! rsync -a -A --progress --delete --exclude "${srcsys2}/run/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "/etc/fstab" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "${srcsys}/var/tmp/*" "${srcsys2}"/* "${srcsys2}" ; then
     echo "error: rsync could not sync"
     exit 1
   fi
@@ -172,7 +172,7 @@ updater()
 
 installer()
 {
-  if ! rsync -a -A --progress --delete --exclude "${srcsys}/run/*" --exclude "${srcsys}/"boot/grub/grub.cfg --exclude "${srcsys}/"boot/grub/device.map --exclude "${dest}" --exclude "${srcsys}/home/*" --exclude "${srcsys}/sys/*" --exclude "${srcsys}/dev/*" --exclude "${srcsys}/proc/*" --exclude "${srcsys}/var/log/*" --exclude "${srcsys}/tmp/*" --exclude "${srcsys}/run/*" --exclude "${srcsys}/var/run/*" --exclude "${srcsys}/var/tmp/*" "${srcsys}"/* "${destsys}" ;then
+  if ! rsync -a -A --progress --delete --exclude "/run/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys2}"/* "${destsys}" ;then
     echo "error: rsync could not sync"
     exit 1
   fi
