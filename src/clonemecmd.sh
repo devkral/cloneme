@@ -114,6 +114,8 @@ editfstabtarget2=""
 bootloadertargetne=""
 installinstallertargetne=""
 
+
+shall_exit=false
 while [ $# -gt 0 ]
 do
   case "$1" in
@@ -168,10 +170,10 @@ fi
 if [ $shall_exit = true ]; then
   exit 1
 else
-  echo "choosed options:"
+  echo "selected options:"
   echo "$mode"
-  echo "$srcsys"
-  echo "$destsys"
+  echo "$clonesource"
+  echo "$clonetarget"
   echo ""
   echo "$copyusertarget"
   echo "$editfstabtarget"
@@ -182,6 +184,8 @@ fi
 # pidlocking
 pidcreate()
 {
+#needed for pid
+"$sharedir"/sh/prepsyncscript.sh "${syncdir}"
 #just one instance can run simultanous
 if [ ! -e "$syncdir/cloneme.pid" ]; then
   echo "$$" > "$syncdir/cloneme.pid"
@@ -202,13 +206,15 @@ if [ ! -e "$syncdir/cloneme.pid" ]; then
 elif [ ! -f "$syncdir/cloneme.pid" ]; then
   echo -e "error: \"$syncdir/cloneme.pid\" is not a file\n"
 else
-  if [ "/proc/$(cat "$syncdir/cloneme.pid")" != "$$" ]; then
+  if [ "$(cat "$syncdir/cloneme.pid")" != "$$" ]; then
     echo "an other instance is running, abort!"
     exit 1;
   else
     rm "$syncdir/cloneme.pid"
   fi
 fi
+#cleanup syncdir
+"$sharedir"/sh/umountsyncscript.sh "$syncdir"
 }
 
 ### basic checks:
@@ -224,11 +230,10 @@ fi
 #check syncdir; it mustn't end with /"
 tempp="$(realpath "$syncdir")"
 
-if [ "$("$sharedir"/sh/report-missing-packages.sh)" = "" ]; then
+if [ "$("$sharedir"/sh/report-missing-packages.sh)" != "" ]; then
   exit 1
 fi
 
-"$sharedir"/sh/prepsyncscript.sh "${syncdir}"
 if ! "$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src; then
   exit 1
 fi
@@ -250,14 +255,17 @@ installer(){
 }
 
 updater(){
+echo "Begin update"
    if ! "$sharedir"/sh/rsyncci.sh \
 --mode update \
---src "${clonesourcedir}" \
---dest "${clonedestdir}" \
+--src "${syncdir}/src" \
+--dest "${syncdir}/dest" \
 "$editfstabtarget" \
 "$bootloadertargetne" \
 "$installinstallertargetne";then
     exit 1;
+  else
+    echo "Update finished"
   fi 
 }
 
@@ -266,13 +274,13 @@ case "$mode" in
   "update")updater;;
   "install")installer;;
   "cleandest")rm -r "$syncdir"/dest/*;;
-  *)usage;exit 1;;
+  *)usage;;
 esac
 
 
-"$sharedir"/sh/umountsyncscript.sh "$syncdir"
+
 pidremove
 
-trap "$sharedir/sh/umountsyncscript.sh \"$syncdir\";pidremove" SIGINT
+trap "pidremove" SIGINT
 
 exit 0;
