@@ -36,7 +36,7 @@
 
 usage()
 {
-  echo "usage: install-installer-compiler.sh <architecture> <output>"
+  echo "usage: install-installer-compiler.sh <architecture against which is checked> <output>"
   echo "warning: cloneme specific"
   exit 1
 }
@@ -70,7 +70,7 @@ if [ "$(uname -m)" != "$architecture" ];then
   cd "$sharedir/src"
   #safety guard: restrict to .cc .h
   compilefiles="$(ls ./*.{cc,h})"
-  if ! g++ -o "$output" `pkg-config --libs --cflags vte-2.90 gtkmm-3.0` -std=c++11 -Wall \
+  if ! g++ -o "$output" `pkg-config --libs --cflags vte-2.90 gtkmm-3.0` -std=c++0x -Wall \
 	-DPACKAGE_DATA_DIR="\"${sharedir}\"" -DPACKAGE_BIN_DIR="\"$outputdir\"" -O2 $compilefiles; then
     echo "error"
     exit 1

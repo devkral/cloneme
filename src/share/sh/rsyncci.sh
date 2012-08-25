@@ -127,7 +127,7 @@ fi
 if [ $shall_exit = true ]; then
   exit 1
 else
-  echo "choosed options"
+  echo "selected options:"
   echo "$mode"
   echo "$srcsys"
   echo "$destsys"

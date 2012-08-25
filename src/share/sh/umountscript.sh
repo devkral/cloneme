@@ -65,6 +65,12 @@ if [ ! -e "$thingtounmount" ] && [[ $(echo "$mountpointt" | wc -l) = 1 ]]; then
   echo "umountscript: error: $mountpointt doesn't exist"
   exit 1
 fi
+
+if [ "$thingtounmount" = "/" ]; then
+  echo "$_ runs crazy and wanted to kill /"
+  exit 1
+fi
+
 staticmounts="$(cat /proc/mounts)"
 
 

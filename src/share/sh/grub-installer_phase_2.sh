@@ -78,3 +78,4 @@ fi
 grub-mkconfig -o /boot/grub/grub.cfg
 echo -e "\ngrub installation finished.\nStart with the configuration of the new system\n"
 eval "$@"
+echo -e "Configuration finished\nGo back\n"

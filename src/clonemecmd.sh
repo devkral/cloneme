@@ -92,7 +92,7 @@ sharedir="./src/share" #--replacepattern--
 #the command which configures the target system
 config_new_sys="$sharedir/sh/addnewusers.sh"
 #the command to install the bootloader
-bootloadertarget="$sharedir/sh/grub-installer_phase_1.sh"
+bootloadertarget="$sharedir/sh/grub-installer_phase_1.sh $syncdir/dest $config_new_sys"
 #folder which is copied by default
 clonesource="/"
 #dir where sync folder are located

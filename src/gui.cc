@@ -128,6 +128,7 @@ bool gui::lockoperation()
 		dest->set_sensitive(false);
 		partnumbsrc->set_sensitive(false);
 		partnumbdest->set_sensitive(false);
+		return true;
 	}
 	else
 	{
@@ -178,37 +179,43 @@ void gui::opengparted()
 
 void gui::update()
 {
-	if (lockoperation()==true && partready()==true);
+	if (partready()==true)
 	{
-		Glib::ustring sum="";
-		sum+=sharedir()+"/sh/rsyncci.sh ";
-		sum+="--mode update ";
-		sum+="--src "+syncdir()+"/src ";
-		sum+="--dest "+syncdir()+"/dest ";
-		if (useeditor->get_active ())
-			sum+="--editfstab \""+editortouse->get_text()+"\" ";
-		sum+="\n";
-		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
-		unlockoperation();
+		if (lockoperation()==true)
+		{
+			Glib::ustring sum="";
+			sum+=sharedir()+"/sh/rsyncci.sh ";
+			sum+="--mode update ";
+			sum+="--src "+syncdir()+"/src ";
+			sum+="--dest "+syncdir()+"/dest ";
+			if (useeditor->get_active ())
+				sum+="--editfstab \""+editortouse->get_text()+"\" ";
+			sum+="\n";
+			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+			unlockoperation();
+		}
 	}
 }
 
 void gui::install()
 {
-	if (lockoperation()==true && partready()==true);
+	if (partready()==true)
 	{
-		Glib::ustring sum="";
-		sum+=sharedir()+"/sh/rsyncci.sh ";
-		sum+="--mode install ";
-		sum+="--src "+syncdir()+"/src ";
-		sum+="--dest "+syncdir()+"/dest ";
-		sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
-		if (useeditor->get_active ())
-			sum+="--editfstab \""+editortouse->get_text()+"\" ";
-		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
-		sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest "+bindir()+"/cloneme --createuser\"\n";
-		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
-		unlockoperation();
+		if (lockoperation()==true)
+		{
+			Glib::ustring sum="";
+			sum+=sharedir()+"/sh/rsyncci.sh ";
+			sum+="--mode install ";
+			sum+="--src "+syncdir()+"/src ";
+			sum+="--dest "+syncdir()+"/dest ";
+			sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
+			if (useeditor->get_active ())
+				sum+="--editfstab \""+editortouse->get_text()+"\" ";
+			sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
+			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest "+bindir()+"/cloneme --createuser\"\n";
+			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
+			unlockoperation();
+		}
 	}
 }
 
@@ -228,9 +235,13 @@ void gui::choosedest(Gtk::EntryIconPosition pos, const GdkEventButton* event)
 //is src and dest mounted
 bool gui::partready()
 {
-	if (is_mounteds==false || is_mountedd==false)
+	if (is_mounteds==true && is_mountedd==true)
+		return true;
+	else
+	{
+		//std::cerr << "src and/or dest not mounted\n";
 		return false;
-	return true;
+	}
 }
 
 bool gui::updatedsrc(void*)
@@ -365,7 +376,7 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 	{
 		std::cerr << "Terminal child didn't start.\n";
 	}
-
+	vte_terminal_set_scrollback_lines(VTE_TERMINAL(vteterm), -1);
 	
 	//Buttons
 	gparted=transform_to_rptr<Gtk::Button>(builder->get_object("gparted"));
