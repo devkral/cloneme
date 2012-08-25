@@ -40,6 +40,7 @@ usage()
   echo "modes:"
   echo "rm: remove mountdir after unmount"
   echo "n/normal/umount: just umount; if mounteddevice is loop or blockdevice umount all depending mounts (and detach loop)"
+  echo "device: just unmount devices not directories"
   echo "related: unmount underlying blockdevice/loop/mountpoint from other mountpoints"
   exit 1
 }
@@ -137,12 +138,21 @@ umount_all()
   un_mount "$umountdevice"
 }
 
+#usage: un_mount_device <mountpoint>
+un_mount_device()
+{
+if [ ! -d "$1" ]; then
+  un_mount "$1"
+fi
+}
+
 
 
 case "$mode" in
   "n")un_mount "$mountpointt";;
   "normal")un_mount "$mountpointt";;
   "umount")un_mount "$mountpointt";;
+  "device")un_mount_device "$mountpointt";;
   "rm")un_mount "$mountpointt"; rmdir "$mountpointt";;
   "related")umount_all;;
   *)usage  ;;

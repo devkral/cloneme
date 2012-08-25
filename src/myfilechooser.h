@@ -62,7 +62,10 @@ private:
 	Glib::RefPtr<Gtk::FileChooserWidget> fcwidget;
 	//added special buttons
 	Glib::RefPtr<Gtk::Button>selectedfile,currentfolder,cancelchoose;
+	
 	Glib::ustring path;
+	//ease the life
+	//Glib::ustring lastdir;
 
 	//adopted entry
 	Glib::RefPtr<Gtk::Entry> adopedentry;

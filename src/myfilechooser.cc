@@ -54,6 +54,7 @@ void myfilechooser::currentfolderf()
 {
 	fcdialog->hide();
 	path=fcwidget->get_current_folder ();
+	
 	if (adopedentry==true)
 	{
 		adopedentry->set_text(path);
@@ -73,6 +74,8 @@ void myfilechooser::cancelchoosef()
 void myfilechooser::run(Glib::RefPtr<Gtk::Entry> &temp)
 {
 	adopedentry=temp;
+	if (path!="")
+		fcwidget->set_current_folder(path);
 	fcdialog->show();
 }
 
