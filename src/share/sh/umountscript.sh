@@ -44,7 +44,7 @@ usage()
   echo "related: unmount underlying blockdevice/loop/mountpoint from other mountpoints"
   exit 1
 }
-if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" != "2" ] ;then
   usage
 fi
 #intern dependencies: -

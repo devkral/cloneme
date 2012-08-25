@@ -184,9 +184,10 @@ void gui::update()
 		sum+=sharedir()+"/sh/rsyncci.sh ";
 		sum+="--mode update ";
 		sum+="--src "+syncdir()+"/src ";
-		sum+="--dest "+syncdir()+"/dest\n";
+		sum+="--dest "+syncdir()+"/dest ";
 		if (useeditor->get_active ())
 			sum+="--editfstab \""+editortouse->get_text()+"\" ";
+		sum+="\n";
 		vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		unlockoperation();
 	}
@@ -201,7 +202,7 @@ void gui::install()
 		sum+="--mode install ";
 		sum+="--src "+syncdir()+"/src ";
 		sum+="--dest "+syncdir()+"/dest ";
-		sum+="--copyuser \""+bindir()+"/cloneme --copyuser\"\n";
+		sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
 		if (useeditor->get_active ())
 			sum+="--editfstab \""+editortouse->get_text()+"\" ";
 		sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
