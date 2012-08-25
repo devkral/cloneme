@@ -116,6 +116,16 @@ void gui::useeditorf()
 
 }
 
+bool gui::islocked()
+{
+	if (access((syncdir()+"/guilock").c_str(),F_OK)==0)
+		return true;
+	else
+		return false;
+	
+}
+
+/**
 bool gui::lockoperation()
 {
 	if (operationlock==false)
@@ -154,15 +164,12 @@ bool gui::unlockoperation()
 	{
 		return false;
 	}
-}
+}*/
 
-
-//void execparted(gui *refback)
 void gui::execparted()
 {
 	if (system("gpartedbin")!=0)
 		std::cerr << "An error happened\n";
-	//refback->gpartmut.unlock();
 	gparted_mutex.unlock();
 }
 
@@ -181,18 +188,19 @@ void gui::update()
 {
 	if (partready()==true)
 	{
-		if (lockoperation()==true)
+		if (islocked()==false)
 		{
-			Glib::ustring sum="";
+			Glib::ustring sum="echo 1 > "+syncdir()+"/guilock\n";
 			sum+=sharedir()+"/sh/rsyncci.sh ";
 			sum+="--mode update ";
 			sum+="--src "+syncdir()+"/src ";
 			sum+="--dest "+syncdir()+"/dest ";
+			sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
 			if (useeditor->get_active ())
 				sum+="--editfstab \""+editortouse->get_text()+"\" ";
 			sum+="\n";
+			sum+="rm "+syncdir()+"/guilock\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
-			unlockoperation();
 		}
 	}
 }
@@ -201,7 +209,7 @@ void gui::install()
 {
 	if (partready()==true)
 	{
-		if (lockoperation()==true)
+		if (islocked()==false)
 		{
 			Glib::ustring sum="";
 			sum+=sharedir()+"/sh/rsyncci.sh ";
@@ -212,11 +220,9 @@ void gui::install()
 			if (useeditor->get_active ())
 				sum+="--editfstab \""+editortouse->get_text()+"\" ";
 			sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
-			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest \\\"if ! "+bindir()+"/cloneme --createuser; then "+sharedir()+"/sh/addnewuser.sh; fi\\\"\"\n";
-			//sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest "+bindir()+"/cloneme --createuser\"\n";
-			
+			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest \\\"if ! "+bindir()+"/cloneme --createuser; then "+sharedir()+"/sh/addnewusers.sh; fi\\\"\"\n";
+			sum+="rm "+syncdir()+"/guilock\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
-			unlockoperation();
 		}
 	}
 }
@@ -435,6 +441,7 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 gui::~gui()
 {
 	//cleanup
+	system(("rm "+syncdir()+"/guilock").c_str());
 	if (unsetpidlock())
 		system((sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n").c_str());
 	if (threadpart!=0)

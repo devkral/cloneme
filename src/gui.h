@@ -119,7 +119,8 @@ private:
 	//safeguards
 	bool operationlock;
 	bool partready();
-	bool lockoperation(),unlockoperation(),;
+	bool islocked();
+	//bool lockoperation(),unlockoperation(),;
 
 	//directs to program file
 	Glib::ustring home_path;

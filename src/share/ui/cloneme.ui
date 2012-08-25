@@ -13,7 +13,7 @@
         <property name="border_width">5</property>
         <child>
           <object class="GtkButton" id="installb">
-            <property name="label" translatable="yes">Start</property>
+            <property name="label" translatable="yes">Install</property>
             <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>

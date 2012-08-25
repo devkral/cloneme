@@ -86,6 +86,8 @@ mode=""
 srcsys=""
 destsys=""
 
+#dir where the cloneme files are located
+sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 copyusertarget="${sharedir}"/sh/copyuser.sh
 editfstabtarget=""
 installinstallertarget=""
@@ -142,13 +144,14 @@ else
   fi
 fi
 
-for check_if_mounted in tmp run proc sys dev
-do
-  if mountpoint -q "$destsys"/"$check_if_mounted"; then
-    echo "$check_if_mounted is mounted! abort!"
-    exit 1;
-  fi
-done
+#won't be sync anymore
+#for check_if_mounted in tmp run proc sys dev
+#do
+#  if mountpoint -q "$destsys"/"$check_if_mounted"; then
+#    echo "$check_if_mounted is mounted! abort!"
+#    exit 1;
+#  fi
+#done
 
 copyuser()
 {
