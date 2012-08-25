@@ -14,7 +14,7 @@ clonesrc_DATA =  \
 	../../createuser.h \
 	../../myfilechooser.cc \
 	../../myfilechooser.h \
-	../../basismethods.h \
-	../../basismethods.cc
+	../../base.h \
+	../../base.cc
 	
 

@@ -36,7 +36,7 @@
  */
 
 #include "copyuser.h"
-#include "basismethods.h"
+#include "base.h"
 #include <getopt.h>
 
 

@@ -36,7 +36,7 @@
  */
 
 #include "myfilechooser.h"
-#include "basismethods.h"
+#include "base.h"
 //privat:
 
 void myfilechooser::selectedfilef()

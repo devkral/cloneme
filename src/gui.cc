@@ -35,8 +35,8 @@
  *
  */
 
-#include "basismethods.h"
 #include "gui.h"
+#include "base.h"
 //#include "myfilechooser.h"
 
 #include <fstream>

@@ -1,7 +1,6 @@
-#include "basismethods.h"
-
-
+#include "base.h"
 #include <cstdio>
+
 Glib::ustring system2(Glib::ustring _tcommand)
 {
    FILE * proc;

@@ -41,7 +41,7 @@
 #include "gui.h"
 #include "copyuser.h"
 #include "createuser.h"
-#include "basismethods.h"
+#include "base.h"
 
 #include <getopt.h>
 //#include <cstdio>

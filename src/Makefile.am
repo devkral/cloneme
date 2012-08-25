@@ -29,8 +29,8 @@ cloneme_SOURCES = \
 	createuser.h \
 	myfilechooser.cc \
 	myfilechooser.h \
-	basismethods.h \
-	basismethods.cc
+	base.h \
+	base.cc
 
 cloneme_LDFLAGS = 
 

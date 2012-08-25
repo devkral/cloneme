@@ -36,11 +36,7 @@
  */
 
 #include "createuser.h"
-#include "basismethods.h"
-//#include <string> //not needed basismethods
-//#include <unistd.h> //not needed basismethods
-//#include <getopt.h>
-//#include <iostream>
+#include "base.h"
 
 int createuser::makeuser()
 {
