@@ -1,7 +1,26 @@
 #! /usr/bin/env bash
 
-echo "stub"
-exit 1
+usage()
+{
+echo "usage: update-users <src> <dest>"
+}
+
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" != "2" ] ;then
+  usage
+fi
+#intern dependencies: -
+
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
+
+srcsys="$(realpath "$1")"
+destsys="$(realpath "$2")"
 
 for copyfiledest in $(ls "${destsys}"/etc/{?,""}shadow{?,""}; ls "${destsys}"/etc/group{?,""})
 do
