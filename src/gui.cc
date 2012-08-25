@@ -212,7 +212,9 @@ void gui::install()
 			if (useeditor->get_active ())
 				sum+="--editfstab \""+editortouse->get_text()+"\" ";
 			sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
-			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest \'if !"+bindir()+"/cloneme --createuser; then "+sharedir()+"/sh/addnewuser.sh; fi\'\"\n";
+			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest \\\"if ! "+bindir()+"/cloneme --createuser; then "+sharedir()+"/sh/addnewuser.sh; fi\\\"\"\n";
+			//sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest "+bindir()+"/cloneme --createuser\"\n";
+			
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 			unlockoperation();
 		}

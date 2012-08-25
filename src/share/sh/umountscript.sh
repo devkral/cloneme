@@ -59,7 +59,11 @@ if [ ! -e "/usr/bin/realpath" ];then
 fi
 
 mode="$1"
-thingtounmount="$(realpath "$2")"
+if [ "$2" != "" ]; then
+  thingtounmount="$(realpath "$2")"
+else
+  exit 1
+fi
 #important for security
 if [ ! -e "$thingtounmount" ] && [[ $(echo "$mountpointt" | wc -l) = 1 ]]; then
   echo "umountscript: error: $mountpointt doesn't exist"
@@ -81,6 +85,11 @@ staticmounts="$(cat /proc/mounts)"
 un_mount()
 {
   umountpoint="${1}"
+  if [ "${umountpoint}" = "/" ]; then
+    echo "Error: don't unmount rootfs"
+    exit 1;
+  fi
+  
   if [ -d "${umountpoint}" ]; then
     if mountpoint "${umountpoint}" > /dev/null; then
       if ! umount "${umountpoint}"; then
@@ -99,7 +108,7 @@ un_mount()
   elif [ -f "${umountpoint}" ]; then
     local umountloop="$(losetup -a | grep "${umountpoint}" | sed 's/:.\+//')"
     local pathtoumount="$(grep "$umountloop" /proc/mounts | sed -e "s/^[^ ]\+ \([^ ]\+\) .*/\1/g")"
-    if [ "$pathtoumount" != "" ]; then
+    if [ "$umountloop" != "" ] && [ "$pathtoumount" != "" ]; then
       for itemtoumount in $pathtoumount
       do
         #echo "mount_blockdevice: un_mount $itemtoumount"

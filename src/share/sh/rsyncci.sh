@@ -44,6 +44,7 @@ usage()
   echo "mode:"
   echo "  update: just sync and ask for each user which files should be copied"
   echo "  install: like update+fstab update and other things; see install section"
+  echo "  test: echo parameters and exit"
   echo ""
   echo "install:"
   echo "  --bootloader <target>: optional (default: none):"
@@ -136,6 +137,9 @@ else
   echo "$editfstabtarget"
   echo "$installinstallertarget"
   echo "$bootloadertarget"
+  if [ "$mode" = "test" ]; then
+    exit 0;
+  fi
 fi
 
 for check_if_mounted in tmp run proc sys dev
@@ -157,7 +161,7 @@ copyuser()
  
 updater()
 {
-  if ! rsync -a -A --progress --delete --exclude "${srcsys2}/run/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "/etc/fstab" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "${srcsys}/var/tmp/*" "${srcsys2}"/* "${srcsys2}" ; then
+  if ! rsync -a -A --progress --delete --exclude "/run/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "/etc/fstab" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys}"/* "${destsys}" ; then
     echo "error: rsync could not sync"
     exit 1
   fi
@@ -172,7 +176,7 @@ updater()
 
 installer()
 {
-  if ! rsync -a -A --progress --delete --exclude "/run/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys2}"/* "${destsys}" ;then
+  if ! rsync -a -A --progress --delete --exclude "/run/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys}"/* "${destsys}" ;then
     echo "error: rsync could not sync"
     exit 1
   fi

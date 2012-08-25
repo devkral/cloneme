@@ -106,7 +106,6 @@ if [ "$mode" = "needpart" ]; then
 fi
 
 if [ "$mode" = "mount" ] || [ -e "$mountpath" ]; then
-
   if [ ! -d "${thingtomount}" ];then
     #sorry other mountpoints but we must be sure that this is the only mountpoint;
     #/proc/mounts of the real running system is used
