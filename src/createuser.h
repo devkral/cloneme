@@ -62,6 +62,7 @@ private:
 	void quit();
 	void adduserquit();
 	int makeuser();
+	Glib::ustring dest;
 	
 };
 

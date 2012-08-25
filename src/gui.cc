@@ -443,7 +443,7 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 gui::~gui()
 {
 	//cleanup
-	system(("rm "+syncdir()+"/guilock").c_str());
+	system(("rm "+syncdir()+"/guilock 2> /dev/null").c_str());
 	if (unsetpidlock())
 		system((sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n").c_str());
 	if (threadpart!=0)

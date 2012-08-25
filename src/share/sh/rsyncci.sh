@@ -177,6 +177,7 @@ updater()
     echo "error: rsync could not sync"
     exit 1
   fi
+  "$sharedir"/sh/update-users.sh "${srcsys}" "${destsys}"
   copyuser
   if [ "$installinstallertarget" != "" ]; then
     eval "$installinstallertarget"
@@ -189,8 +190,9 @@ installer()
     echo "error: rsync could not sync"
     exit 1
   fi
-  "$sharedir"/sh/update-users.sh
-  if [ -f "${dest}"/etc/fstab ];then
+  "$sharedir"/sh/update-users.sh "${srcsys}" "${destsys}"
+  
+  if [ -f "${destsys}"/etc/fstab ];then
     local tempprobefstab="$("$sharedir"/sh/devicefinder.sh uuid "${destsys}")"
     local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobe}\1/" "${destsys}"/etc/fstab)"
     echo "$tempsed" > "${destsys}"/etc/fstab
@@ -203,12 +205,12 @@ installer()
     echo "no fstab found"
     exit 1
   fi
-  #optional add bootflag to partition target dir is on (thinkpad boot) This should be done in the bootloader script.
+  
   copyuser
   if [ "$installinstallertarget" != "" ]; then
     eval "$installinstallertarget"
   fi
-
+#optional add bootflag to partition target dir is on (thinkpad boot) This should be done in the bootloader script.
   if [ "$bootloadertarget" != "" ]; then
     eval "$bootloadertarget"
   fi

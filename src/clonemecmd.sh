@@ -85,7 +85,7 @@ if [ ! -e "/usr/bin/realpath" ];then
     echo "$(readlink -f "$1")"
     exit 0;
   }
-fi	
+fi
 
 #create absolut path name for this program
 myself="$(realpath "$0")"
@@ -105,7 +105,7 @@ copyusertarget="${sharedir}"/sh/copyuser.sh
 #command to add new users
 addusertarget="${sharedir}"/sh/addnewusers.sh
 #command to install the installer
-installinstallertarget="\"$sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/ ${clonedestdir};"
+installinstallertarget="\"$sharedir/sh/install-installer.sh $0 $(dirname "$sharedir")/applications/ ${clonedestdir}"
 #don't comment or change this
 clonetarget=""
 mode=""
@@ -133,10 +133,10 @@ do
 done
 
 if [ ! -n $installinstallertarget2 ]; then
-  installinstallertarget="--exec $installinstallertarget2"
-  installinstallertargetne="--exec $installinstallertarget2"
+  installinstallertarget="--installinstaller $installinstallertarget2"
+  installinstallertargetne="--installinstaller $installinstallertarget2"
 else
-  installinstallertarget="--exec $installinstallertarget"
+  installinstallertarget="--installinstaller $installinstallertarget"
 fi 
 
 if [ "$clonetarget" = "" ] || [ ! -e "$clonetarget" ]; then
@@ -225,15 +225,18 @@ fi
 #check syncdir; it mustn't end with /"
 tempp="$(realpath "$syncdir")"
 
-if [ "$("$sharedir"/sh/report-missing-packages.sh)" != "" ]; then
-  exit 1
-fi
+#if [ "$("$sharedir"/sh/report-missing-packages.sh)" != "" ]; then
+#  echo "missing packages" 
+#  exit 1
+#fi
 
 if ! "$sharedir"/sh/mountscript.sh mount "$clonesource" "$syncdir"/src; then
+  echo "Can't mount src abort"
   exit 1
 fi
  
 if ! "$sharedir"/sh/mountscript.sh mount "$clonetarget" "$syncdir"/dest; then
+  echo "Can't mount dest abort"
   exit 1
 fi
 
@@ -249,6 +252,8 @@ installer(){
 "$bootloadertarget" \
 "$installinstallertarget";then
     exit 1;
+  else
+    echo "installation finished"
   fi 
 }
 
