@@ -33,7 +33,7 @@ do
   if [ -f "${destsys}"/etc/"${copyfilesrc}.oldrm" ]; then
     for destuser in $(ls /home/*)
     do
-      # check if user is alread
+      # check if user is already in file
       if ! grep "^$destuser" "${destsys}"/etc/"${copyfilesrc}"; then
         #should be just one line
         grep "^$destuser" "${destsys}"/etc/"${copyfilesrc}.oldrm" > "${destsys}"/etc/"${copyfilesrc}"
