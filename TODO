@@ -1,4 +1,6 @@
 
+Limitation: graphic addnewusers just works on systems with the same architecture
+
 less important:
 +++run less parts as root (less important)
 +add support for other bootloaders
