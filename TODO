@@ -1,6 +1,6 @@
 
-+update /etc/shadow /etc/group extra
-+don't copy /var/spool
++update /etc/shadow /etc/group extra (overwrites elsewise new users, etc)
++don't copy /var/spool/mail
 
 Limitation: graphic addnewusers just works on systems with the same architecture
 Limitation: can copy just one partition
