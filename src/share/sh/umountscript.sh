@@ -59,9 +59,9 @@ if [ ! -e "/usr/bin/realpath" ];then
 fi
 
 mode="$1"
-mountpointt="$(realpath "$2")"
+thingtounmount="$(realpath "$2")"
 #important for security
-if [ ! -e "$mountpointt" ] && [[ $(echo "$mountpointt" | wc -l) = 1 ]]; then
+if [ ! -e "$thingtounmount" ] && [[ $(echo "$mountpointt" | wc -l) = 1 ]]; then
   echo "umountscript: error: $mountpointt doesn't exist"
   exit 1
 fi
@@ -122,14 +122,14 @@ un_mount()
 #umount_all
 umount_all()
 {
-  if [ -b "$mountpointt" ];then
+  if [ -b "$thingtounmount" ];then
     #same behaviour
-    local umountdevice="$mountpointt"
-  elif [ -f "$mountpointt" ];then
+    local umountdevice="$thingtounmount"
+  elif [ -f "$thingtounmount" ];then
     #same behaviour
-    local umountdevice="$mountpointt"
-  elif [ -d "$mountpointt" ];then
-    local umountdevice="$(grep "$mountpointt " /proc/mounts | grep "^/" | sed -e "s/^\([^ ]\+\) [^ ]\+ .*/\1/g")"
+    local umountdevice="$thingtounmount"
+  elif [ -d "$thingtounmount" ];then
+    local umountdevice="$(grep "$thingtounmount " /proc/mounts | grep "^/" | sed -e "s/^\([^ ]\+\) [^ ]\+ .*/\1/g")"
     if [ "$umountdevice" = "" ]; then
       echo "$mountpointt is no mountpoint"
       exit 1
@@ -149,11 +149,11 @@ fi
 
 
 case "$mode" in
-  "n")un_mount "$mountpointt";;
-  "normal")un_mount "$mountpointt";;
-  "umount")un_mount "$mountpointt";;
-  "device")un_mount_device "$mountpointt";;
-  "rm")un_mount "$mountpointt"; rmdir "$mountpointt";;
+  "n")un_mount "$thingtounmount";;
+  "normal")un_mount "$thingtounmount";;
+  "umount")un_mount "$thingtounmount";;
+  "device")un_mount_device "$thingtounmount";;
+  "rm")un_mount "$thingtounmount"; rmdir "$thingtounmount";;
   "related")umount_all;;
   *)usage  ;;
 esac

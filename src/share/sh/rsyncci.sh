@@ -166,7 +166,7 @@ updater()
     eval "$installinstallertarget"
   fi
   if [ -n "$bootloadertarget" ]; then
-    eval "$bootloadertarget $destsys"
+    eval "$bootloadertarget"
   fi
 }
 
@@ -197,7 +197,7 @@ installer()
   fi
 
   if [ "$bootloadertarget" != "" ]; then
-    eval "$bootloadertarget $destsys"
+    eval "$bootloadertarget"
   fi
 }
 

@@ -35,7 +35,7 @@
 
 usage()
 {
-  echo "usage: grub-installer_phase_1.sh <targetsystem> [command for sysconfig like adding users] [ args ] (currently just one)"
+  echo "usage: grub-installer_phase_1.sh <targetsystem> [command for sysconfig like adding users] [ args ]"
   exit 1
 }
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
