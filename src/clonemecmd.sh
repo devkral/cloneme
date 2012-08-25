@@ -131,11 +131,15 @@ done
 if [ installinstallertarget2 != "" ]; then
   installinstallertarget="--installinstaller $installinstallertarget2"
   installinstallertargetne="--installinstaller $installinstallertarget2"
+else
+  installinstallertarget="--installinstaller $installinstallertarget"
 fi 
 
 if [ bootloadertarget2 != "" ]; then
   bootloadertarget="--bootloader $bootloadertarget2"
   bootloadertargetne="--bootloader $bootloadertarget2"
+else
+  bootloadertarget="--bootloader $bootloadertarget"
 fi
 
 if [ editfstabtarget2 != "" ]; then
