@@ -1,6 +1,6 @@
 #include "basismethods.h"
 
-/**
+
 #include <cstdio>
 Glib::ustring system2(Glib::ustring _tcommand)
 {
@@ -31,6 +31,6 @@ Glib::ustring system2(Glib::ustring _tcommand)
 			return temp;
 		}
 }
-*/
+
 
 
