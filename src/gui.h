@@ -35,29 +35,11 @@
  *
  */
 
-//using namespace std;
-/**
-#ifdef test_an
-#undef PACKAGE_DATA_DIR
-#define PACKAGE_DATA_DIR "src"
-#endif
-*/
-
-
-
 #include <gtkmm.h>
 #include <string>
 //#include <thread>
 //#include <mutex>
 #include "myfilechooser.h"
-
-/**
-struct srcdest
-{
-	Glib::ustring src;
-	Glib::ustring dest;
-};*/
-
 
 #ifndef _GUI_H_
 #define _GUI_H_
@@ -77,8 +59,6 @@ private:
 	Gtk::Main kitdeprecated;
 	Glib::RefPtr<Gtk::Builder> builder;
 	Glib::RefPtr<Gtk::Window> main_win;
-
-
 	
 	//Terminal
 	GtkWidget* vteterm;
