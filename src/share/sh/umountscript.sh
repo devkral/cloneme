@@ -86,7 +86,7 @@ un_mount()
 {
   umountpoint="${1}"
   if [ "${umountpoint}" = "/" ]; then
-    echo "Error: don't unmount rootfs"
+    echo "Error: don't unmount rootfs. Check your application"
     exit 1;
   fi
   

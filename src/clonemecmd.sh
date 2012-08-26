@@ -123,12 +123,12 @@ do
     "--mode")mode="$2";shift;;
     "--src")clonesource="$(realpath "$2")"; shift;;
     "--dest")clonetarget="$(realpath "$2")"; shift;;
-    "--copyuser")copyusertarget="$(realpath "$2")"; shift;;
-    "--adduser")addusertarget="$(realpath "$2")"; shift;;
+    "--copyuser")copyusertarget="$2"; shift;;
+    "--adduser")addusertarget="$2"; shift;;
     #will be modified to add --editfstab before payload
     "--editfstab")editfstabtarget="$2"; shift;;
-    "--installinstaller")installinstallertarget2="$(realpath "$2")"; shift;;
-    "--bootloader")bootloadertarget="$(realpath "$2")"; shift;;
+    "--installinstaller")installinstallertarget2="$2"; shift;;
+    "--bootloader")bootloadertarget="$2"; shift;;
   esac
   shift
 done
