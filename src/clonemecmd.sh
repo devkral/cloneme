@@ -66,8 +66,7 @@ usage()
   echo "    - specify program to copy users"
   echo "    - syntax of target program:"
   echo "        <target> --src <src> --dest <dest> --user <name>"
-  echo "" #\\\"$sharedir\\\"/sh/addnewusers.sh\"
-
+  echo "  --syncdir <directory> where sync takes place (includes src, dest folders and locks)"
   echo ""
   echo "The syntax is nearly the same as the one of rsyncci.sh. The reason:"
   echo "Most args are transmitted to rsyncci.sh but clonemecmd.sh adds useful things like mount of blockdevices/raw files and sane defaults"
@@ -129,6 +128,7 @@ do
     "--editfstab")editfstabtarget="$2"; shift;;
     "--installinstaller")installinstallertarget2="$2"; shift;;
     "--bootloader")bootloadertarget="$2"; shift;;
+    "--syncdir")syncdir="$2"; shift;;
   esac
   shift
 done
@@ -163,6 +163,7 @@ else
   echo "$mode"
   echo "$clonesource"
   echo "$clonetarget"
+  echo "$syncdir"
   echo ""
   echo "$copyusertarget"
   echo "$addusertarget"
