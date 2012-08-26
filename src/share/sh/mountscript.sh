@@ -61,19 +61,19 @@ sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 case "$#" in
 4)
   mode="$1"
-  thingtomount="$(echo "$2" | sed -e "s|/$||")"
+  thingtomount="$(realpath "$2")"
   partition="$3"
   mountpath="$(realpath "$4")"
     
   ;;
 3)
   mode="$1"
-  thingtomount="$(echo "$2" | sed -e "s|/$||")"
+  thingtomount="$(realpath "$2")"
   mountpath="$(realpath "$3")"
   ;;
 2)
   mode="$1"
-  thingtomount="$(echo "$2" | sed -e "s|/$||")"
+  thingtomount="$(realpath "$2")"
   ;;
 esac
 
@@ -118,7 +118,6 @@ if [ "$mode" = "mount" ] || [ -e "$mountpath" ]; then
       exit 1
     fi
   fi
-  
   if [ -d "${thingtomount}" ];then
     mount -o bind "${thingtomount}" "${mountpath}"
   elif [ -b "${thingtomount}" ];then

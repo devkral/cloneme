@@ -65,8 +65,8 @@ else
   exit 1
 fi
 #important for security
-if [ ! -e "$thingtounmount" ] && [[ $(echo "$mountpointt" | wc -l) = 1 ]]; then
-  echo "umountscript: error: $mountpointt doesn't exist"
+if [ ! -e "$thingtounmount" ] && [[ $(echo "$thingtounmount" | wc -l) = 1 ]]; then
+  echo "umountscript: error: $thingtounmount doesn't exist"
   exit 1
 fi
 
