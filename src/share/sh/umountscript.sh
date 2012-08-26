@@ -59,11 +59,7 @@ if [ ! -e "/usr/bin/realpath" ];then
 fi
 
 mode="$1"
-if [ "$2" != "" ]; then
-  thingtounmount="$(realpath "$2")"
-else
-  exit 1
-fi
+thingtounmount="$(realpath "$2")"
 #important for security
 if [ ! -e "$thingtounmount" ] && [[ $(echo "$thingtounmount" | wc -l) = 1 ]]; then
   echo "umountscript: error: $thingtounmount doesn't exist"
@@ -71,7 +67,7 @@ if [ ! -e "$thingtounmount" ] && [[ $(echo "$thingtounmount" | wc -l) = 1 ]]; th
 fi
 
 if [ "$thingtounmount" = "/" ]; then
-  echo "$_ runs crazy and wanted to kill /"
+  echo "$_ runs crazy and wanted to unmount / (rootfs)"
   exit 1
 fi
 
@@ -84,11 +80,6 @@ staticmounts="$(cat /proc/mounts)"
 #usage: un_mount <mountpoint>
 un_mount()
 {
-  umountpoint="${1}"
-  if [ "${umountpoint}" = "/" ]; then
-    echo "Error: don't unmount rootfs. Check your application"
-    exit 1;
-  fi
   
   if [ -d "${umountpoint}" ]; then
     if mountpoint "${umountpoint}" > /dev/null; then
