@@ -80,7 +80,7 @@ staticmounts="$(cat /proc/mounts)"
 #usage: un_mount <mountpoint>
 un_mount()
 {
-  
+  umountpoint="$1"
   if [ -d "${umountpoint}" ]; then
     if mountpoint "${umountpoint}" > /dev/null; then
       if ! umount "${umountpoint}"; then
