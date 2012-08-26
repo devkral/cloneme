@@ -68,9 +68,9 @@ fi
 
 sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd{?,""}
 sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group{?,""}
-sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/group{?,""}
+sed -i -e "s/\b${usertemp}\b//g" -e "s/,,\+/,/g" -e "s/: *,/:/g" -e "s/, *$//g" "${targetn}"/etc/group{?,""}
 sed -i -e "/^${usertemp}/d" "${targetn}"/etc/{?,""}shadow{?,""}
-sed -i -e "s/\b${usertemp}\b//g" "${targetn}"/etc/gshadow{?,""}
+sed -i -e "s/\b${usertemp}\b//g" -e "s/,,\+/,/g" -e "s/: *,/:/g" -e "s/, *$//g" "${targetn}"/etc/gshadow{?,""}
 
 if [ -d "${targetn}"/home/"$usertemp" ];then
   rm -r "${targetn}"/home/"$usertemp"
