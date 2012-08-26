@@ -125,6 +125,7 @@ do
     "--dest")clonetarget="$(realpath "$2")"; shift;;
     "--copyuser")copyusertarget="$2"; shift;;
     "--adduser")addusertarget="$2"; shift;;
+    #will be modified to add --editfstab before payload
     "--editfstab")editfstabtarget="$2"; shift;;
     "--installinstaller")installinstallertarget2="$2"; shift;;
     "--bootloader")bootloadertarget="$2"; shift;;
@@ -251,9 +252,10 @@ installer(){
 "$editfstabtarget" \
 "$bootloadertarget" \
 "$installinstallertarget";then
+    echo "Installation failed!"
     exit 1;
   else
-    echo "installation finished"
+    echo "Installation finished"
   fi 
 }
 
@@ -264,6 +266,7 @@ echo "Begin update"
 --src "${syncdir}/src" \
 --dest "${syncdir}/dest" \
 "$installinstallertargetne";then
+    echo "Update failed!"
     exit 1;
   else
     echo "Update finished"
