@@ -77,4 +77,4 @@ if [ -d "${targetn}"/home/"$usertemp" ];then
 fi
 # and remove email folder
 shred -u "${targetn}/var/spool/mail/${usertemp}" 2> /dev/null
-echo "email box shreded"
+echo "email box shredded"

@@ -24,15 +24,15 @@ destsys="$(realpath "$2")"
 
 
 #must run before preploopdest because these files are needed and proceeding without them makes no sense
-preploopsrc="\"$(ls "${srcsys}"/etc/{?,""}shadow 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\" \"$(ls "${srcsys}"/etc/group 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\"$(if [ -f \"${srcsys}/etc/passwd\" ]; then echo " \"${srcsys}/etc/passwd\""; fi)"
-if [ "$preploopsrc" = "\"\"\"\"" ]; then
+preploopsrc="$(basename -a  "${srcsys}"/etc/{?,""}shadow "${srcsys}"/etc/group "${srcsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')"
+if [ "$preploopsrc" = "" ]; then
   echo "\'${srcsys}\'̣’s etc folder contains no password files"
   exit 1
 fi
 
-preploopdest="\"$(ls "${destsys}"/etc/{?,""}shadow 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\" \"$(ls "${destsys}"/etc/group 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\"$(if [ -f "${destsys}"/etc/passwd ]; then echo " \"${destsys}/etc/passwd\""; fi)"
+preploopdest="$(basename -a  "${destsys}"/etc/{?,""}shadow "${destsys}"/etc/group "${destsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')"
 
-prepdestuser="\"$(ls "${destsys}"/home/ 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\""
+prepdestuser="\"$(basename -a  "${destsys}"/home/* 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\""
 
 
 #must run before copysrc loop (backups files)
