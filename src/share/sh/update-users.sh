@@ -19,18 +19,31 @@ if [ ! -e "/usr/bin/realpath" ];then
   }
 fi
 
+#because some oudated popular linux distros haven't the -a switch
+#basenamea path1 path2…
+basenamea()
+{
+  for currrentpath in "$@"
+  do
+    if [ -e "$currrentpath" ]; then
+      basename "$currrentpath"
+    fi
+  done
+}
+
+
 srcsys="$(realpath "$1")"
 destsys="$(realpath "$2")"
 
 
 #must run before preploopdest because these files are needed and proceeding without them makes no sense
-preploopsrc="$(basename -a  "${srcsys}"/etc/{?,""}shadow "${srcsys}"/etc/group "${srcsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')"
+preploopsrc="$(basenamea  "${srcsys}"/etc/{?,""}shadow "${srcsys}"/etc/group "${srcsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g')"
 if [ "$preploopsrc" = "" ]; then
-  echo "\'${srcsys}\'̣’s etc folder contains no password files"
+  echo -e "\"${srcsys}\"’s etc folder contains no password files\n"
   exit 1
 fi
 
-preploopdest="$(basename -a  "${destsys}"/etc/{?,""}shadow "${destsys}"/etc/group "${destsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')"
+preploopdest="$(basenamea  "${destsys}"/etc/{?,""}shadow "${destsys}"/etc/group "${destsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')"
 
 prepdestuser="\"$(basename -a  "${destsys}"/home/* 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\""
 
@@ -39,7 +52,7 @@ prepdestuser="\"$(basename -a  "${destsys}"/home/* 2> /dev/null | sed -e ':a' -e
 if [ "$preploopdest" != "\"\"\"\"" ]; then
   for copyfiledest in $preploopdest
   do
-    cp "${destsys}"/etc/"$copyfiledest" "${destsys}"/etc/"${copyfiledest}.oldrm"
+    mv "${destsys}"/etc/"$copyfiledest" "${destsys}"/etc/"${copyfiledest}.oldrm"
   done
 fi
 
@@ -64,6 +77,6 @@ do
       fi
     done
   fi
-  rm "${destsys}"/etc/"${copyfilesrc}.oldrm"
+  rm "${destsys}"/etc/"${copyfilesrc}.oldrm" 2> /dev/null
 done
 

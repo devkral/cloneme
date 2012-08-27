@@ -38,14 +38,13 @@ usage()
   echo "usage: cleanuser.sh <user> <targetsystem>"
   exit 1
 }
-if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" != "2" ] ;then
   usage
 fi
 
 #intern dependencies: -
 
 
-usertemp="$1"
 #use readlink -f if realpath isn't available
 if [ ! -e "/usr/bin/realpath" ];then
   realpath()
@@ -54,6 +53,8 @@ if [ ! -e "/usr/bin/realpath" ];then
     exit 0;
   }
 fi
+
+usertemp="$1"
 targetn="$(realpath "$2")"
 
 if [ "$targetn" = "" ];then
@@ -61,20 +62,25 @@ if [ "$targetn" = "" ];then
   exit 1
 fi
 
-if [ -e "$targetn"/"$usertemp" ];then
-  rm -r "$targetn"/"$usertemp"
+echo "remove home directory…"
+if [ -d "${targetn}"/home/"$usertemp" ];then
+  rm -r "${targetn}"/home/"$usertemp"
 fi
+echo "finished"
 
+if [ -e "${targetn}"/home/.ecryptfs/"$usertemp" ]; then
+  echo "remove ecryptfs user files"
+  rm -r "${targetn}"/home/.ecryptfs/"$usertemp"
+fi
 
 sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd{?,""}
 sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group{?,""}
+#never run such a command in passwd:
 sed -i -e "s/\b${usertemp}\b//g" -e "s/,,\+/,/g" -e "s/: *,/:/g" -e "s/, *$//g" "${targetn}"/etc/group{?,""}
 sed -i -e "/^${usertemp}/d" "${targetn}"/etc/{?,""}shadow{?,""}
 sed -i -e "s/\b${usertemp}\b//g" -e "s/,,\+/,/g" -e "s/: *,/:/g" -e "s/, *$//g" "${targetn}"/etc/gshadow{?,""}
 
-if [ -d "${targetn}"/home/"$usertemp" ];then
-  rm -r "${targetn}"/home/"$usertemp"
-fi
+
 # and remove email folder
 shred -u "${targetn}/var/spool/mail/${usertemp}" 2> /dev/null
 echo "email box shredded"

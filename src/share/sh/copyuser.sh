@@ -143,8 +143,13 @@ do
       exit 1
     fi
     if [ -f "${srcsys}"/var/spool/mail/"${curuser}" ]; then
-      rsync -a -A "${srcsys}"/var/spool/mail/"${curuser}" "${destsys}"/var/spool/mail/
+      rsync -a -A --delete "${srcsys}"/var/spool/mail/"${curuser}" "${destsys}"/var/spool/mail/
     fi
+    if [ -e "${srcsys}"/home/.ecryptfs/"${curuser}" ]; then
+      mkdir -p "${destsys}"/home/.ecryptfs/ 2> /dev/null
+      rsync -a -A --delete "${srcsys}"/home/.ecryptfs/"${curuser}" "${destsys}"/home/.ecryptfs/
+    fi
+    
     break
   fi
   if [ "$answer_useracc" = "e" ]; then
