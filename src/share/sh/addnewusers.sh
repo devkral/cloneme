@@ -83,7 +83,7 @@ do
       usergroupargs+="$usergroupargs,$("${sharedir}"/sh/groupexist.sh $admingroup)"
     fi
     useradd -m -U "$user_name" -p "" -R "$destsys" -G "$usergroupargs"
-    passwd -e "$user_name" -R "$destsys"
+    passwd -R "$destsys" -e "$user_name"
   fi
   if [ "$n_user" = "no" ];then
     break
