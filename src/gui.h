@@ -99,7 +99,7 @@ private:
 	//safeguards
 	bool operationlock;
 	bool partready();
-	bool islocked();
+	//bool islocked();
 	//bool lockoperation(),unlockoperation(),;
 
 	//directs to program file

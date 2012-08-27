@@ -44,7 +44,7 @@
 
 void copyuser::cleanuser()
 {
-	Glib::ustring sum=sharedir()+"/sh/cleanuser.sh "+name+" "+dest+"\n";
+	Glib::ustring sum=sharedir()+"/sh/cleanuser.sh \""+name+"\" \""+dest+"\"\n";
 	if (system(sum.c_str())==0)
 		kitcopy.quit();
 }
@@ -52,7 +52,7 @@ void copyuser::cleanuser()
 
 void copyuser::copysynchf()
 {
-	Glib::ustring sum=sharedir()+"/sh/copyuser.sh --src "+src+" --dest "+dest+" --user "+name+" --action s\n";
+	Glib::ustring sum=sharedir()+"/sh/copyuser.sh --src \""+src+"\" --dest \""+dest+"\" --user \""+name+"\" --action s\n";
 	if (system(sum.c_str())==0)
 		kitcopy.quit();
 }
@@ -67,7 +67,7 @@ void copyuser::ignoref()
 
 void copyuser::emptyf()
 {
-	Glib::ustring sum=sharedir()+"/sh/copyuser.sh --src "+src+" --dest "+dest+" --user "+name+" --action e\n";
+	Glib::ustring sum=sharedir()+"/sh/copyuser.sh --src \""+src+"\" --dest \""+dest+"\" --user \""+name+"\" --action e\n";
 	if (system(sum.c_str())==0)
 		kitcopy.quit();
 }

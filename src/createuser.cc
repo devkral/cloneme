@@ -49,9 +49,9 @@ int createuser::makeuser()
 	{
 		supplement_groups+=" wheel adm admin";
 	}
-	sum+="useradd -m -R "+dest+" -U \""+(Glib::ustring)username->get_text()+"\" -p \"\" -G $("\
+	sum+="useradd -m -R \""+dest+"\" -U \""+(Glib::ustring)username->get_text()+"\" -p \"\" -G $(\""\
 		+sharedir()+\
-		"/sh/groupexist.sh "+supplement_groups+")\n";
+		"\"/sh/groupexist.sh "+supplement_groups+")\n";
 	sum+="passwd -e \""+username->get_text()+"\"\n";
 	if (system(sum.c_str())==0)
 		username->set_text("");

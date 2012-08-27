@@ -89,6 +89,9 @@ sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 #"$sharedir"/sh/install-installer.sh "$(dirname "$0")" "$(dirname "$sharedir")"/applications/cloneme.desktop "${clonedestdir}"
 
 shall_exit=false
+mode=""
+srcsys=""
+destsys=""
 installinstallertarget=""
 addusertarget=""
 editfstab=""
@@ -110,22 +113,22 @@ do
   shift
 done
 
-if [ -n $srcsys ] || [ ! -e "$srcsys" ]; then
+if [ "$srcsys" = "" ] || [ ! -e "$srcsys" ]; then
   echo "Error: no source system specified";
   shall_exit=true;
 fi
 
-if [ -n $destsys ] || [ ! -e "$destsys" ]; then
+if [ "$destsys" = "" ] || [ ! -e "$destsys" ]; then
   echo "Error: no destination system specified";
   shall_exit=true;
 fi
 
-if [ -n $mode ]; then
+if [ "$mode" = "" ]; then
   echo "Error: no mode is specified";
   shall_exit=true;
 fi
 
-if [ -n $copyusertarget ]; then
+if [ "$copyusertarget" = "" ]; then
   echo "Error: command for copying userfiles specified";
   shall_exit=true;
 fi
@@ -163,10 +166,10 @@ copyuser()
   local usertemp
   for usertemp in $(ls "${srcsys}"/home)
   do
-    eval "$copyusertarget --src ${srcsys} --dest ${destsys} --user ${usertemp}"
+    eval "$copyusertarget --src \"${srcsys}\" --dest \"${destsys}\" --user \"${usertemp}\""
   done
   if [ "$addusertarget" != "" ]; then
-    eval "$addusertarget --dest ${destsys}"
+    eval "$addusertarget --dest \"${destsys}\""
   fi
   
 }

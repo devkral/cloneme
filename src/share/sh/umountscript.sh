@@ -137,7 +137,7 @@ umount_all()
   elif [ -d "$thingtounmount" ];then
     local umountdevice="$(grep "$thingtounmount " /proc/mounts | grep "^/" | sed -e "s/^\([^ ]\+\) [^ ]\+ .*/\1/g")"
     if [ "$umountdevice" = "" ]; then
-      echo "$mountpointt is no mountpoint"
+      echo "$thingtounmount is no mountpoint"
       exit 1
     fi
   fi

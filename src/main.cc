@@ -80,19 +80,19 @@ Glib::ustring becomeroot()
 	return (Glib::ustring)"su -c";
 };
 
-void startgui(int argc, char* argv[])
+int startgui(int argc, char* argv[])
 {
 	if (getuid()==0)
 	{
 		gui(argc,argv);
-	}
-	if (getuid()!=0)
+		return 0;
+	}else
 	{
 		Glib::ustring summary=becomeroot();
 		summary+=argv[0];
 		for (int count=1; count<argc; count++)
 			summary+=argv[count];
-		system(summary.c_str());
+		return system(summary.c_str());
 	}
 }
 
@@ -118,12 +118,12 @@ main (int argc, char *argv[])
 				break;
 			case 2: createuser(argc,argv);
 				break;
-			default: startgui(argc,argv);
+			default: return startgui(argc,argv);
 				break;
 		};
 	}
 	else
-		startgui(argc,argv);
-
+		return startgui(argc,argv);
+		
 	return 0;
 }

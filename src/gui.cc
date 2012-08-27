@@ -53,11 +53,11 @@
 //#include <cerrno>
 
 
-bool setpidlock()
+bool setpidlock(Glib::ustring lockfile)
 { 
-	if (access((syncdir()+"/cloneme.pid").c_str(),F_OK)==0)
+	if (access(lockfile.c_str(),F_OK)==0)
 	{
-		std::ifstream pidread((syncdir()+"/cloneme.pid").c_str());
+		std::ifstream pidread(lockfile.c_str());
 		char extract[25];
 		pidread.getline(extract,25);
 		Glib::ustring tempof="/proc/";
@@ -70,24 +70,24 @@ bool setpidlock()
 		}
 	}
 	//elsewise set pid and return true
-	std::ofstream pidwrite((syncdir()+"/cloneme.pid").c_str());
+	std::ofstream pidwrite(lockfile.c_str());
 	pidwrite << getpid();
 	pidwrite.close();
 	return true;
 }
 
-bool unsetpidlock()
+bool unsetpidlock(Glib::ustring lockfile)
 {
 
-	if (access((syncdir()+"/cloneme.pid").c_str(),F_OK)==0)
+	if (access(lockfile.c_str(),F_OK)==0)
 	{
-		std::ifstream pidread((syncdir()+"/cloneme.pid").c_str());
+		std::ifstream pidread(lockfile.c_str());
 		char extract[25];
 		pidread.getline(extract,25);
 
 		if ((int)getpid()==atoi(extract))
 		{
-			if(remove((syncdir()+"/cloneme.pid").c_str()) != 0 )
+			if(remove(lockfile.c_str()) != 0 )
 				std::cerr << "error: error while removing file\n";
 			else
 				return true;
@@ -101,7 +101,15 @@ bool unsetpidlock()
 		std::cerr << "debug: pidfile doesn't exist\n";
 	return false;
 }
-
+/**
+bool islocked(Glib::ustring lockfile)
+{
+	if (access(lockfile.c_str(),F_OK)==0)
+		return true;
+	else
+		return false;
+	
+}*/
 
 void gui::useeditorf()
 {
@@ -116,14 +124,7 @@ void gui::useeditorf()
 
 }
 
-bool gui::islocked()
-{
-	if (access((syncdir()+"/guilock").c_str(),F_OK)==0)
-		return true;
-	else
-		return false;
-	
-}
+
 
 /**
 bool gui::lockoperation()
@@ -188,19 +189,19 @@ void gui::update()
 {
 	if (partready()==true)
 	{
-		if (islocked()==false)
+		if (setpidlock(syncdir()+"/guilock.pid")==true)
 		{
-			Glib::ustring sum="echo 1 > "+syncdir()+"/guilock\n";
+			Glib::ustring sum="";
 			sum+=sharedir()+"/sh/rsyncci.sh ";
 			sum+="--mode update ";
-			sum+="--src "+syncdir()+"/src ";
-			sum+="--dest "+syncdir()+"/dest ";
+			sum+="--src \""+syncdir()+"\"/src ";
+			sum+="--dest \""+syncdir()+"\"/dest ";
 			sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
 //doesn't work
 //			if (useeditor->get_active ())
 //				sum+="--editfstab \""+editortouse->get_text()+"\" ";
 			sum+="\n";
-			sum+="rm "+syncdir()+"/guilock\n";
+			sum+="rm \""+syncdir()+"\"/guilock.pid\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		}
 	}
@@ -210,20 +211,20 @@ void gui::install()
 {
 	if (partready()==true)
 	{
-		if (islocked()==false)
+		if (setpidlock(syncdir()+"/guilock.pid")==true)
 		{
 			Glib::ustring sum="";
 			sum+=sharedir()+"/sh/rsyncci.sh ";
 			sum+="--mode install ";
-			sum+="--src "+syncdir()+"/src ";
-			sum+="--dest "+syncdir()+"/dest ";
+			sum+="--src \""+syncdir()+"\"/src ";
+			sum+="--dest \""+syncdir()+"\"/dest ";
 			sum+="--adduser \""+bindir()+"/cloneme --createuser\" ";
 			sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
 			if (useeditor->get_active ())
 				sum+="--editfstab \""+editortouse->get_text()+"\" ";
 			sum+="--exec \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
 			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest\"\n";
-			sum+="rm "+syncdir()+"/guilock\n";
+			sum+="rm \""+syncdir()+"\"/guilock.pid\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		}
 	}
@@ -258,10 +259,10 @@ bool gui::updatedsrc(void*)
 {
 	if (operationlock==false && src->get_text()!="")
 	{
-		if (system2(sharedir()+"/sh/mountscript.sh needpart "+src->get_text())=="false")
+		if (system2(sharedir()+"/sh/mountscript.sh needpart \""+src->get_text()+"\"")=="false")
 		{
 			sourcepart->hide();
-			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" "+syncdir()+"/src";
+			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount \""+src->get_text()+"\" \""+syncdir()+"\"/src";
 			if ( system(sum.c_str())==0)
 				is_mounteds=true;
 		} else
@@ -284,7 +285,7 @@ bool gui::updatedsrcpart(void*)
 {
 	if (operationlock==false && partnumbsrc->get_text()!="")
 	{
-		Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+src->get_text()+" p"+partnumbsrc->get_text()+" "+syncdir()+"/src";
+		Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount \""+src->get_text()+"\" p"+partnumbsrc->get_text()+" \""+syncdir()+"\"/src";
 		if ( system(sum.c_str())==0)
 			is_mounteds=true;
 	}
@@ -295,10 +296,10 @@ bool gui::updateddest(void*)
 {
 	if (operationlock==false && dest->get_text()!="")
 	{
-		if (system2(sharedir()+"/sh/mountscript.sh needpart "+dest->get_text())=="false")
+		if (system2(sharedir()+"/sh/mountscript.sh needpart \""+dest->get_text()+"\"")=="false")
 		{
 			destpart->hide();
-			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" "+syncdir()+"/dest";
+			Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount \""+dest->get_text()+"\" \""+syncdir()+"\"/dest";
 			if ( system(sum.c_str())==0)
 				is_mountedd=true;
 		}else
@@ -322,7 +323,7 @@ bool gui::updateddestpart(void*)
 {
 	if (operationlock==false && partnumbdest->get_text()!="")
 	{
-		Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount "+dest->get_text()+" p"+partnumbdest->get_text()+" "+syncdir()+"/dest";
+		Glib::ustring sum=sharedir()+"/sh/mountscript.sh mount \""+dest->get_text()+"\" p"+partnumbdest->get_text()+" \""+syncdir()+"\"/dest";
 		if ( system(sum.c_str())==0)
 			is_mountedd=true;
 	}
@@ -332,12 +333,13 @@ bool gui::updateddestpart(void*)
 gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filechoosedest()//
 {
 	//initialize syncdir
-	if (system((sharedir()+"/sh/prepsyncscript.sh "+syncdir()+"\n").c_str())!=0)
+	if (system((sharedir()+"/sh/prepsyncscript.sh \""+syncdir()+"\"\n").c_str())!=0)
 		throw (-1);
-	if (setpidlock()==false)
+	if (setpidlock(syncdir()+"/cloneme.pid")==false)
 		throw (-1);
 	is_mountedd=false;
 	is_mounteds=false;
+	threadpart=0;
 	//kit=Gtk::Application::create(argc, argv,"org.gtkmm.cloneme.main");
 	
 	//lock for preserving src and dest positions
@@ -443,9 +445,9 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 gui::~gui()
 {
 	//cleanup
-	system(("rm "+syncdir()+"/guilock 2> /dev/null").c_str());
-	if (unsetpidlock())
-		system((sharedir()+"/sh/umountsyncscript.sh "+syncdir()+"\n").c_str());
+	unsetpidlock(syncdir()+"/guilock.pid");
+	if (unsetpidlock(syncdir()+"/cloneme.pid"))
+		system((sharedir()+"/sh/umountsyncscript.sh \""+syncdir()+"\"\n").c_str());
 	if (threadpart!=0)
 		threadpart->join();
 }

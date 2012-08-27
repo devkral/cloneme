@@ -2,8 +2,12 @@
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkWindow" id="copyuser_win">
+    <property name="visible">True</property>
     <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="window_position">center</property>
     <property name="icon">icon.png</property>
+    <property name="urgency_hint">True</property>
     <child>
       <object class="GtkGrid" id="grid3">
         <property name="visible">True</property>
@@ -116,6 +120,9 @@
   </object>
   <object class="GtkWindow" id="explaination">
     <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="transient_for">copyuser_win</property>
     <child>
       <object class="GtkGrid" id="grid5">
         <property name="visible">True</property>
@@ -127,7 +134,7 @@
             <property name="label" translatable="yes">This option don't even create an empty userfolder.
 Its purpose is to copy a system without a specific user
 even without obvious traces
-Things where the user will be killed:
+Things where the user will be eradicated from:
 /etc/passwd
 /etc/passwd-
 /etc/group
@@ -308,7 +315,7 @@ Things where the user will be killed:
     </child>
     <child>
       <object class="GtkButton" id="explain">
-        <property name="label" translatable="yes">Explaination</property>
+        <property name="label" translatable="yes">Explain</property>
         <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>

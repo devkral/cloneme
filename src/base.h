@@ -67,7 +67,7 @@ inline Glib::ustring sharedir()
 }
 inline Glib::ustring bindir()
 {
-	if (access(PACKAGE_BIN_DIR,F_OK)==0)
+	if (access(((Glib::ustring)PACKAGE_BIN_DIR+(Glib::ustring)"/cloneme").c_str(),F_OK)==0)
 		return (Glib::ustring)PACKAGE_BIN_DIR;
 	else
 		return (Glib::ustring)"./src";
