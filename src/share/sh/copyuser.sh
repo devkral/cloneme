@@ -120,10 +120,8 @@ do
     else
       if [ -d "${srcsys}"/home/"${curuser}" ]; then
         echo -e "Copy user account. Type \"s\""
-      fi
-      echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
-      if [ -d "${srcsys}"/home/"${curuser}" ]; then
-        echo -e "Go on without copying the user account. Type \"i\""  
+        echo -e "Create empty user account (with the same password and permissions as the existing one). Type \"e\""
+        echo -e "Go on without copying the user account. Type \"i\""
       else
         echo -e "Go on. Type \"i\""
       fi
@@ -165,6 +163,11 @@ do
     fi
     # and remove email folder
     shred -u "${destsys}/var/spool/mail/${curuser}" 2> /dev/null
+    break
+    # and remove ecryptfs user files if available
+    if [ -e "${destsys}"/home/.ecryptfs/"${curuser}" ]; then
+      rm -r "${destsys}"/home/.ecryptfs/"${curuser}"/.Private/*
+    fi
     break
   fi
 

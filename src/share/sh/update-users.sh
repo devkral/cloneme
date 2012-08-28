@@ -43,13 +43,13 @@ if [ "$preploopsrc" = "" ]; then
   exit 1
 fi
 
-preploopdest="$(basenamea  "${destsys}"/etc/{?,""}shadow "${destsys}"/etc/group "${destsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')"
+preploopdest="$(basenamea  "${destsys}"/etc/{?,""}shadow "${destsys}"/etc/group "${destsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g')"
 
 prepdestuser="\"$(basename -a  "${destsys}"/home/* 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\""
 
 
 #must run before copysrc loop (backups files)
-if [ "$preploopdest" != "\"\"\"\"" ]; then
+if [ "$preploopdest" != "" ]; then
   for copyfiledest in $preploopdest
   do
     mv "${destsys}"/etc/"$copyfiledest" "${destsys}"/etc/"${copyfiledest}.oldrm"
@@ -60,7 +60,7 @@ fi
 for copyfilesrc in $preploopsrc
 do
   cp "${srcsys}"/etc/"$copyfilesrc" "${destsys}"/etc/
-  if [ -f "${destsys}"/etc/"${copyfilesrc}.oldrm" ] && [ "$prepdestuser" != "\"\"" ]; then
+  if [ -f "${destsys}"/etc/"${copyfilesrc}.oldrm" ] && [ "$prepdestuser" != "" ]; then
     for destuser in $prepdestuser
     do
       # check if user is already in file
