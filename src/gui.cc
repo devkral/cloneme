@@ -222,7 +222,7 @@ void gui::install()
 			sum+="--copyuser \""+bindir()+"/cloneme --copyuser\" ";
 			if (useeditor->get_active ())
 				sum+="--editfstab \""+editortouse->get_text()+"\" ";
-			sum+="--exec \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
+			sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
 			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest\"\n";
 			sum+="rm \""+syncdir()+"\"/guilock.pid\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
