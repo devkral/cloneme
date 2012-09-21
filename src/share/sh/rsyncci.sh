@@ -203,7 +203,11 @@ installer()
   
   if [ -f "${destsys}"/etc/fstab ];then
     local tempprobefstab="$("$sharedir"/sh/devicefinder.sh uuid "${destsys}")"
-    local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobe}\1/" "${destsys}"/etc/fstab)"
+    if [ "$tempprobefstab" = "" ]; then
+      echo "tempprobefstab is empty. Something went wrong. Exit!"
+      exit 1
+    fi
+    local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobefstab}\1/" "${destsys}"/etc/fstab)"
     echo "$tempsed" > "${destsys}"/etc/fstab
     echo "root in fstab updated"
     if [ -n "$editfstabtarget" ]; then
