@@ -53,6 +53,9 @@ if [ ! -e "/usr/bin/realpath" ];then
     exit 0;
   }
 fi
+
+echo "install installer files…"
+
 #dir where the cloneme files are located
 sharedir="$(dirname "$(dirname "$(realpath "$0")")")"
 
@@ -96,4 +99,4 @@ if [ "$linkdir" != "" ];then
   cp "$linkdir"/cloneme.desktop "$targetdir$linkdir"
 fi
 
-
+echo "install-installer: finished"

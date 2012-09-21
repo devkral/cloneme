@@ -31,10 +31,10 @@ basenamea()
   done
 }
 
+echo "update user password files…"
 
 srcsys="$(realpath "$1")"
 destsys="$(realpath "$2")"
-
 
 #must run before preploopdest because these files are needed and proceeding without them makes no sense
 preploopsrc="$(basenamea  "${srcsys}"/etc/{?,""}shadow "${srcsys}"/etc/group "${srcsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g')"
@@ -56,7 +56,6 @@ if [ "$preploopdest" != "" ]; then
   done
 fi
 
-
 for copyfilesrc in $preploopsrc
 do
   cp "${srcsys}"/etc/"$copyfilesrc" "${destsys}"/etc/
@@ -66,7 +65,7 @@ do
       # check if user is already in file
       if ! grep "^$destuser" "${destsys}"/etc/"${copyfilesrc}"; then
         #should be just one line
-        grep "^$destuser" "${destsys}"/etc/"${copyfilesrc}.oldrm" > "${destsys}"/etc/"${copyfilesrc}"
+        grep "^$destuser" "${destsys}"/etc/"${copyfilesrc}.oldrm" >> "${destsys}"/etc/"${copyfilesrc}" 2> /dev/null
       fi
       if echo "${copyfilesrc}" | grep "group" > /dev/null || echo "${copyfilesrc}" | grep "gshadow" > /dev/null; then
       #not saved via \" but should work anyway
@@ -79,4 +78,4 @@ do
   fi
   rm "${destsys}"/etc/"${copyfilesrc}.oldrm" 2> /dev/null
 done
-
+echo "update-users.sh: finished"

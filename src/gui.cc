@@ -65,7 +65,7 @@ bool setpidlock(Glib::ustring lockfile)
 		std::cerr << "Debug: " << tempof << std::endl;
 		if (access(tempof.c_str(),F_OK)==0)
 		{
-			std::cerr << "cloneme gui runs already. abort\n";
+			std::cerr << "An other instance is running already. Stop.\n";
 			return false;
 		}
 	}
@@ -94,11 +94,13 @@ bool unsetpidlock(Glib::ustring lockfile)
 		}
 		else
 		{
-			std::cerr << "Error: an other cloneme service is running. Don't unmount!\n";
+			std::cerr << "Error: an other instance is running. Don't unmount!\n";
 		}
 	}
 	else
-		std::cerr << "debug: pidfile doesn't exist\n";
+	{
+		std::cerr << "debug: pidfile: " <<  lockfile << " doesn't exist\n";
+	}
 	return false;
 }
 /**
@@ -445,7 +447,8 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 gui::~gui()
 {
 	//cleanup
-	unsetpidlock(syncdir()+"/guilock.pid");
+	if (access((syncdir()+"/guilock.pid").c_str(),F_OK)==0)
+		unsetpidlock(syncdir()+"/guilock.pid");
 	if (unsetpidlock(syncdir()+"/cloneme.pid"))
 		system((sharedir()+"/sh/umountsyncscript.sh \""+syncdir()+"\"\n").c_str());
 	if (threadpart!=0)

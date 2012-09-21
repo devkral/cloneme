@@ -180,7 +180,10 @@ updater()
     echo "error: rsync could not sync"
     exit 1
   fi
-  "$sharedir"/sh/update-users.sh "${srcsys}" "${destsys}"
+  if ! "$sharedir"/sh/update-users.sh "${srcsys}" "${destsys}"; then
+    echo "error in update-users.sh; exit!"
+    exit 1
+  fi
   copyuser
   if [ "$installinstallertarget" != "" ]; then
     eval "$installinstallertarget"
@@ -193,7 +196,10 @@ installer()
     echo "error: rsync could not sync"
     exit 1
   fi
-  "$sharedir"/sh/update-users.sh "${srcsys}" "${destsys}"
+  if ! "$sharedir"/sh/update-users.sh "${srcsys}" "${destsys}"; then
+    echo "error in update-users.sh; exit!"
+    exit 1
+  fi
   
   if [ -f "${destsys}"/etc/fstab ];then
     local tempprobefstab="$("$sharedir"/sh/devicefinder.sh uuid "${destsys}")"
