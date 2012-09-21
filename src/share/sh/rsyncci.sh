@@ -64,7 +64,7 @@ usage()
   echo "general options:"
   echo "  --installinstaller <target> optional (default: skip):"
   echo "      use target prog to install installer"
-
+  
   exit 1
 }
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then

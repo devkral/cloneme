@@ -247,7 +247,6 @@ installer(){
 --mode install \
 --src "$syncdir"/src \
 --dest "$syncdir"/dest \
---dest "$syncdir"/dest \
 --adduser "$addusertarget" \
 --copyuser "$copyusertarget" \
 "$editfstabtarget" \
@@ -266,7 +265,7 @@ echo "Begin update"
 --mode update \
 --src "${syncdir}/src" \
 --dest "${syncdir}/dest" \
-"$installinstallertargetne";then
+--copyuser "$copyusertarget" "$installinstallertargetne";then
     echo "Update failed!"
     exit 1;
   else
