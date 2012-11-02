@@ -50,7 +50,7 @@
 //#  include <libintl.h>
 //#endif
 
-
+/**
 bool comparechar(char *r1, char *r2)
 {
 	if (r1==NULL||r2==NULL)
@@ -61,7 +61,7 @@ bool comparechar(char *r1, char *r2)
 		else
 			return false;
 
-}
+}*/
 
 
 
