@@ -34,23 +34,39 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 usage()
-  echo "usage: groupexist.sh group1 group2 …"
+{
+  echo "usage: groupexist.sh <destsys> group1 group2 …"
   echo "returns all existing groups (which are specified via args) commaseparated"
   echo "exit 2 if a group doesn't exist; exit 0 when every group exist"
   exit 1
 }
-if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$#" = "0" ] ;then
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ $# -le 1 ] ;then
   usage
 fi
 #intern dependencies: -
 
+#use readlink -f if realpath isn't available
+if [ ! -e "/usr/bin/realpath" ];then
+  realpath()
+  {
+    echo "$(readlink -f "$1")"
+    exit 0;
+  }
+fi
+
+if [ "$1" = "/" ]; then
+  dest=""
+else
+  dest="$(realpath "$1")"
+fi
+shift 1
 
 missing_group=false
 existing_groups=""
 
 for curgroup in "$@"
 do
-  if grep -e "$curgroup" /etc/group > /dev/null; then
+  if grep -e "$curgroup" "$dest"/etc/group > /dev/null; then
     existing_groups="$existing_groups$curgroup,"
   else
     missing_group=true

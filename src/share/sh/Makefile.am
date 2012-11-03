@@ -20,4 +20,5 @@ supportscripts_SCRIPTS = \
 	rsyncci.sh \
 	umountscript.sh \
 	umountsyncscript.sh \
-	update-users.sh
+	update-users.sh \
+	usersaddroot.sh

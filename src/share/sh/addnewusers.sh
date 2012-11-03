@@ -80,10 +80,9 @@ do
     echo "Shall this user account have admin (can change to root) permissions? [yes] default: no"
     read admin_perm
     if [ "$admin_perm" = "yes" ];then
-      usergroupargs+="$usergroupargs,$("${sharedir}"/sh/groupexist.sh $admingroup)"
+      usergroupargs+="$usergroupargs,$("${sharedir}"/sh/groupexist.sh "$destsys" $admingroup)"
     fi
-    useradd -m -U "$user_name" -p "" -R "$destsys" -G "$usergroupargs"
-    passwd -R "$destsys" -e "$user_name"
+    "$sharedir/useraddroot.sh" "$destsys" "$usergroupargs" "$user_name"
   fi
   if [ "$n_user" = "no" ];then
     break
