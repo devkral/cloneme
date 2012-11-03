@@ -79,6 +79,9 @@ echo "finished"
 #add bootflag
 echo "Now add bootflag to the partition (needed to boot with some mainboards e.g. thinkpad)"
 parted -s "${getdevice}" set $getpartition boot on
+#try to hide from windows
+echo "Now add hiddenflag to the partition (needed to survive windows)"
+parted -s "${getdevice}" set $getpartition hidden on
 #
 
 

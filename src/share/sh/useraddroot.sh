@@ -115,4 +115,4 @@ else
   cp -r "$destsys/etc/skel" "$destsys/home/${uname}"
 fi
 
-
+exit 0

@@ -223,7 +223,8 @@ installer()
   if [ "$installinstallertarget" != "" ]; then
     eval "$installinstallertarget"
   fi
-#optional add bootflag to partition target dir is on (thinkpad boot) This should be done in the bootloader script.
+#optional add "boot" flag to partition target dir is on (thinkpad boot) This should be done in the bootloader script.
+#optional add "hidden" flag to partition target dir is on (survive windows) This should be done in the bootloader script.
   if [ "$bootloadertarget" != "" ]; then
     eval "$bootloadertarget"
   fi
