@@ -21,4 +21,4 @@ supportscripts_SCRIPTS = \
 	umountscript.sh \
 	umountsyncscript.sh \
 	update-users.sh \
-	usersaddroot.sh
+	useraddroot.sh
