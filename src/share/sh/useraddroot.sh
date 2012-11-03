@@ -98,7 +98,9 @@ else
   echo "Debug: /etc/shadow, /etc/gshadow, /etc/passwd and/or /etc/group doesn't exist"
   if [ ! -e "$destsys/etc/" ]; then
     echo "Debug: create /etc directory"
-    mkdir "$destsys/etc/"
+    if ! mkdir "$destsys/etc/"; then
+      exit 1
+    fi
   fi
   
   update_files
@@ -110,9 +112,13 @@ if [ -e "$destsys/home/${uname}" ]; then
 else
   if [ ! -e "$destsys/home/" ]; then
     echo "Debug: create /home directory"
-    mkdir "$destsys/home/"
+    if ! mkdir "$destsys/home/"; then
+      exit 1
+    fi
   fi
-  cp -r "$destsys/etc/skel" "$destsys/home/${uname}"
+  if ! cp -r "$destsys/etc/skel" "$destsys/home/${uname}"; then
+    exit 1
+  fi
 fi
 
 exit 0
