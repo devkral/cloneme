@@ -49,7 +49,7 @@ int createuser::makeuser()
 	{
 		supplement_groups+=" wheel adm admin";
 	}
-	sum+=sharedir()+"/useraddroot.sh \""+dest+"\" $(\""+sharedir()+\
+	sum+=sharedir()+"/sh/useraddroot.sh \""+dest+"\" $(\""+sharedir()+\
 		"\"/sh/groupexist.sh \""+dest+"\" "+supplement_groups+") "+username->get_text()+"\n";
 	if (system(sum.c_str())==0)
 		username->set_text("");
