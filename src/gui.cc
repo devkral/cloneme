@@ -94,7 +94,16 @@ bool unsetpidlock(Glib::ustring lockfile)
 		}
 		else
 		{
-			std::cerr << "Error: an other instance is running. Don't unmount!\n";
+			//remove stall pidfile
+			std::string procdirfile="/proc/";
+			procdirfile+=extract;
+			if (access(procdirfile.c_str(),F_OK)!=0)
+				if(remove(lockfile.c_str()) != 0 )
+					std::cerr << "error: error while removing file\n";
+				else
+					return true;
+			else
+				std::cerr << "Error: an other instance is running. Don't unmount!\n";
 		}
 	}
 	else
