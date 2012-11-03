@@ -1,7 +1,10 @@
 
 Limitation: can copy just one partition
 Limitation: copying system must compatible to the system you copy with for bootloader
+Limitation: hide flag badly supported by parted (not with mbr tables+a bit with gpt tables)
 
+
++use a better command than parted
 less important:
 
 +++run less parts as root
