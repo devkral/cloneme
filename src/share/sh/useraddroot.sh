@@ -75,14 +75,14 @@ uname="$3"
 #update files (shadow, passwd, gshadow, group)
 update_files()
 {
-  echo "${uname}:!:0:0:99999:7:::" >> "$destsys"/etc/shadow
+  echo "${uname}::0:0:99999:7:::" >> "$destsys"/etc/shadow
   echo "${uname}:x::${ugroups}" >> "$destsys"/etc/gshadow
   counter=1000
   while grep ":${counter}:" "$destsys"/etc/passwd > /dev/null 2> /dev/null && grep ":${counter}:" "$destsys"/etc/group > /dev/null  2> /dev/null
   do
     ((counter+=1))
   done
-  echo "${uname}:x:${counter}:${counter}::/home/${uname}:/bin/bash" >> "$destsys"/etc/passwd
+  echo "${uname}:x:${counter}:${counter}:${uname}:/home/${uname}:/bin/bash" >> "$destsys"/etc/passwd
   echo "${uname}:x:${counter}:${ugroups}" >> "$destsys"/etc/group
 }
 
