@@ -13,6 +13,7 @@ Makefile.in*
 # needed keep it
 !Makefile.am
 
+/mkinstalldirs
 
 /Debug
 
@@ -34,3 +35,5 @@ Makefile.in*
 /missing
 /config.*
 /ltmain.sh
+
+
