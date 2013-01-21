@@ -176,10 +176,11 @@ copyuser()
  
 updater()
 {
-  if ! rsync -a -A --progress --delete --exclude "/etc/fstab" --exclude "/run/*" --exclude "/var/spool/mail/*" --exclude "/etc/passwd" --exclude "/etc/passwd?"  --exclude "/etc/group" --exclude "/etc/group?" --exclude "/etc/shadow" --exclude "/etc/shadow?" --exclude "/etc/gshadow" --exclude "/etc/gshadow?" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys}"/* "${destsys}" ; then
+  if ! rsync -a -A --progress --delete --exclude "/etc/fstab" --exclude "/run/*" --exclude "/var/spool/mail/*" --exclude "/etc/passwd" --exclude "/etc/passwd?"  --exclude "/etc/group" --exclude "/etc/group?" --exclude "/etc/shadow" --exclude "/etc/shadow?" --exclude "/etc/gshadow" --exclude "/etc/gshadow?" --exclude "/etc/NetworkManager/system-connections/*" --exclude "/boot/grub/grub.cfg" --exclude "/boot/grub/device.map" --exclude "${dest}" --exclude "/home/*" --exclude "/sys/*" --exclude "/dev/*" --exclude "/proc/*" --exclude "/var/log/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/var/run/*" --exclude "/var/tmp/*" "${srcsys}"/* "${destsys}" ; then
     echo "error: rsync could not sync"
     exit 1
   fi
+  
   if ! "$sharedir"/sh/update-users.sh "${srcsys}" "${destsys}"; then
     echo "error in update-users.sh; exit!"
     exit 1

@@ -67,15 +67,15 @@ bool comparechar(char *r1, char *r2)
 
 Glib::ustring becomeroot()
 {
-	
-	if ( access("/usr/bin/gksudo",F_OK)==0)
-			return (std::string)"gksudo -k ";
+	//cause polkit is bugged letting me not getting root rights breaks after a short time
+	//if ( access("/usr/bin/pkexec",F_OK)==0)
+	//		return (Glib::ustring)"/usr/bin/pkexec ";
 			
-	if ( access("/usr/bin/gksu",F_OK)==0)
-			return (std::string)"gksu -S -k ";
+	if ( access("/usr/bin/gksudo",F_OK)==0)
+			return (Glib::ustring)"gksu -S -k ";
 
 	if ( access("/usr/bin/sudo",F_OK)==0)
-			return (std::string)"sudo -E ";
+			return (Glib::ustring)"sudo -E ";
 	
 	return (Glib::ustring)"su -c";
 };
