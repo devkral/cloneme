@@ -73,11 +73,11 @@ if [ -e "${targetn}"/home/.ecryptfs/"$usertemp" ]; then
   rm -r "${targetn}"/home/.ecryptfs/"$usertemp"
 fi
 
-sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd{?,""}
-sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group{?,""}
+sed -i -e "/^${usertemp}/d" "${targetn}"/etc/passwd? "${targetn}"/etc/passwd
+sed -i -e "/^${usertemp}/d" "${targetn}"/etc/group? "${targetn}"/etc/group
 #never run such a command in passwd:
 sed -i -e "s/\b${usertemp}\b//g" -e "s/,,\+/,/g" -e "s/: *,/:/g" -e "s/, *$//g" "${targetn}"/etc/group{?,""}
-sed -i -e "/^${usertemp}/d" "${targetn}"/etc/{?,""}shadow{?,""}
+sed -i -e "/^${usertemp}/d" "${targetn}"/etc/?shadow? "${targetn}"/etc/?shadow "${targetn}"/etc/shadow? "${targetn}"/etc/shadow
 sed -i -e "s/\b${usertemp}\b//g" -e "s/,,\+/,/g" -e "s/: *,/:/g" -e "s/, *$//g" "${targetn}"/etc/gshadow{?,""}
 
 
