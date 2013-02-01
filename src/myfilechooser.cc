@@ -42,10 +42,10 @@
 void myfilechooser::selectedfilef()
 {
 	fcdialog->hide();
-	path=fcwidget->get_preview_filename();
+	path=fcwidget->get_preview_file();
 	if (adopedentry==true)
 	{
-		adopedentry->set_text(path);
+		adopedentry->set_text(path->get_path());
 		adopedentry->grab_focus ();
 	}
 }
@@ -53,11 +53,10 @@ void myfilechooser::selectedfilef()
 void myfilechooser::currentfolderf()
 {
 	fcdialog->hide();
-	path=fcwidget->get_current_folder ();
-	
+	path=fcwidget->get_preview_file()->get_parent();
 	if (adopedentry==true)
 	{
-		adopedentry->set_text(path);
+		adopedentry->set_text(path->get_path());
 		adopedentry->grab_focus ();
 	}
 }
@@ -65,7 +64,7 @@ void myfilechooser::currentfolderf()
 void myfilechooser::cancelchoosef()
 {
 	fcdialog->hide();
-	path="";
+	path=Gio::File::create_for_path("");
 }
 
 
@@ -74,14 +73,14 @@ void myfilechooser::cancelchoosef()
 void myfilechooser::run(Glib::RefPtr<Gtk::Entry> &temp)
 {
 	adopedentry=temp;
-	if (path!="")
-		fcwidget->set_current_folder(path);
+	if (path->get_path()!="")
+		fcwidget->set_current_folder_file(path);
 	fcdialog->show();
 }
 
 myfilechooser::myfilechooser()
 {
-	path="";
+	path=Gio::File::create_for_path("");
 	builder2 = Gtk::Builder::create();
 	try
 	{

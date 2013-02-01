@@ -67,7 +67,7 @@ bool comparechar(char *r1, char *r2)
 
 Glib::ustring becomeroot()
 {
-	//cause polkit is bugged letting me not getting root rights breaks after a short time
+	//because polkit is bugged
 	//if ( access("/usr/bin/pkexec",F_OK)==0)
 	//		return (Glib::ustring)"/usr/bin/pkexec ";
 			

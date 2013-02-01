@@ -63,7 +63,7 @@ private:
 	//added special buttons
 	Glib::RefPtr<Gtk::Button>selectedfile,currentfolder,cancelchoose;
 	
-	Glib::ustring path;
+	Glib::RefPtr<Gio::File> path;
 	//ease the life
 	//Glib::ustring lastdir;
 
