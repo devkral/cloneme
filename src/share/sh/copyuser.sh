@@ -154,6 +154,7 @@ do
     rm -r "${destsys}"/home/"${curuser}"
     mkdir -p "${destsys}"/home/"${curuser}"
     #
+    #FIXME: should use id instead because not working in target system
     if grep "${curuser}" "${srcsys}"/etc/passwd > /dev/null;then
       chown "${curuser}" "${destsys}"/home/"${curuser}"
       #chown group
