@@ -208,12 +208,14 @@ installer()
       echo "tempprobefstab is empty. Something went wrong. Exit!"
       exit 1
     fi
-    local tempsed="$(sed -e "s/.\+\( \/ .\+\)/UUID=${tempprobefstab}\1/" "${destsys}"/etc/fstab)"
-    echo "$tempsed" > "${destsys}"/etc/fstab
+    sed -i -e "/^#/! s/.\+\( \/ .\+\)/UUID=${tempprobefstab}\1/" "${destsys}"/etc/fstab
     echo "root in fstab updated"
-    if [ -n "$editfstabtarget" ]; then
+    if [ "$editfstabtarget" -ne "" ]; then
       echo "Open fstab with $editfstabtarget"
       eval "$editfstabtarget" "${destsys}"/etc/fstab
+    elif [[ "$(sed "s/#.*//"  "${destsys}"/etc/fstab | grep -c " / ")" -ne "1" ]] ; then
+      echo "Error: multiple occurrences of / (rootsystem) please fix"
+      $EDITOR "${destsys}"/etc/fstab
     fi
   else
     echo "no fstab found"

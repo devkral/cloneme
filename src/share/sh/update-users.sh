@@ -43,28 +43,23 @@ if [ "$preploopsrc" = "" ]; then
   exit 1
 fi
 
-preploopdest="$(basenamea  "${destsys}"/etc/{?,""}shadow "${destsys}"/etc/group "${destsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g')"
+preploopdest="$(basenamea  "${destsys}"/etc/?shadow "${destsys}"/etc/shadow "${destsys}"/etc/group "${destsys}"/etc/passwd 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g')"
 
 prepdestuser="\"$(basename -a  "${destsys}"/home/* 2> /dev/null | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\" \"/g')\""
 
 
-#must run before copysrc loop (backups files)
-if [ "$preploopdest" != "" ]; then
-  for copyfiledest in $preploopdest
-  do
-    mv "${destsys}"/etc/"$copyfiledest" "${destsys}"/etc/"${copyfiledest}.oldrm"
-  done
-fi
-
 for copyfilesrc in $preploopsrc
 do
-  cp "${srcsys}"/etc/"$copyfilesrc" "${destsys}"/etc/
+  #copy
+  #use relaxed attributes, which need to be enforced for secret files like shadow
+  install -b -S .oldrm -g 0 -o 0 -m 755 "${srcsys}"/etc/"$copyfilesrc" "${destsys}"/etc/
   if [ -f "${destsys}"/etc/"${copyfilesrc}.oldrm" ] && [ "$prepdestuser" != "" ]; then
     for destuser in $prepdestuser
     do
       # check if user is already in file
+      #should be just one match
       if ! grep "^$destuser" "${destsys}"/etc/"${copyfilesrc}"; then
-        #should be just one line
+        #should be just one match
         grep "^$destuser" "${destsys}"/etc/"${copyfilesrc}.oldrm" >> "${destsys}"/etc/"${copyfilesrc}" 2> /dev/null
       fi
       if echo "${copyfilesrc}" | grep "group" > /dev/null || echo "${copyfilesrc}" | grep "gshadow" > /dev/null; then
@@ -74,8 +69,14 @@ do
           sed -i -e "/${destuser}/! s/^\($curgroup.*\)$/\1,${destuser}/g" "${destsys}"/etc/"${copyfilesrc}"
         done
       fi
+  
     done
   fi
+  #fix permissions  copyfilesrc is ok
+  if echo "${copyfilesrc}" | grep -q "shadow"; then
+    chmod 700 "${destsys}"/etc/"${copyfilesrc}"
+  fi
+  
   rm "${destsys}"/etc/"${copyfilesrc}.oldrm" 2> /dev/null
 done
 echo "update-users.sh: finished"
