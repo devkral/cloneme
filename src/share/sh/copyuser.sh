@@ -154,14 +154,15 @@ do
     rm -r "${destsys}"/home/"${curuser}"
     mkdir -p "${destsys}"/home/"${curuser}"
     cp -R "${srcsys}"/etc/skel/* "${destsys}"/home/"${curuser}"
-    #if destsys have already passwd file
+    
+    #if destsys haven't got a passwd file use the one of the source
     if [ ! -e "${destsys}"/etc/passwd ]; then
       echo "Debug: no passwd file available on destsys; use source sys instead"
-      userid="$(sed "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${srcsys}"/etc/passwd 2> /dev/null)" 
-      groupid="$(sed "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${srcsys}"/etc/group 2> /dev/null)" 
+      userid="$(sed -n "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${srcsys}"/etc/passwd 2> /dev/null)" 
+      groupid="$(sed -n "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${srcsys}"/etc/group 2> /dev/null)" 
     else
-      userid="$(sed "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${destsys}"/etc/passwd 2> /dev/null)" 
-      groupid="$(sed "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${destsys}"/etc/group 2> /dev/null)"     
+      userid="$(sed -n "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${destsys}"/etc/passwd 2> /dev/null)" 
+      groupid="$(sed -n "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${destsys}"/etc/group 2> /dev/null)"     
     fi
     
     if [[ "$userid" != "" ]] && [[ "$groupid" != "" ]]; then
