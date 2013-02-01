@@ -200,7 +200,7 @@ void gui::update()
 {
 	if (partready()==true)
 	{
-		if (setpidlock(syncdir()+"/guilock.pid")==true)
+		if (setpidlock(syncdir()+"/cloneme-lock.pid")==true)
 		{
 			Glib::ustring sum="";
 			sum+=sharedir()+"/sh/rsyncci.sh ";
@@ -212,7 +212,7 @@ void gui::update()
 //			if (useeditor->get_active ())
 //				sum+="--editfstab \""+editortouse->get_text()+"\" ";
 			sum+="\n";
-			sum+="rm \""+syncdir()+"\"/guilock.pid\n";
+			sum+="rm \""+syncdir()+"\"/cloneme-lock.pid\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		}
 	}
@@ -222,7 +222,7 @@ void gui::install()
 {
 	if (partready()==true)
 	{
-		if (setpidlock(syncdir()+"/guilock.pid")==true)
+		if (setpidlock(syncdir()+"/cloneme-lock.pid")==true)
 		{
 			Glib::ustring sum="";
 			sum+=sharedir()+"/sh/rsyncci.sh ";
@@ -235,7 +235,7 @@ void gui::install()
 				sum+="--editfstab \""+editortouse->get_text()+"\" ";
 			sum+="--installinstaller \""+sharedir()+"/sh/install-installer.sh "+bindir()+" $(dirname "+sharedir()+")/applications/ "+syncdir()+"/dest\" ";
 			sum+="--bootloader \""+sharedir()+"/sh/grub-installer_phase_1.sh "+syncdir()+"/dest\"\n";
-			sum+="rm \""+syncdir()+"\"/guilock.pid\n";
+			sum+="rm \""+syncdir()+"\"/cloneme-lock.pid\n";
 			vte_terminal_feed_child (VTE_TERMINAL(vteterm),sum.c_str(),sum.length());
 		}
 	}
@@ -346,7 +346,7 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 	//initialize syncdir
 	if (system((sharedir()+"/sh/prepsyncscript.sh \""+syncdir()+"\"\n").c_str())!=0)
 		throw (-1);
-	if (setpidlock(syncdir()+"/cloneme.pid")==false)
+	if (setpidlock(syncdir()+"/cloneme-gui.pid")==false)
 		throw (-1);
 	is_mountedd=false;
 	is_mounteds=false;
@@ -456,9 +456,9 @@ gui::gui(int argc, char** argv): kitdeprecated(argc,argv),filechoosesrc(),filech
 gui::~gui()
 {
 	//cleanup
-	if (access((syncdir()+"/guilock.pid").c_str(),F_OK)==0)
-		unsetpidlock(syncdir()+"/guilock.pid");
-	if (unsetpidlock(syncdir()+"/cloneme.pid"))
+	if (access((syncdir()+"/cloneme-gui.pid").c_str(),F_OK)==0)
+		unsetpidlock(syncdir()+"/cloneme-lock.pid");
+	if (unsetpidlock(syncdir()+"/cloneme-gui.pid"))
 		system((sharedir()+"/sh/umountsyncscript.sh \""+syncdir()+"\"\n").c_str());
 	if (threadpart!=0)
 		threadpart->join();

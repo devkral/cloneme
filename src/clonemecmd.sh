@@ -184,30 +184,30 @@ pidcreate()
 #needed for pid
 "$sharedir"/sh/prepsyncscript.sh "${syncdir}"
 #just one instance can run simultanous
-if [ ! -e "$syncdir/cloneme.pid" ]; then
-  echo "$$" > "$syncdir/cloneme.pid"
+if [ ! -e "$syncdir/cloneme-lock.pid" ]; then
+  echo "$$" > "$syncdir/cloneme-lock.pid"
 else
-  if [ -d "/proc/$(cat "$syncdir/cloneme.pid")" ]; then
+  if [ -d "/proc/$(cat "$syncdir/cloneme-lock.pid")" ]; then
     echo "an other instance is running, abort!"
     exit 1;
   else
-    echo "$$" > "$syncdir/cloneme.pid"
+    echo "$$" > "$syncdir/cloneme-lock.pid"
   fi
 fi
 }
 
 pidremove()
 {
-if [ ! -e "$syncdir/cloneme.pid" ]; then
+if [ ! -e "$syncdir/cloneme-lock.pid" ]; then
   echo "error: missing pidfile"
-elif [ ! -f "$syncdir/cloneme.pid" ]; then
-  echo -e "error: \"$syncdir/cloneme.pid\" is not a file\n"
+elif [ ! -f "$syncdir/cloneme-lock.pid" ]; then
+  echo -e "error: \"$syncdir/cloneme-lock.pid\" is not a file\n"
 else
-  if [ "$(cat "$syncdir/cloneme.pid")" != "$$" ]; then
+  if [ "$(cat "$syncdir/cloneme-lock.pid")" != "$$" ]; then
     echo "an other instance is running, abort!"
     exit 1;
   else
-    rm "$syncdir/cloneme.pid"
+    rm "$syncdir/cloneme-lock.pid"
   fi
 fi
 #cleanup syncdir
