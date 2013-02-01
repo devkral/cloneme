@@ -67,7 +67,7 @@ bool comparechar(char *r1, char *r2)
 
 Glib::ustring becomeroot()
 {
-	//because polkit is bugged
+	//because polkit is bugged (closes itself with the meassage: password incorrect)
 	//if ( access("/usr/bin/pkexec",F_OK)==0)
 	//		return (Glib::ustring)"/usr/bin/pkexec ";
 			

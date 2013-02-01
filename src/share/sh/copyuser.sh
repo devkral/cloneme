@@ -153,15 +153,25 @@ do
   if [ "$answer_useracc" = "e" ]; then
     rm -r "${destsys}"/home/"${curuser}"
     mkdir -p "${destsys}"/home/"${curuser}"
-    #
-    #FIXME: should use id instead because not working in target system
-    if grep "${curuser}" "${srcsys}"/etc/passwd > /dev/null;then
-      chown "${curuser}" "${destsys}"/home/"${curuser}"
-      #chown group
-      if grep "${curuser}" "${srcsys}"/etc/group > /dev/null;then
-        chown "${curuser}:${curuser}" "${destsys}"/home/"${curuser}"
-      fi
+    cp -R "${srcsys}"/etc/skel/* "${destsys}"/home/"${curuser}"
+    #if destsys have already passwd file
+    if [ ! -e "${destsys}"/etc/passwd ]; then
+      echo "Debug: no passwd file available on destsys; use source sys instead"
+      userid="$(sed "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${srcsys}"/etc/passwd 2> /dev/null)" 
+      groupid="$(sed "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${srcsys}"/etc/group 2> /dev/null)" 
+    else
+      userid="$(sed "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${destsys}"/etc/passwd 2> /dev/null)" 
+      groupid="$(sed "/^${curuser}/ s/^[^:]*:[^:]*:\([^:]*\):.*$/\1/g p" "${destsys}"/etc/group 2> /dev/null)"     
     fi
+    
+    if [[ "$userid" != "" ]] && [[ "$groupid" != "" ]]; then
+      chown "${userid}:${groupid}" "${destsys}"/home/"${curuser}"
+    elif [[ "$userid" != "" ]]; then
+      chown "${userid}" "${destsys}"/home/"${curuser}"
+    else
+      echo "Error: no user id found"
+    fi
+
     # and remove email folder
     shred -u "${destsys}/var/spool/mail/${curuser}" 2> /dev/null
     break
