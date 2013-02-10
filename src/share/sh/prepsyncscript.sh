@@ -56,11 +56,17 @@ fi
 if [ "$1" != "" ]; then
   syncdir="$(realpath "$1")"
 else
-  echo "error: no mountpoint specified"
+  echo "error: no syncdir specified"
   exit 1
 fi
 
+
 mkdir -p "${syncdir}"/src
 mkdir -p "${syncdir}"/dest
+mkdir -p "${syncdir}"/tmpmount
+mkdir -p "${syncdir}"/transferdir
 
+
+chmod 700 "${syncdir}"/transferdir
+chown 0:0 "${syncdir}"/transferdir
 

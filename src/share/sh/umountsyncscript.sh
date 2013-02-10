@@ -59,7 +59,8 @@ syncdir="$(realpath "$1")"
 
 "$sharedir"/sh/umountscript.sh "rm" "${syncdir}"/src
 "$sharedir"/sh/umountscript.sh "rm" "${syncdir}"/dest
-
+"$sharedir"/sh/umountscript.sh "rm" "${syncdir}"/tmpmount
+rm -R "${syncdir}"/transferdir
 
 #delete if exist
 if [ -d "${syncdir}" ]; then 
